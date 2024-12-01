@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="ascendant_mobs"
+version="1.0.0"
+displayName="Ascendant Mobs"
+displayURL="https://meherbensalem.github.io"
+logoFile="logo.png"
+credits="no credits"
+authors="NAIZO"
+description="In this mod, every mob has the potential to grow stronger, smarter, and more dangerous as they gain levels"
+
+# Start of user code block mod configuration
+# End of user code block mod configuration
+
+[[dependencies.ascendant_mobs]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="AFTER"
+    side="BOTH"
+
+
+
+
+# Start of user code block dependencies configuration
+# End of user code block dependencies configuration

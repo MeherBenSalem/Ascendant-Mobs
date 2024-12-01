@@ -1,0 +1,28 @@
+/summon pig
+/gamemode creative
+/summon minecraft:pig
+/tp 99999 ~ ~
+/summon minecraft:pig
+/setblock ~ ~ ~ minecraft:end_portal
+/setblock ~ ~ ~ minecraft:nether_portal
+/tp 99999 ~ ~
+/gamemode survival
+/kill @e[type=minecraft:piglin]
+/gamemode creative
+/locate structure ascendant_mobs:loot_station_one
+/tp @s -1920 ~ -800
+/gamemode creative
+/tp @s -1920 ~ -800
+/locate structure ascendant_mobs:loot_station_one
+/gamemode creative
+/tp @s 1712 ~ -2800
+/locate structure ascendant_mobs:loot_station_one
+/gamemode creative
+/tp @s -64 ~ -544
+/time set night
+/gamemode survival
+/locate structure ascendant_mobs:loot_station_one
+/gamemode creative
+/tp @s -2304 ~ 800
+/time set midnight
+/time set day

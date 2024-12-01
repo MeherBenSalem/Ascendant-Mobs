@@ -1,0 +1,30 @@
+
+["Distance Scale Settings"]
+	#Recommended over 25 000
+	scale_distance = 55000.0
+	#The scale type can be 'vertical' , 'horizontal' , 'both', 'random' or 'MOTP'
+	scale_type = "both"
+	day_factor = 1.0
+
+["Mobs Levels Settings"]
+	base_level = 0.0
+	scale_factor = 0.5
+	#Mods after a cartain level get random buffs 
+	random_effects = true
+	#[1-200]
+	ascendant_effects_min_level = 25.0
+	#[1-100]
+	ascendant_effects_chance = 3.5
+	ascendant_loot_table = "minecraft:chests/end_city_treasure"
+
+["Ingame Overlay Settings"]
+	display_lvl_name = true
+
+["Scale Factors"]
+	damage_modifier = 5.0
+	health_modifier = 5.0
+	protection_modifier = 5.0
+	speed_modifier = 0.3
+	xp_modfier = 5.0
+	min_speed = 0.1
+
