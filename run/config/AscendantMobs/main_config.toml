@@ -14,17 +14,15 @@
 	#[1-200]
 	ascendant_effects_min_level = 25.0
 	#[1-100]
-	ascendant_effects_chance = 3.5
+	ascendant_effects_chance = 0.5
 	ascendant_loot_table = "minecraft:chests/end_city_treasure"
 
 ["Ingame Overlay Settings"]
 	display_lvl_name = true
 
 ["Scale Factors"]
-	damage_modifier = 5.0
 	health_modifier = 5.0
-	protection_modifier = 5.0
-	speed_modifier = 0.3
+	damage_modifier = 5.0
 	xp_modfier = 5.0
-	min_speed = 0.1
+	scaling_factors = ["[base]1[baseEnd][modifier]2[modifierEnd][max]30[maxEnd][cmd]attribute @s minecraft:generic.armor base set {value}"]
 

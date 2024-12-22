@@ -2,6 +2,8 @@ package tn.mbs.ascendantmobs.configuration;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.List;
+
 public class MobsLevelsMainConfigConfiguration {
 	public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 	public static final ForgeConfigSpec SPEC;
@@ -15,12 +17,10 @@ public class MobsLevelsMainConfigConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_CHANCE;
 	public static final ForgeConfigSpec.ConfigValue<String> ASCENDANT_LOOT_TABLE;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> DISPLAY_LVL_NAME;
-	public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_MODIFIER;
 	public static final ForgeConfigSpec.ConfigValue<Double> HEALTH_MODIFIER;
-	public static final ForgeConfigSpec.ConfigValue<Double> PROTECTION_MODIFIER;
-	public static final ForgeConfigSpec.ConfigValue<Double> SPEED_MODIFIER;
+	public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_MODIFIER;
 	public static final ForgeConfigSpec.ConfigValue<Double> XP_MODFIER;
-	public static final ForgeConfigSpec.ConfigValue<Double> MIN_SPEED;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> SCALING_FACTORS;
 	static {
 		BUILDER.push("Distance Scale Settings");
 		SCALE_DISTANCE = BUILDER.comment("Recommended over 25 000").define("scale_distance", (double) 55000);
@@ -39,12 +39,10 @@ public class MobsLevelsMainConfigConfiguration {
 		DISPLAY_LVL_NAME = BUILDER.define("display_lvl_name", true);
 		BUILDER.pop();
 		BUILDER.push("Scale Factors");
-		DAMAGE_MODIFIER = BUILDER.define("damage_modifier", (double) 5);
 		HEALTH_MODIFIER = BUILDER.define("health_modifier", (double) 5);
-		PROTECTION_MODIFIER = BUILDER.define("protection_modifier", (double) 5);
-		SPEED_MODIFIER = BUILDER.define("speed_modifier", (double) 0.3);
+		DAMAGE_MODIFIER = BUILDER.define("damage_modifier", (double) 5);
 		XP_MODFIER = BUILDER.define("xp_modfier", (double) 5);
-		MIN_SPEED = BUILDER.define("min_speed", (double) 0.1);
+		SCALING_FACTORS = BUILDER.defineList("scaling_factors", List.of("[base]1[baseEnd][modifier]0.3[modifierEnd][max]30[maxEnd][cmd]attribute @s minecraft:generic.armor base set {value}"), entry -> true);
 		BUILDER.pop();
 
 		SPEC = BUILDER.build();

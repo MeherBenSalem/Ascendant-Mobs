@@ -26,3 +26,4 @@
 /tp @s -2304 ~ 800
 /time set midnight
 /time set day
+/gamemode creative

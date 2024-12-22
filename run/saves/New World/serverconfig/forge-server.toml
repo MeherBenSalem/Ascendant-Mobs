@@ -15,6 +15,6 @@
 	zombieBabyChance = 0.05
 	#The permission handler used by the server. Defaults to forge:default_handler if no such handler with that name is registered.
 	permissionHandler = "forge:default_handler"
-	#Fix advancement loading to use a proper topological sort. This may have visibility side-effects and can thus be turned off if needed for data-pack compatibility.
-	fixAdvancementLoading = true
+	#Set this to true to enable advertising the dedicated server to local LAN clients so that it shows up in the Multiplayer screen automatically.
+	advertiseDedicatedServerToLan = true
 

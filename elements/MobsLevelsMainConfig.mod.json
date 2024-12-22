@@ -203,23 +203,6 @@
             "numberField": 5.0,
             "textDefault": "",
             "comment": "",
-            "vardisplay": "damage_modifier",
-            "varname": "damage_modifier",
-            "enablecomment": false,
-            "stringlist": []
-          },
-          {
-            "item": {
-              "value": ""
-            },
-            "silkTouchMode": 1,
-            "block": {
-              "value": ""
-            },
-            "logicField": 0,
-            "numberField": 5.0,
-            "textDefault": "",
-            "comment": "",
             "vardisplay": "health_modifier",
             "varname": "health_modifier",
             "enablecomment": false,
@@ -237,25 +220,8 @@
             "numberField": 5.0,
             "textDefault": "",
             "comment": "",
-            "vardisplay": "protection_modifier",
-            "varname": "protection_modifier",
-            "enablecomment": false,
-            "stringlist": []
-          },
-          {
-            "item": {
-              "value": ""
-            },
-            "silkTouchMode": 1,
-            "block": {
-              "value": ""
-            },
-            "logicField": 0,
-            "numberField": 0.3,
-            "textDefault": "",
-            "comment": "",
-            "vardisplay": "speed_modifier",
-            "varname": "speed_modifier",
+            "vardisplay": "damage_modifier",
+            "varname": "damage_modifier",
             "enablecomment": false,
             "stringlist": []
           },
@@ -280,18 +246,20 @@
             "item": {
               "value": ""
             },
-            "silkTouchMode": 1,
+            "silkTouchMode": 5,
             "block": {
               "value": ""
             },
             "logicField": 0,
-            "numberField": 0.1,
+            "numberField": 0.0,
             "textDefault": "",
             "comment": "",
-            "vardisplay": "min_speed",
-            "varname": "min_speed",
+            "vardisplay": "scaling_factors",
+            "varname": "scaling_factors",
             "enablecomment": false,
-            "stringlist": []
+            "stringlist": [
+              "[base]1[baseEnd][modifier]0.3[modifierEnd][max]30[maxEnd][cmd]attribute @s minecraft:generic.armor base set {value}"
+            ]
           }
         ]
       }
