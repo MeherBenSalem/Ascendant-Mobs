@@ -24,5 +24,5 @@
 	health_modifier = 5.0
 	damage_modifier = 5.0
 	xp_modfier = 5.0
-	scaling_factors = ["[base]1[baseEnd][modifier]2[modifierEnd][max]30[maxEnd][cmd]attribute @s minecraft:generic.armor base set {value}"]
+	scaling_factors = ["[base]1[baseEnd][modifier]0.3[modifierEnd][max]30[maxEnd][cmd]attribute @s minecraft:generic.armor base set {value}"]
 

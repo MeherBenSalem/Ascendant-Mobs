@@ -23,7 +23,7 @@ public class GetMaxLevelFromConfigProcedure {
 						}
 						return 0;
 					}
-				}.convert(stringiterator.substring(4, 7));
+				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[max]") + 5), (int) stringiterator.indexOf("[maxEnd]")));
 				break;
 			}
 		}

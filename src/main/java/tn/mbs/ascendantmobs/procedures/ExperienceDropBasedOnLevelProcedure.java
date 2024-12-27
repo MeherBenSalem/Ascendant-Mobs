@@ -1,9 +1,7 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -13,7 +11,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
 
@@ -34,12 +31,6 @@ public class ExperienceDropBasedOnLevelProcedure {
 		if (entity == null)
 			return;
 		if (entity.getPersistentData().getBoolean("am_level")) {
-			for (String stringiterator : MobsListConfigConfiguration.DEATH_MESSAGES.get()) {
-				if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator)) {
-					if (!world.isClientSide() && world.getServer() != null)
-						world.getServer().getPlayerList().broadcastSystemMessage(Component.literal((entity.getDisplayName().getString() + " was killed")), false);
-				}
-			}
 			if (world instanceof ServerLevel _level)
 				_level.addFreshEntity(new ExperienceOrb(_level, x, y, z, (int) Math.floor(entity.getPersistentData().getDouble("am_lvl") * (double) MobsLevelsMainConfigConfiguration.XP_MODFIER.get())));
 		}

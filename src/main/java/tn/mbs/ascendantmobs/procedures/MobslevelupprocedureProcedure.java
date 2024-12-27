@@ -11,14 +11,12 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
@@ -52,7 +50,7 @@ public class MobslevelupprocedureProcedure {
 		double maxValue = 0;
 		double value = 0;
 		if (!(entity instanceof ServerPlayer || entity instanceof Player)) {
-			if (entity.getPersistentData().getBoolean("am_level") || CanGetLevelProcedureProcedure.execute(entity)) {
+			if (entity.getPersistentData().getBoolean("AM_mobs_level") || CanGetLevelProcedureProcedure.execute(entity)) {
 				return;
 			}
 			lockedLevel = LockedMobsProcedureProcedure.execute(entity);
@@ -130,19 +128,8 @@ public class MobslevelupprocedureProcedure {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			if (MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && !(entity.getDisplayName().getString()).contains("[Lv.")) {
-				if (entity.getPersistentData().getBoolean("am_leader")) {
-					entity.setCustomName(Component.literal(("\u00A74[Lv." + new java.text.DecimalFormat("##").format(level) + "] \u00A7eLeader " + entity.getDisplayName().getString())));
-				} else if (entity instanceof LivingEntity _livEnt39 && _livEnt39.getMobType() == MobType.ILLAGER || entity instanceof LivingEntity _livEnt40 && _livEnt40.getMobType() == MobType.UNDEAD) {
-					entity.setCustomName(Component.literal(("\u00A74[Lv." + new java.text.DecimalFormat("##").format(level) + "] \u00A7f" + entity.getDisplayName().getString())));
-				} else if (entity instanceof LivingEntity _livEnt43 && _livEnt43.getMobType() == MobType.WATER) {
-					entity.setCustomName(Component.literal(("\u00A71[Lv." + new java.text.DecimalFormat("##").format(level) + "] \u00A7f" + entity.getDisplayName().getString())));
-				} else {
-					entity.setCustomName(Component.literal(("\u00A72[Lv." + new java.text.DecimalFormat("##").format(level) + "] \u00A7f" + entity.getDisplayName().getString())));
-				}
-			}
-			entity.getPersistentData().putBoolean("am_level", true);
-			entity.getPersistentData().putDouble("am_lvl", level);
+			entity.getPersistentData().putBoolean("AM_mobs_level", true);
+			entity.getPersistentData().putDouble("AM_mobs_level", level);
 		}
 	}
 }

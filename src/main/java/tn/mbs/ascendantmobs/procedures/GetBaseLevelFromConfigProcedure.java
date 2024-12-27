@@ -23,7 +23,7 @@ public class GetBaseLevelFromConfigProcedure {
 						}
 						return 0;
 					}
-				}.convert(stringiterator.substring(0, 3));
+				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[min]") + 5), (int) stringiterator.indexOf("[minEnd]")));
 				break;
 			}
 		}

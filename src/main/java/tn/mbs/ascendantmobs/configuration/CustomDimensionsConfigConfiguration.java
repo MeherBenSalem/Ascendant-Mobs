@@ -10,9 +10,8 @@ public class CustomDimensionsConfigConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSIONS_SETTINGS;
 	static {
 		BUILDER.push("Custom Dimensions Config");
-		DIMENSIONS_SETTINGS = BUILDER
-				.comment("(min/max/dimensionName) Make sure levels are written in 3 digits, e.g. (005/010/twilightforest:twilight_forest) in this example, you will limit the spawning level for the twilight forest to level 5 and level 10.")
-				.defineList("dimensions_settings", List.of("000/075/minecraft:overworld", "050/100/minecraft:the_nether", "100/200/minecraft:the_end", "020/050/the_bumblezone:the_bumblezone", "005/010/twilightforest:twilight_forest"), entry -> true);
+		DIMENSIONS_SETTINGS = BUILDER.defineList("dimensions_settings", List.of("[min]0[minEnd][max]75[maxEnd]minecraft:overworld", "[min]50[minEnd][max]100[maxEnd]minecraft:the_nether", "[min]100[minEnd][max]200[maxEnd]minecraft:the_end",
+				"[min]20[minEnd][max]50[maxEnd]the_bumblezone:the_bumblezone", "[min]5[minEnd][max]10[maxEnd]twilightforest:twilight_forest"), entry -> true);
 		BUILDER.pop();
 
 		SPEC = BUILDER.build();
