@@ -1,6 +1,7 @@
 ascendant_mobs.mcreator
 .gradle
 .mcreator
+.eclipse
 .settings
 bin
 elements
