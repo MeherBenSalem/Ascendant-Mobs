@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "tn.mbs.ascendantmobs.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mixins.ascendant_mobs.refmap.json",
+  "mixins": [],
+  "client": [],
+  "minVersion": "0.8"
+}
