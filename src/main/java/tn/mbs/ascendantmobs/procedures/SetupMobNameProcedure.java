@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 @Mod.EventBusSubscriber
 public class SetupMobNameProcedure {
 	@SubscribeEvent
-	public static void onEntitySpawned(EntityJoinLevelEvent event) {
+	public static void onEntityJoin(EntityJoinLevelEvent event) {
 		execute(event, event.getEntity());
 	}
 
@@ -39,7 +39,7 @@ public class SetupMobNameProcedure {
 		double modifier = 0;
 		double maxValue = 0;
 		double value = 0;
-		if (MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && !(entity.getDisplayName().getString()).contains("[Lv.") && entity.getPersistentData().getDouble("AM_mobs_level") > 0) {
+		if (MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && !(entity.getDisplayName().getString()).contains("[Lv.")) {
 			entity.setCustomName(Component.literal(("\u00A72[Lv." + Math.round(entity.getPersistentData().getDouble("AM_mobs_level")) + "] \u00A7f" + entity.getDisplayName().getString())));
 		}
 	}

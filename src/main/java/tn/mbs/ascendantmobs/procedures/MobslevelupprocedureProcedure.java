@@ -50,7 +50,7 @@ public class MobslevelupprocedureProcedure {
 		double maxValue = 0;
 		double value = 0;
 		if (!(entity instanceof ServerPlayer || entity instanceof Player)) {
-			if (entity.getPersistentData().getBoolean("AM_mobs_level") || CanGetLevelProcedureProcedure.execute(entity)) {
+			if (entity.getPersistentData().getDouble("AM_mobs_level") > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
 				return;
 			}
 			lockedLevel = LockedMobsProcedureProcedure.execute(entity);
@@ -128,7 +128,6 @@ public class MobslevelupprocedureProcedure {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			entity.getPersistentData().putBoolean("AM_mobs_level", true);
 			entity.getPersistentData().putDouble("AM_mobs_level", level);
 		}
 	}
