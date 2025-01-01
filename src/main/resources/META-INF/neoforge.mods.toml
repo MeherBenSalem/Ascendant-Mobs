@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[4,)"
+loaderVersion="[2,)"
 license="All Rights Reserved"
 
 [[mods]]
@@ -18,14 +18,14 @@ description="In this mod, every mob has the potential to grow stronger, smarter,
 [[dependencies.ascendant_mobs]]
     modId="neoforge"
     type="required"
-    versionRange="[21.1.1,)"
+    versionRange="[20.6.117,)"
     ordering="AFTER"
     side="BOTH"
 
 [[dependencies.ascendant_mobs]]
     modId="minecraft"
     type="required"
-    versionRange="[1.21.1]"
+    versionRange="[1.20.6]"
     ordering="AFTER"
     side="BOTH"
 

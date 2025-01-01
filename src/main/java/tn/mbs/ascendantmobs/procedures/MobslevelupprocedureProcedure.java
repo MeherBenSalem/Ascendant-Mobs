@@ -17,6 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
@@ -50,7 +51,7 @@ public class MobslevelupprocedureProcedure {
 		double maxValue = 0;
 		double value = 0;
 		if (!(entity instanceof ServerPlayer || entity instanceof Player)) {
-			if (entity.getPersistentData().getDouble("AM_mobs_level") > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
+			if (entity.getPersistentData().getDouble("am_level") > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
 				return;
 			}
 			lockedLevel = LockedMobsProcedureProcedure.execute(entity);
@@ -128,7 +129,10 @@ public class MobslevelupprocedureProcedure {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			entity.getPersistentData().putDouble("AM_mobs_level", level);
+			if (!(MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && (entity.getDisplayName().getString()).contains("[Lv."))) {
+				entity.setCustomName(Component.literal(("\u00A72[Lv." + Math.round(level) + "] \u00A7r" + entity.getDisplayName().getString())));
+			}
+			entity.getPersistentData().putDouble("am_level", level);
 		}
 	}
 }
