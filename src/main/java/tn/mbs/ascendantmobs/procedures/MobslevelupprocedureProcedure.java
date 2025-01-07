@@ -4,10 +4,10 @@ import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 
 import org.checkerframework.checker.units.qual.s;
 
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +23,7 @@ import net.minecraft.commands.CommandSource;
 
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class MobslevelupprocedureProcedure {
 	@SubscribeEvent
 	public static void onEntitySpawned(EntityJoinLevelEvent event) {

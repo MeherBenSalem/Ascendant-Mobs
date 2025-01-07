@@ -4,9 +4,8 @@ import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
 
 import org.checkerframework.checker.units.qual.s;
 
-import net.minecraftforge.registries.ForgeRegistries;
-
 import net.minecraft.world.entity.Entity;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class LockedMobsProcedureProcedure {
 	public static double execute(Entity entity) {
@@ -15,7 +14,7 @@ public class LockedMobsProcedureProcedure {
 		double level = 0;
 		level = -1;
 		for (String stringiterator : MobsListConfigConfiguration.LOCKED_MOBS.get()) {
-			if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator.substring(4))) {
+			if ((BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()).equals(stringiterator.substring(4))) {
 				level = new Object() {
 					double convert(String s) {
 						try {

@@ -22,9 +22,9 @@ public class GetBestSpawnParamCmdProcedure {
 				_player.displayClientMessage(Component.literal("\u00A74[Debug] \u00A7fscale_type is set to \u00A74MOTP"), false);
 		} else {
 			if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("vertical")) {
-				spawnlocation = Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
+				spawnlocation = Math.pow(entity.getY() - world.getLevelData().getSpawnPos().getY(), 2);
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("horizontal")) {
-				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2);
+				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getSpawnPos().getX(), 2) + Math.pow(entity.getZ() - world.getLevelData().getSpawnPos().getZ(), 2);
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("time")) {
 				if (entity instanceof Player _player && !_player.level().isClientSide())
 					_player.displayClientMessage(Component.literal("\u00A74[Debug] \u00A7fscale_type is set to \u00A74time"), false);
@@ -32,7 +32,7 @@ public class GetBestSpawnParamCmdProcedure {
 				if (entity instanceof Player _player && !_player.level().isClientSide())
 					_player.displayClientMessage(Component.literal("\u00A74[Debug] \u00A7fscale_type is set to \u00A74random"), false);
 			} else {
-				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2) + Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
+				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getSpawnPos().getX(), 2) + Math.pow(entity.getZ() - world.getLevelData().getSpawnPos().getZ(), 2) + Math.pow(entity.getY() - world.getLevelData().getSpawnPos().getY(), 2);
 			}
 		}
 		if (entity instanceof Player _player && !_player.level().isClientSide())

@@ -1,26 +1,27 @@
 package tn.mbs.ascendantmobs.configuration;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
 public class MobsLevelsMainConfigConfiguration {
-	public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-	public static final ForgeConfigSpec SPEC;
-	public static final ForgeConfigSpec.ConfigValue<Double> SCALE_DISTANCE;
-	public static final ForgeConfigSpec.ConfigValue<String> SCALE_TYPE;
-	public static final ForgeConfigSpec.ConfigValue<Double> DAY_FACTOR;
-	public static final ForgeConfigSpec.ConfigValue<Double> BASE_LEVEL;
-	public static final ForgeConfigSpec.ConfigValue<Double> SCALE_FACTOR;
-	public static final ForgeConfigSpec.ConfigValue<Boolean> RANDOM_EFFECTS;
-	public static final ForgeConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_LEVEL;
-	public static final ForgeConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_CHANCE;
-	public static final ForgeConfigSpec.ConfigValue<String> ASCENDANT_LOOT_TABLE;
-	public static final ForgeConfigSpec.ConfigValue<Boolean> DISPLAY_LVL_NAME;
-	public static final ForgeConfigSpec.ConfigValue<Double> HEALTH_MODIFIER;
-	public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_MODIFIER;
-	public static final ForgeConfigSpec.ConfigValue<Double> XP_MODFIER;
-	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> SCALING_FACTORS;
+	public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+	public static final ModConfigSpec SPEC;
+
+	public static final ModConfigSpec.ConfigValue<Double> SCALE_DISTANCE;
+	public static final ModConfigSpec.ConfigValue<String> SCALE_TYPE;
+	public static final ModConfigSpec.ConfigValue<Double> DAY_FACTOR;
+	public static final ModConfigSpec.ConfigValue<Double> BASE_LEVEL;
+	public static final ModConfigSpec.ConfigValue<Double> SCALE_FACTOR;
+	public static final ModConfigSpec.ConfigValue<Boolean> RANDOM_EFFECTS;
+	public static final ModConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_LEVEL;
+	public static final ModConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_CHANCE;
+	public static final ModConfigSpec.ConfigValue<String> ASCENDANT_LOOT_TABLE;
+	public static final ModConfigSpec.ConfigValue<Boolean> DISPLAY_LVL_NAME;
+	public static final ModConfigSpec.ConfigValue<Double> HEALTH_MODIFIER;
+	public static final ModConfigSpec.ConfigValue<Double> DAMAGE_MODIFIER;
+	public static final ModConfigSpec.ConfigValue<Double> XP_MODFIER;
+	public static final ModConfigSpec.ConfigValue<List<? extends String>> SCALING_FACTORS;
 	static {
 		BUILDER.push("Distance Scale Settings");
 		SCALE_DISTANCE = BUILDER.comment("Recommended over 25 000").define("scale_distance", (double) 55000);
