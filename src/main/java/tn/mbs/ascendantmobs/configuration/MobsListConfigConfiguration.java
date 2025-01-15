@@ -1,17 +1,17 @@
 package tn.mbs.ascendantmobs.configuration;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
 
 public class MobsListConfigConfiguration {
-	public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
-	public static final ModConfigSpec SPEC;
+	public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final ForgeConfigSpec SPEC;
 
-	public static final ModConfigSpec.ConfigValue<List<? extends String>> BANNED;
-	public static final ModConfigSpec.ConfigValue<Boolean> DEATH_MESSAGES;
-	public static final ModConfigSpec.ConfigValue<List<? extends String>> LOCKED_MOBS;
-	public static final ModConfigSpec.ConfigValue<List<? extends String>> CAN_BE_ASCENDANT;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BANNED;
+	public static final ForgeConfigSpec.ConfigValue<Boolean> DEATH_MESSAGES;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> LOCKED_MOBS;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CAN_BE_ASCENDANT;
 	static {
 		BUILDER.push("Blacklist");
 		BANNED = BUILDER.comment("write the registry name of the entities").defineList("banned", List.of(" "), entry -> true);

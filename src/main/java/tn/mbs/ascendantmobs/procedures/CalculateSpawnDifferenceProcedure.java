@@ -2,7 +2,7 @@ package tn.mbs.ascendantmobs.procedures;
 
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.ModList;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.Entity;
@@ -21,15 +21,15 @@ public class CalculateSpawnDifferenceProcedure {
 			}
 		} else {
 			if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("vertical")) {
-				spawnlocation = Math.pow(entity.getY() - world.getLevelData().getSpawnPos().getY(), 2);
+				spawnlocation = Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("horizontal")) {
-				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getSpawnPos().getX(), 2) + Math.pow(entity.getZ() - world.getLevelData().getSpawnPos().getZ(), 2);
+				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2);
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("time")) {
 				return Math.floor((world.dayTime() / 24000) / (double) MobsLevelsMainConfigConfiguration.DAY_FACTOR.get());
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("random")) {
 				return Mth.nextInt(RandomSource.create(), (int) GetBaseLevelFromConfigProcedure.execute(world), (int) GetMaxLevelFromConfigProcedure.execute(world));
 			} else {
-				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getSpawnPos().getX(), 2) + Math.pow(entity.getZ() - world.getLevelData().getSpawnPos().getZ(), 2) + Math.pow(entity.getY() - world.getLevelData().getSpawnPos().getY(), 2);
+				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2) + Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
 			}
 		}
 		return Math.floor(spawnlocation / (double) MobsLevelsMainConfigConfiguration.SCALE_DISTANCE.get());

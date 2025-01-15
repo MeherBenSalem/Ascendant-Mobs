@@ -2,8 +2,9 @@ package tn.mbs.ascendantmobs.procedures;
 
 import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
 
+import net.minecraftforge.registries.ForgeRegistries;
+
 import net.minecraft.world.entity.Entity;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 public class IsMobCanAscendantProcedure {
 	public static boolean execute(Entity entity) {
@@ -12,7 +13,7 @@ public class IsMobCanAscendantProcedure {
 		boolean canBeBoss = false;
 		canBeBoss = false;
 		for (String stringiterator : MobsListConfigConfiguration.CAN_BE_ASCENDANT.get()) {
-			if ((BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()).equals(stringiterator)) {
+			if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator)) {
 				canBeBoss = true;
 			}
 		}

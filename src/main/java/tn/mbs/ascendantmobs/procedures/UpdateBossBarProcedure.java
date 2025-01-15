@@ -1,9 +1,9 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.bus.api.Event;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
@@ -13,11 +13,11 @@ import net.minecraft.commands.CommandSource;
 
 import javax.annotation.Nullable;
 
-@EventBusSubscriber
+@Mod.EventBusSubscriber
 public class UpdateBossBarProcedure {
 	@SubscribeEvent
-	public static void onEntityAttacked(LivingDamageEvent.Post event) {
-		if (event.getEntity() != null) {
+	public static void onEntityAttacked(LivingHurtEvent event) {
+		if (event != null && event.getEntity() != null) {
 			execute(event, event.getEntity());
 		}
 	}

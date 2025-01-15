@@ -1,13 +1,15 @@
 package tn.mbs.ascendantmobs.procedures;
 
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
+import tn.mbs.ascendantmobs.AscendantMobsMod;
 
 import org.checkerframework.checker.units.qual.s;
 
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.bus.api.Event;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
@@ -17,13 +19,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
 import javax.annotation.Nullable;
 
-@EventBusSubscriber
+@Mod.EventBusSubscriber
 public class MobslevelupprocedureProcedure {
 	@SubscribeEvent
 	public static void onEntitySpawned(EntityJoinLevelEvent event) {
@@ -37,20 +40,16 @@ public class MobslevelupprocedureProcedure {
 	private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
 		if (entity == null)
 			return;
-		String dimensionName = "";
-		String mobType = "";
-		String cmd = "";
+		String attribute = "";
+		String mobRegistry = "";
 		double level = 0;
-		double health = 0;
-		double attack_damage = 0;
 		double baseLevel = 0;
 		double maxLevel = 0;
 		double lockedLevel = 0;
-		double baseValue = 0;
-		double modifier = 0;
 		double maxValue = 0;
 		double value = 0;
-		if (!(entity instanceof ServerPlayer || entity instanceof Player)) {
+		double currentValue = 0;
+		if (entity instanceof LivingEntity && !(entity instanceof ServerPlayer || entity instanceof Player)) {
 			if (entity.getPersistentData().getDouble("am_level") > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
 				return;
 			}
@@ -65,71 +64,66 @@ public class MobslevelupprocedureProcedure {
 					level = maxLevel;
 				}
 			}
-			for (String stringiterator : MobsLevelsMainConfigConfiguration.SCALING_FACTORS.get()) {
-				baseValue = new Object() {
-					double convert(String s) {
-						try {
-							return Double.parseDouble(s.trim());
-						} catch (Exception e) {
+			for (String stringiterator : MobsLevelsMainConfigConfiguration.ATTRIBUTES_LIST.get()) {
+				if (stringiterator.contains("[attribute]") && stringiterator.contains("[attributeEnd]") && stringiterator.contains("[value]") && stringiterator.contains("[valueEnd]") && stringiterator.contains("[max]")
+						&& stringiterator.contains("[maxEnd]")) {
+					value = new Object() {
+						double convert(String s) {
+							try {
+								return Double.parseDouble(s.trim());
+							} catch (Exception e) {
+							}
+							return 0;
 						}
-						return 0;
-					}
-				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[base]") + 6), (int) stringiterator.indexOf("[baseEnd]")));
-				modifier = new Object() {
-					double convert(String s) {
-						try {
-							return Double.parseDouble(s.trim());
-						} catch (Exception e) {
+					}.convert(stringiterator.substring((int) (stringiterator.indexOf("[value]") + 7), (int) stringiterator.indexOf("[valueEnd]")));
+					maxValue = new Object() {
+						double convert(String s) {
+							try {
+								return Double.parseDouble(s.trim());
+							} catch (Exception e) {
+							}
+							return 0;
 						}
-						return 0;
+					}.convert(stringiterator.substring((int) (stringiterator.indexOf("[max]") + 5), (int) stringiterator.indexOf("[maxEnd]")));
+					attribute = stringiterator.substring((int) (stringiterator.indexOf("[attribute]") + 11), (int) stringiterator.indexOf("[attributeEnd]"));
+					if (stringiterator.contains("[mob]") && stringiterator.contains("[mobEnd]")) {
+						mobRegistry = stringiterator.substring((int) (stringiterator.indexOf("[mob]") + 5), (int) stringiterator.indexOf("[mobEnd]"));
+					} else {
+						mobRegistry = "";
 					}
-				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[modifier]") + 10), (int) stringiterator.indexOf("[modifierEnd]")));
-				maxValue = new Object() {
-					double convert(String s) {
-						try {
-							return Double.parseDouble(s.trim());
-						} catch (Exception e) {
+					if (!((LivingEntity) entity).getAttributes()
+							.hasAttribute(ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation((attribute.substring(0, (int) attribute.indexOf(":"))), (attribute.substring((int) (attribute.indexOf(":") + 1))))))) {
+						continue;
+					}
+					if (!(mobRegistry).isEmpty()) {
+						if (!(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(mobRegistry)) {
+							continue;
 						}
-						return 0;
 					}
-				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[max]") + 5), (int) stringiterator.indexOf("[maxEnd]")));
-				value = (level + 1) * baseValue * modifier;
-				if (value >= maxValue) {
-					value = maxValue;
-				}
-				cmd = stringiterator.substring((int) (stringiterator.indexOf("[cmd]") + 5));
-				{
-					Entity _ent = entity;
-					if (!_ent.level().isClientSide() && _ent.getServer() != null) {
-						_ent.getServer().getCommands().performPrefixedCommand(new CommandSourceStack(CommandSource.NULL, _ent.position(), _ent.getRotationVector(), _ent.level() instanceof ServerLevel ? (ServerLevel) _ent.level() : null, 4,
-								_ent.getName().getString(), _ent.getDisplayName(), _ent.level().getServer(), _ent), (cmd.replace("{value}", new java.text.DecimalFormat("##.##").format(value))));
+					currentValue = ((LivingEntity) entity).getAttribute(ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation((attribute.substring(0, (int) attribute.indexOf(":"))), (attribute.substring((int) (attribute.indexOf(":") + 1))))))
+							.getBaseValue() + level * value;
+					if (currentValue > maxValue) {
+						currentValue = maxValue;
 					}
-				}
-			}
-			health = level * (double) MobsLevelsMainConfigConfiguration.HEALTH_MODIFIER.get() + (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1);
-			attack_damage = health / (double) MobsLevelsMainConfigConfiguration.DAMAGE_MODIFIER.get();
-			{
-				Entity _ent = entity;
-				if (!_ent.level().isClientSide() && _ent.getServer() != null) {
-					_ent.getServer().getCommands().performPrefixedCommand(new CommandSourceStack(CommandSource.NULL, _ent.position(), _ent.getRotationVector(), _ent.level() instanceof ServerLevel ? (ServerLevel) _ent.level() : null, 4,
-							_ent.getName().getString(), _ent.getDisplayName(), _ent.level().getServer(), _ent), ("attribute @s minecraft:generic.max_health base set {health}".replace("{health}", "" + health)));
-				}
-			}
-			{
-				Entity _ent = entity;
-				if (!_ent.level().isClientSide() && _ent.getServer() != null) {
-					_ent.getServer().getCommands().performPrefixedCommand(new CommandSourceStack(CommandSource.NULL, _ent.position(), _ent.getRotationVector(), _ent.level() instanceof ServerLevel ? (ServerLevel) _ent.level() : null, 4,
-							_ent.getName().getString(), _ent.getDisplayName(), _ent.level().getServer(), _ent), ("attribute @s minecraft:generic.attack_damage base set {damage}".replace("{damage}", "" + attack_damage)));
+					{
+						Entity _ent = entity;
+						if (!_ent.level().isClientSide() && _ent.getServer() != null) {
+							_ent.getServer().getCommands().performPrefixedCommand(new CommandSourceStack(CommandSource.NULL, _ent.position(), _ent.getRotationVector(), _ent.level() instanceof ServerLevel ? (ServerLevel) _ent.level() : null, 4,
+									_ent.getName().getString(), _ent.getDisplayName(), _ent.level().getServer(), _ent), ("attribute @s " + attribute + " base set " + currentValue));
+						}
+					}
+				} else {
+					AscendantMobsMod.LOGGER.error("Error in config files of attributes_list please check the syntaxt is correct");
 				}
 			}
 			if (entity instanceof LivingEntity _entity)
-				_entity.setHealth((float) health);
+				_entity.setHealth(entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1);
 			if (MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS.get() && IsMobCanAscendantProcedure.execute(entity) && level >= (double) MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS_LEVEL.get()) {
 				if (Mth.nextDouble(RandomSource.create(), 0, 100) <= (double) MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS_CHANCE.get()) {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			if (!(MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && (entity.getDisplayName().getString()).contains("[Lv."))) {
+			if (MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && !(entity.getDisplayName().getString()).contains("[Lv.")) {
 				entity.setCustomName(Component.literal(("\u00A72[Lv." + Math.round(level) + "] \u00A7r" + entity.getDisplayName().getString())));
 			}
 			entity.getPersistentData().putDouble("am_level", level);

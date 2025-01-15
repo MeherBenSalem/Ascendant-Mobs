@@ -2,10 +2,10 @@ package tn.mbs.ascendantmobs.procedures;
 
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.bus.api.Event;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -20,19 +20,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
 import javax.annotation.Nullable;
 
-@EventBusSubscriber
+@Mod.EventBusSubscriber
 public class WhenBossDiesProcedure {
 	@SubscribeEvent
 	public static void onEntityDeath(LivingDeathEvent event) {
-		if (event.getEntity() != null) {
+		if (event != null && event.getEntity() != null) {
 			execute(event, event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
 		}
 	}
@@ -62,8 +60,7 @@ public class WhenBossDiesProcedure {
 				_level.addFreshEntity(entityToSpawn);
 			}
 			if (!world.isClientSide() && world.getServer() != null) {
-				for (ItemStack itemstackiterator : world.getServer().reloadableRegistries()
-						.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(((MobsLevelsMainConfigConfiguration.ASCENDANT_LOOT_TABLE.get())).toLowerCase(java.util.Locale.ENGLISH))))
+				for (ItemStack itemstackiterator : world.getServer().getLootData().getLootTable(new ResourceLocation(((MobsLevelsMainConfigConfiguration.ASCENDANT_LOOT_TABLE.get())).toLowerCase(java.util.Locale.ENGLISH)))
 						.getRandomItems(new LootParams.Builder((ServerLevel) world).create(LootContextParamSets.EMPTY))) {
 					if (randomLoot <= Mth.nextInt(RandomSource.create(), 0, 100)) {
 						if (world instanceof ServerLevel _level) {
