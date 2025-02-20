@@ -1,5 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
+import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 import tn.mbs.ascendantmobs.AscendantMobsMod;
 
@@ -50,12 +51,20 @@ public class MobslevelupprocedureProcedure {
 		double value = 0;
 		double currentValue = 0;
 		if (entity instanceof LivingEntity && !(entity instanceof ServerPlayer || entity instanceof Player)) {
-			if (entity.getPersistentData().getDouble("am_level") > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
+			if ((entity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get())
+					? _livingEntity3.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).getValue()
+					: 0) > 0 || CanGetLevelProcedureProcedure.execute(entity)) {
 				return;
 			}
 			lockedLevel = LockedMobsProcedureProcedure.execute(entity);
 			if (lockedLevel != -1) {
 				level = lockedLevel;
+			} else if ((entity instanceof LivingEntity _livingEntity4 && _livingEntity4.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
+					? _livingEntity4.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
+					: 0) > 0) {
+				level = entity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
+						? _livingEntity5.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
+						: 0;
 			} else {
 				baseLevel = GetBaseLevelFromConfigProcedure.execute(world);
 				maxLevel = GetMaxLevelFromConfigProcedure.execute(world);
@@ -126,7 +135,10 @@ public class MobslevelupprocedureProcedure {
 			if (MobsLevelsMainConfigConfiguration.DISPLAY_LVL_NAME.get() && !(entity.getDisplayName().getString()).contains("[Lv.")) {
 				entity.setCustomName(Component.literal(("\u00A72[Lv." + Math.round(level) + "] \u00A7r" + entity.getDisplayName().getString())));
 			}
-			entity.getPersistentData().putDouble("am_level", level);
+			if (entity instanceof LivingEntity _livingEntity55 && _livingEntity55.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
+				_livingEntity55.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
+			if (entity instanceof LivingEntity _livingEntity56 && _livingEntity56.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
+				_livingEntity56.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
 		}
 	}
 }

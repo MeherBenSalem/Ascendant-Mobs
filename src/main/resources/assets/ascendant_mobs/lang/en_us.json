@@ -1,4 +1,6 @@
 {
   "item.ascendant_mobs.calender": "Calender",
-  "item.ascendant_mobs.calender.description_0": "§9Its not only to show the days"
+  "attribute.ascendant_mobs.am_got_level": "Am_GotLevel",
+  "item.ascendant_mobs.calender.description_0": "§9Its not only to show the days",
+  "attribute.ascendant_mobs.amlevel_attribute": "Am_level"
 }

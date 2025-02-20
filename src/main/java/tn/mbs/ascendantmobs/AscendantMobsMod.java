@@ -2,6 +2,7 @@ package tn.mbs.ascendantmobs;
 
 import tn.mbs.ascendantmobs.init.AscendantMobsModTabs;
 import tn.mbs.ascendantmobs.init.AscendantMobsModItems;
+import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +45,7 @@ public class AscendantMobsMod {
 
 		AscendantMobsModTabs.REGISTRY.register(bus);
 
+		AscendantMobsModAttributes.REGISTRY.register(bus);
 		// Start of user code block mod init
 		// End of user code block mod init
 	}
