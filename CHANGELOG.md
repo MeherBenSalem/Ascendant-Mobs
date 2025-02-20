@@ -6,4 +6,6 @@
 - Added a custom attribute to all mobs "ascendant_mobs:amlevel_attribute" 
 Which will contain the level of the mobs
 (this allows you to spawn any type of level of the mobs using classic vanilla summon cmd)
-example : /summon minecraft:sheep ~ ~ ~ {Attributes:[{Name:"ascendant_mobs:amlevel_attribute",Base:50}]}
+example : 
+1.20 : /summon minecraft:sheep ~ ~ ~ {Attributes:[{Name:"ascendant_mobs:amlevel_attribute",Base:50}]}
+1.21 : /summon minecraft:sheep ~ ~ ~ {attributes:[{id:"ascendant_mobs:amlevel_attribute",base:50}]}
