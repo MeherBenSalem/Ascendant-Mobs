@@ -12,7 +12,7 @@ Explore all features, configurations, and tips on getting the most out of the **
 
 ## 💖 Sponsors List  
 *None yet* 😔  
-Want to support this project? [Become a sponsor](https://github.com/sponsors/MeherBenSalem)!  
+Want to support this project? [Become a sponsor](https://ko-fi.com/nightbeamstudio)!  
 
 ---
 
