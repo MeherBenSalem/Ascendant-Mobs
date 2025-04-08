@@ -1,4 +1,17 @@
 =============================================
+## Changelog 1.3.0
+=============================================
+
+* Replaced the old level name HUD with a new HUD system, now separate from the vanilla display name.
+* Added new configuration options:
+    * `enable_name_render` to show the mobs health
+    * `display_lvl_y_offset` the y offset of the mobs name
+    * `level_x_offset_level` the x offset of the mobs level
+    * `level_y_offset_level` the y offset of the mobs level
+    * `level_color_code` the color of the mobs level
+* Fixed compatibility issues with **Alex's Mobs** mod.
+
+=============================================
 ## Changelog 1.2.1
 =============================================
 
