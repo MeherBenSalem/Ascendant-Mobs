@@ -23,6 +23,18 @@ description="In this mod, every mob has the potential to grow stronger, smarter,
     side="BOTH"
 
 
+[[dependencies.ascendant_mobs]]
+    modId="mixin"
+    mandatory=false
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.ascendant_mobs]]
+    modId="neat"
+    mandatory=false
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"
 
 
 # Start of user code block dependencies configuration
