@@ -133,7 +133,7 @@ public class MobslevelupprocedureProcedure {
 				}
 			}
 			if (MobsLevelsMainConfigConfiguration.USE_LEGACY_HUD.get()) {
-				entity.setCustomName(Component.literal(("\u00A72[ Lvl." + level + "]\u00A7f " + entity.getDisplayName().getString())));
+				entity.setCustomName(Component.literal(("\u00A72[Lvl." + new java.text.DecimalFormat("##").format(level) + "]\u00A7f " + entity.getDisplayName().getString())));
 			}
 			if (entity instanceof LivingEntity _livingEntity54 && _livingEntity54.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
 				_livingEntity54.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
