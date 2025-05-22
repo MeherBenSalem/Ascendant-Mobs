@@ -21,6 +21,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
@@ -131,10 +132,13 @@ public class MobslevelupprocedureProcedure {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			if (entity instanceof LivingEntity _livingEntity51 && _livingEntity51.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
-				_livingEntity51.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
-			if (entity instanceof LivingEntity _livingEntity52 && _livingEntity52.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
-				_livingEntity52.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
+			if (MobsLevelsMainConfigConfiguration.USE_LEGACY_HUD.get()) {
+				entity.setCustomName(Component.literal(("\u00A72[ Lvl." + level + "]\u00A7f " + entity.getDisplayName().getString())));
+			}
+			if (entity instanceof LivingEntity _livingEntity54 && _livingEntity54.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
+				_livingEntity54.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
+			if (entity instanceof LivingEntity _livingEntity55 && _livingEntity55.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
+				_livingEntity55.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
 		}
 	}
 }
