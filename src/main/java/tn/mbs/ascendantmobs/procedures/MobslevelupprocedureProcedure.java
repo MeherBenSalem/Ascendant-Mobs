@@ -50,6 +50,7 @@ public class MobslevelupprocedureProcedure {
 		double maxValue = 0;
 		double value = 0;
 		double currentValue = 0;
+		boolean show = false;
 		if (entity instanceof LivingEntity && !(entity instanceof ServerPlayer || entity instanceof Player)) {
 			if ((entity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get())
 					? _livingEntity3.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).getValue()
@@ -133,12 +134,21 @@ public class MobslevelupprocedureProcedure {
 				}
 			}
 			if (MobsLevelsMainConfigConfiguration.USE_LEGACY_HUD.get()) {
+				show = true;
+				for (String stringiterator : MobsLevelsMainConfigConfiguration.HIDE_HUD_FOR.get()) {
+					if (stringiterator.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) {
+						show = false;
+						break;
+					}
+				}
+			}
+			if (show) {
 				entity.setCustomName(Component.literal(("\u00A72[Lvl." + new java.text.DecimalFormat("##").format(level) + "]\u00A7f " + entity.getDisplayName().getString())));
 			}
-			if (entity instanceof LivingEntity _livingEntity54 && _livingEntity54.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
-				_livingEntity54.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
-			if (entity instanceof LivingEntity _livingEntity55 && _livingEntity55.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
-				_livingEntity55.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
+			if (entity instanceof LivingEntity _livingEntity57 && _livingEntity57.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
+				_livingEntity57.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
+			if (entity instanceof LivingEntity _livingEntity58 && _livingEntity58.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
+				_livingEntity58.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
 		}
 	}
 }

@@ -20,6 +20,7 @@ public class MobsLevelsMainConfigConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Double> RANDOM_EFFECTS_CHANCE;
 	public static final ForgeConfigSpec.ConfigValue<String> ASCENDANT_LOOT_TABLE;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> USE_LEGACY_HUD;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDE_HUD_FOR;
 	static {
 		BUILDER.push("Attributes Scale Settings");
 		ATTRIBUTES_LIST = BUILDER.comment("Configures attribute scaling with mob levels: [attribute] defines the stat, [value] is per-level increment, [max] is the cap, [mob] (optional) targets specific mobs or all").defineList("attributes_list",
@@ -41,6 +42,7 @@ public class MobsLevelsMainConfigConfiguration {
 		RANDOM_EFFECTS_CHANCE = BUILDER.comment("[1-100]").define("ascendant_effects_chance", (double) 0.5);
 		ASCENDANT_LOOT_TABLE = BUILDER.define("ascendant_loot_table", "minecraft:chests/end_city_treasure");
 		USE_LEGACY_HUD = BUILDER.define("use_legacy_hud", true);
+		HIDE_HUD_FOR = BUILDER.defineList("hide_hud_for", List.of(" "), entry -> true);
 		BUILDER.pop();
 
 		SPEC = BUILDER.build();
