@@ -24,16 +24,16 @@ public class CreateOrReplaceDimensionsConfigProcedure {
 		String dir = "";
 		String filename = "";
 		dir = "ascendant_mobs";
-		filename = "dimensions";
+		filename = "dimensions_settings";
 		if (JaumlConfigLib.createConfigFile(dir, filename)) {
 			JaumlConfigLib.createConfigFile(dir, filename);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "settings")) {
-			JaumlConfigLib.addStringToArray(dir, filename, "settings", "[min]0[minEnd][max]75[maxEnd]minecraft:overworld");
-			JaumlConfigLib.addStringToArray(dir, filename, "settings", "[min]50[minEnd][max]100[maxEnd]minecraft:the_nether");
-			JaumlConfigLib.addStringToArray(dir, filename, "settings", "[min]100[minEnd][max]200[maxEnd]minecraft:the_end");
-			JaumlConfigLib.addStringToArray(dir, filename, "settings", "[min]20[minEnd][max]50[maxEnd]the_bumblezone:the_bumblezone");
-			JaumlConfigLib.addStringToArray(dir, filename, "settings", "[min]5[minEnd][max]10[maxEnd]twilightforest:twilight_forest");
+			JaumlConfigLib.addStringToArray(dir, filename, "dimensions", "[min]0[minEnd][max]75[maxEnd]minecraft:overworld");
+			JaumlConfigLib.addStringToArray(dir, filename, "dimensions", "[min]50[minEnd][max]100[maxEnd]minecraft:the_nether");
+			JaumlConfigLib.addStringToArray(dir, filename, "dimensions", "[min]100[minEnd][max]200[maxEnd]minecraft:the_end");
+			JaumlConfigLib.addStringToArray(dir, filename, "dimensions", "[min]20[minEnd][max]50[maxEnd]the_bumblezone:the_bumblezone");
+			JaumlConfigLib.addStringToArray(dir, filename, "dimensions", "[min]5[minEnd][max]10[maxEnd]twilightforest:twilight_forest");
 		}
 	}
 }
