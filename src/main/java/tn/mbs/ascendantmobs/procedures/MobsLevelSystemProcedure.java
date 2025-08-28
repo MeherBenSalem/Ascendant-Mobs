@@ -7,10 +7,6 @@ import tn.mbs.ascendantmobs.AscendantMobsMod;
 import org.checkerframework.checker.units.qual.s;
 
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
@@ -25,32 +21,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 
-import javax.annotation.Nullable;
-
-@Mod.EventBusSubscriber
-public class MobslevelupprocedureProcedure {
-	@SubscribeEvent
-	public static void onEntitySpawned(EntityJoinLevelEvent event) {
-		execute(event, event.getLevel(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
-	}
-
+public class MobsLevelSystemProcedure {
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
-		execute(null, world, x, y, z, entity);
-	}
-
-	private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
 		if (entity == null)
 			return;
+		boolean show = false;
 		String attribute = "";
 		String mobRegistry = "";
-		double level = 0;
-		double baseLevel = 0;
 		double maxLevel = 0;
-		double lockedLevel = 0;
+		double level = 0;
 		double maxValue = 0;
+		double lockedLevel = 0;
+		double baseLevel = 0;
 		double value = 0;
 		double currentValue = 0;
-		boolean show = false;
 		if (entity instanceof LivingEntity && !(entity instanceof ServerPlayer || entity instanceof Player)) {
 			if ((entity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get())
 					? _livingEntity3.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).getValue()
@@ -67,8 +51,8 @@ public class MobslevelupprocedureProcedure {
 						? _livingEntity5.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
 						: 0;
 			} else {
-				baseLevel = GetBaseLevelFromConfigProcedure.execute(world);
-				maxLevel = GetMaxLevelFromConfigProcedure.execute(world);
+				baseLevel = GetBaseLevelProcedure.execute(world);
+				maxLevel = GetMaxLevelProcedure.execute(world);
 				level = Math.floor(baseLevel + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) * (double) MobsLevelsMainConfigConfiguration.SCALE_FACTOR.get());
 				if (level >= maxLevel) {
 					level = maxLevel;

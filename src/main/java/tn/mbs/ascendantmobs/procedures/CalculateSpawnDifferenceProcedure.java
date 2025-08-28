@@ -27,7 +27,7 @@ public class CalculateSpawnDifferenceProcedure {
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("time")) {
 				return Math.floor((world.dayTime() / 24000) / (double) MobsLevelsMainConfigConfiguration.DAY_FACTOR.get());
 			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("random")) {
-				return Mth.nextInt(RandomSource.create(), (int) GetBaseLevelFromConfigProcedure.execute(world), (int) GetMaxLevelFromConfigProcedure.execute(world));
+				return Mth.nextInt(RandomSource.create(), (int) GetBaseLevelProcedure.execute(world), (int) GetMaxLevelProcedure.execute(world));
 			} else {
 				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2) + Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
 			}

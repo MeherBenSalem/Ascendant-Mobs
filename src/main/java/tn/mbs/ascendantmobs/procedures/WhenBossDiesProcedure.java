@@ -60,7 +60,7 @@ public class WhenBossDiesProcedure {
 				_level.addFreshEntity(entityToSpawn);
 			}
 			if (!world.isClientSide() && world.getServer() != null) {
-				for (ItemStack itemstackiterator : world.getServer().getLootData().getLootTable(new ResourceLocation(((MobsLevelsMainConfigConfiguration.ASCENDANT_LOOT_TABLE.get())).toLowerCase(java.util.Locale.ENGLISH)))
+				for (ItemStack itemstackiterator : world.getServer().getLootData().getLootTable(ResourceLocation.parse(((MobsLevelsMainConfigConfiguration.ASCENDANT_LOOT_TABLE.get())).toLowerCase(java.util.Locale.ENGLISH)))
 						.getRandomItems(new LootParams.Builder((ServerLevel) world).create(LootContextParamSets.EMPTY))) {
 					if (randomLoot <= Mth.nextInt(RandomSource.create(), 0, 100)) {
 						if (world instanceof ServerLevel _level) {

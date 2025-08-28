@@ -1,4 +1,3 @@
-
 package tn.mbs.ascendantmobs.command;
 
 import tn.mbs.ascendantmobs.procedures.GetDistanceFromSpawnCmdProcedure;
@@ -53,4 +52,5 @@ public class GetDistanceFromSpawnCommand {
 			return 0;
 		})))));
 	}
+
 }

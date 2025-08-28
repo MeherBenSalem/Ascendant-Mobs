@@ -8,6 +8,6 @@ public class ReturnDebugDimensionIDProcedure {
 	public static String execute(LevelAccessor world) {
 		String dimensionName = "";
 		dimensionName = "" + (world instanceof Level _lvl ? _lvl.dimension() : (world instanceof WorldGenLevel _wgl ? _wgl.getLevel().dimension() : Level.OVERWORLD));
-		return dimensionName.substring(34, (int) ((dimensionName).length() - 1));
+		return dimensionName.substring(34, (dimensionName).length() - 1);
 	}
 }

@@ -5,13 +5,15 @@ import tn.mbs.ascendantmobs.configuration.CustomDimensionsConfigConfiguration;
 
 import org.checkerframework.checker.units.qual.s;
 
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
-public class GetMaxLevelFromConfigProcedure {
+public class GetMaxLevelProcedure {
 	public static double execute(LevelAccessor world) {
 		String dimName = "";
 		double toReturn = 0;
-		dimName = ReturnDebugDimensionIDProcedure.execute(world);
+		dimName = "" + (world instanceof Level _lvl ? _lvl.dimension() : (world instanceof WorldGenLevel _wgl ? _wgl.getLevel().dimension() : Level.OVERWORLD));
 		toReturn = (double) MobsLevelsMainConfigConfiguration.BASE_LEVEL.get();
 		for (String stringiterator : CustomDimensionsConfigConfiguration.DIMENSIONS_SETTINGS.get()) {
 			if (stringiterator.contains(dimName)) {
@@ -23,8 +25,7 @@ public class GetMaxLevelFromConfigProcedure {
 						}
 						return 0;
 					}
-				}.convert(stringiterator.substring((int) (stringiterator.indexOf("[max]") + 5), (int) stringiterator.indexOf("[maxEnd]")));
-				break;
+				}.convert(stringiterator.substring(stringiterator.indexOf("[max]", 0), stringiterator.indexOf("[maxEnd]", 0)));
 			}
 		}
 		return toReturn;
