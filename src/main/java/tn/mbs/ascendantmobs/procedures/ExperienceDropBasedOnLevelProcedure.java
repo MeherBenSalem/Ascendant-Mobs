@@ -7,7 +7,7 @@ import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 
 import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.PlayerTeam;
@@ -15,25 +15,27 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber
 public class ExperienceDropBasedOnLevelProcedure {
 	@SubscribeEvent
-	public static void onEntityDeath(LivingDeathEvent event) {
+	public static void onLivingDropXp(LivingExperienceDropEvent event) {
 		if (event != null && event.getEntity() != null) {
-			execute(event, event.getEntity().level(), event.getEntity(), event.getSource().getEntity());
+			execute(event, event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
 		}
 	}
 
-	public static void execute(LevelAccessor world, Entity entity, Entity sourceentity) {
-		execute(null, world, entity, sourceentity);
+	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
+		execute(null, world, x, y, z, entity);
 	}
 
-	private static void execute(@Nullable Event event, LevelAccessor world, Entity entity, Entity sourceentity) {
-		if (entity == null || sourceentity == null)
+	private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
+		if (entity == null)
 			return;
 		if ((entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
 				? _livingEntity0.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
@@ -55,10 +57,11 @@ public class ExperienceDropBasedOnLevelProcedure {
 					}
 				}
 			}
-			if (sourceentity instanceof Player _player)
-				_player.giveExperiencePoints((int) Math.floor((entity instanceof LivingEntity _livingEntity4 && _livingEntity4.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
-						? _livingEntity4.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
-						: 0) * JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "xp_modfier")));
+			if (world instanceof ServerLevel _level)
+				_level.addFreshEntity(new ExperienceOrb(_level, x, y, z,
+						(int) Math.floor((entity instanceof LivingEntity _livingEntity4 && _livingEntity4.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
+								? _livingEntity4.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
+								: 0) * JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "xp_modfier"))));
 		}
 	}
 }

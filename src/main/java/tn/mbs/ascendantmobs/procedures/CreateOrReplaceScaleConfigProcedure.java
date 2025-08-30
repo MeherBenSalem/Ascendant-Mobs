@@ -35,10 +35,10 @@ public class CreateOrReplaceScaleConfigProcedure {
 			JaumlConfigLib.setNumberValue(dir, filename, "base_level", 0);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "scale_factor")) {
-			JaumlConfigLib.setNumberValue(dir, filename, "scale_factor", 0.5);
+			JaumlConfigLib.setNumberValue(dir, filename, "scale_factor", 0.05);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "scale_distance")) {
-			JaumlConfigLib.setNumberValue(dir, filename, "scale_distance", 55000);
+			JaumlConfigLib.setNumberValue(dir, filename, "scale_distance", 100000);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "day_factor")) {
 			JaumlConfigLib.setNumberValue(dir, filename, "day_factor", 1);

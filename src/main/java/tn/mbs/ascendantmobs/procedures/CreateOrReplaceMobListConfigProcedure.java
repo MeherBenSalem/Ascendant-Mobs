@@ -29,14 +29,19 @@ public class CreateOrReplaceMobListConfigProcedure {
 			JaumlConfigLib.createConfigFile(dir, filename);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "banned")) {
-			JaumlConfigLib.addStringToArray(dir, filename, "banned", "");
+			JaumlConfigLib.addStringToArray(dir, filename, "banned", "minecraft:dolphin");
+			JaumlConfigLib.addStringToArray(dir, filename, "banned", "minecraft:bat");
+			JaumlConfigLib.addStringToArray(dir, filename, "banned", "minecraft:pufferfish");
+			JaumlConfigLib.addStringToArray(dir, filename, "banned", "minecraft:salmon");
+			JaumlConfigLib.addStringToArray(dir, filename, "banned", "minecraft:cod");
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "death_messages")) {
 			JaumlConfigLib.setBooleanValue(dir, filename, "death_messages", false);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "locked_mobs")) {
-			JaumlConfigLib.addStringToArray(dir, filename, "locked_mobs", "100/minecraft:ender_dragon");
-			JaumlConfigLib.addStringToArray(dir, filename, "locked_mobs", "150/minecraft:wither");
+			JaumlConfigLib.addStringToArray(dir, filename, "locked_mobs", "10/minecraft:ender_dragon");
+			JaumlConfigLib.addStringToArray(dir, filename, "locked_mobs", "10/minecraft:wither");
+			JaumlConfigLib.addStringToArray(dir, filename, "locked_mobs", "10/minecraft:warden");
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "can_be_ascendant")) {
 			JaumlConfigLib.addStringToArray(dir, filename, "can_be_ascendant", "minecraft:zombie");

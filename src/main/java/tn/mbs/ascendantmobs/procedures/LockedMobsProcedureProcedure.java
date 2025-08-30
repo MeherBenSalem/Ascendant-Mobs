@@ -2,8 +2,6 @@ package tn.mbs.ascendantmobs.procedures;
 
 import tn.naizo.jauml.JaumlConfigLib;
 
-import tn.mbs.ascendantmobs.AscendantMobsMod;
-
 import org.checkerframework.checker.units.qual.s;
 
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,8 +19,6 @@ public class LockedMobsProcedureProcedure {
 		count = 0;
 		for (int index0 = 0; index0 < (int) JaumlConfigLib.getArrayLength("ascendant_mobs", "mobs_list_settings", "locked_mobs"); index0++) {
 			line = JaumlConfigLib.getArrayElement("ascendant_mobs", "mobs_list_settings", "locked_mobs", ((int) count));
-			AscendantMobsMod.LOGGER.info(line);
-			AscendantMobsMod.LOGGER.info(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString());
 			if (line.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) {
 				level = new Object() {
 					double convert(String s) {
@@ -32,7 +28,7 @@ public class LockedMobsProcedureProcedure {
 						}
 						return 0;
 					}
-				}.convert(line.substring(0, 3));
+				}.convert(line.substring(0, line.indexOf("/", 0)));
 				break;
 			}
 			count = count + 1;

@@ -32,7 +32,7 @@ public class CreateOrReplaceGlobalConfigProcedure {
 			JaumlConfigLib.setStringValue(dir, filename, "ascendant_loot_table", "minecraft:chests/end_city_treasure");
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "ascendant_effects_min_level")) {
-			JaumlConfigLib.setNumberValue(dir, filename, "ascendant_effects_min_level", 25);
+			JaumlConfigLib.setNumberValue(dir, filename, "ascendant_effects_min_level", 50);
 		}
 		if (!JaumlConfigLib.arrayKeyExists(dir, filename, "ascendant_effects_chance")) {
 			JaumlConfigLib.setNumberValue(dir, filename, "ascendant_effects_chance", 0.5);

@@ -140,7 +140,7 @@ public class MobsLevelSystemProcedure {
 			}
 			if (JaumlConfigLib.getBooleanValue("ascendant_mobs", "global_settings", "use_legacy_hud")) {
 				show = true;
-				if (JaumlConfigLib.stringExistsInArray("ascendant_mobs", "global_settings", "use_legacy_hud", (ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()))) {
+				if (JaumlConfigLib.stringExistsInArray("ascendant_mobs", "global_settings", "hide_hud_for", (ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()))) {
 					show = false;
 				}
 			}
