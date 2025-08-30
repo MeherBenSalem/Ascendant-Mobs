@@ -1,6 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
 
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -12,10 +12,8 @@ public class CanGetLevelProcedureProcedure {
 			return false;
 		boolean found = false;
 		found = false;
-		for (String stringiterator : MobsListConfigConfiguration.BANNED.get()) {
-			if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator)) {
-				found = true;
-			}
+		if (JaumlConfigLib.stringExistsInArray("ascendant_mobs", "mobs_list_settings", "banned", (ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()))) {
+			found = true;
 		}
 		return found;
 	}

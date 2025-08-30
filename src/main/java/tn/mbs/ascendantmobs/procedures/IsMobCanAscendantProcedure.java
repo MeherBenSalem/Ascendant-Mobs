@@ -1,6 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
 
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -12,10 +12,8 @@ public class IsMobCanAscendantProcedure {
 			return false;
 		boolean canBeBoss = false;
 		canBeBoss = false;
-		for (String stringiterator : MobsListConfigConfiguration.CAN_BE_ASCENDANT.get()) {
-			if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator)) {
-				canBeBoss = true;
-			}
+		if (JaumlConfigLib.stringExistsInArray("ascendant_mobs", "mobs_list_settings", "can_be_ascendant", (ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()))) {
+			canBeBoss = true;
 		}
 		return canBeBoss;
 	}

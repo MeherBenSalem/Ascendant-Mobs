@@ -1,8 +1,8 @@
 package tn.mbs.ascendantmobs.procedures;
 
+import tn.naizo.jauml.JaumlConfigLib;
+
 import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -38,7 +38,7 @@ public class ExperienceDropBasedOnLevelProcedure {
 		if ((entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
 				? _livingEntity0.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
 				: 0) > 0) {
-			if (!MobsListConfigConfiguration.DEATH_MESSAGES.get()) {
+			if (!JaumlConfigLib.getBooleanValue("ascendant_mobs", "mobs_list_settings", "death_messages")) {
 				if (world instanceof Level _level) {
 					PlayerTeam _pt = _level.getScoreboard().getPlayerTeam("am_no_msg");
 					if (_pt != null)
@@ -58,7 +58,7 @@ public class ExperienceDropBasedOnLevelProcedure {
 			if (sourceentity instanceof Player _player)
 				_player.giveExperiencePoints((int) Math.floor((entity instanceof LivingEntity _livingEntity4 && _livingEntity4.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get())
 						? _livingEntity4.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).getValue()
-						: 0) * (double) MobsLevelsMainConfigConfiguration.XP_MODFIER.get()));
+						: 0) * JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "xp_modfier")));
 		}
 	}
 }

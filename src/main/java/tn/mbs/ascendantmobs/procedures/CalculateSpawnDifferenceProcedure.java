@@ -1,6 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
 
 import net.minecraftforge.fml.ModList;
 
@@ -15,23 +15,25 @@ public class CalculateSpawnDifferenceProcedure {
 			return 0;
 		double spawnlocation = 0;
 		Entity lowestLevelEntity = null;
-		if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("MOTP")) {
+		String scaletype = "";
+		scaletype = JaumlConfigLib.getStringValue("ascendant_mobs", "scale_settings", "scale_type");
+		if ((scaletype).equals("MOTP")) {
 			if (ModList.get().isLoaded("memory_of_the_past")) {
 				return GetLowestEntityLevelProcedure.execute(world, x, y, z);
 			}
 		} else {
-			if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("vertical")) {
+			if ((scaletype).equals("vertical")) {
 				spawnlocation = Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
-			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("horizontal")) {
+			} else if ((scaletype).equals("horizontal")) {
 				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2);
-			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("time")) {
-				return Math.floor((world.dayTime() / 24000) / (double) MobsLevelsMainConfigConfiguration.DAY_FACTOR.get());
-			} else if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("random")) {
+			} else if ((scaletype).equals("time")) {
+				return Math.floor((world.dayTime() / 24000) / JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "day_factor"));
+			} else if ((scaletype).equals("random")) {
 				return Mth.nextInt(RandomSource.create(), (int) GetBaseLevelProcedure.execute(world), (int) GetMaxLevelProcedure.execute(world));
 			} else {
 				spawnlocation = Math.pow(entity.getX() - world.getLevelData().getXSpawn(), 2) + Math.pow(entity.getZ() - world.getLevelData().getZSpawn(), 2) + Math.pow(entity.getY() - world.getLevelData().getYSpawn(), 2);
 			}
 		}
-		return Math.floor(spawnlocation / (double) MobsLevelsMainConfigConfiguration.SCALE_DISTANCE.get());
+		return Math.floor(spawnlocation / JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "scale_distance"));
 	}
 }

@@ -1,6 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.ModList;
@@ -30,7 +30,7 @@ public class OnJoinWorldProcedure {
 			return;
 		double YourLevel = 0;
 		YourLevel = 0;
-		if ((MobsLevelsMainConfigConfiguration.SCALE_TYPE.get()).equals("MOTP")) {
+		if ((JaumlConfigLib.getStringValue("ascendant_mobs", "scale_settings", "scale_type")).equals("MOTP")) {
 			if (!ModList.get().isLoaded("memory_of_the_past")) {
 				if (entity instanceof Player _player && !_player.level().isClientSide())
 					_player.displayClientMessage(Component.literal(

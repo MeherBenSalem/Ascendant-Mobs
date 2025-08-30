@@ -1,5 +1,7 @@
 package tn.mbs.ascendantmobs.procedures;
 
+import tn.naizo.jauml.JaumlConfigLib;
+
 import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 import tn.mbs.ascendantmobs.AscendantMobsMod;
@@ -42,8 +44,6 @@ public class MobsLevelSystemProcedure {
 		if (entity == null)
 			return;
 		boolean show = false;
-		String attribute = "";
-		String mobRegistry = "";
 		double maxLevel = 0;
 		double level = 0;
 		double maxValue = 0;
@@ -51,6 +51,10 @@ public class MobsLevelSystemProcedure {
 		double baseLevel = 0;
 		double value = 0;
 		double currentValue = 0;
+		double count = 0;
+		String attribute = "";
+		String mobRegistry = "";
+		String line = "";
 		if (entity instanceof LivingEntity && !(entity instanceof ServerPlayer || entity instanceof Player)) {
 			if ((entity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get())
 					? _livingEntity3.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).getValue()
@@ -74,9 +78,9 @@ public class MobsLevelSystemProcedure {
 					level = maxLevel;
 				}
 			}
-			for (String stringiterator : MobsLevelsMainConfigConfiguration.ATTRIBUTES_LIST.get()) {
-				if (stringiterator.contains("[attribute]") && stringiterator.contains("[attributeEnd]") && stringiterator.contains("[value]") && stringiterator.contains("[valueEnd]") && stringiterator.contains("[max]")
-						&& stringiterator.contains("[maxEnd]")) {
+			for (int index0 = 0; index0 < (int) JaumlConfigLib.getArrayLength("ascendant_mobs", "attributes_settings", "attributes_list"); index0++) {
+				line = JaumlConfigLib.getArrayElement("ascendant_mobs", "attributes_settings", "attributes_list", ((int) count));
+				if (line.contains("[attribute]") && line.contains("[attributeEnd]") && line.contains("[value]") && line.contains("[valueEnd]") && line.contains("[max]") && line.contains("[maxEnd]")) {
 					value = new Object() {
 						double convert(String s) {
 							try {
@@ -85,7 +89,7 @@ public class MobsLevelSystemProcedure {
 							}
 							return 0;
 						}
-					}.convert(stringiterator.substring((int) (stringiterator.indexOf("[value]") + 7), (int) stringiterator.indexOf("[valueEnd]")));
+					}.convert(line.substring((int) (line.indexOf("[value]") + 7), (int) line.indexOf("[valueEnd]")));
 					maxValue = new Object() {
 						double convert(String s) {
 							try {
@@ -94,10 +98,10 @@ public class MobsLevelSystemProcedure {
 							}
 							return 0;
 						}
-					}.convert(stringiterator.substring((int) (stringiterator.indexOf("[max]") + 5), (int) stringiterator.indexOf("[maxEnd]")));
-					attribute = stringiterator.substring((int) (stringiterator.indexOf("[attribute]") + 11), (int) stringiterator.indexOf("[attributeEnd]"));
-					if (stringiterator.contains("[mob]") && stringiterator.contains("[mobEnd]")) {
-						mobRegistry = stringiterator.substring((int) (stringiterator.indexOf("[mob]") + 5), (int) stringiterator.indexOf("[mobEnd]"));
+					}.convert(line.substring((int) (line.indexOf("[max]") + 5), (int) line.indexOf("[maxEnd]")));
+					attribute = line.substring((int) (line.indexOf("[attribute]") + 11), (int) line.indexOf("[attributeEnd]"));
+					if (line.contains("[mob]") && line.contains("[mobEnd]")) {
+						mobRegistry = line.substring((int) (line.indexOf("[mob]") + 5), (int) line.indexOf("[mobEnd]"));
 					} else {
 						mobRegistry = "";
 					}
@@ -122,6 +126,7 @@ public class MobsLevelSystemProcedure {
 									_ent.getName().getString(), _ent.getDisplayName(), _ent.level().getServer(), _ent), ("attribute @s " + attribute + " base set " + currentValue));
 						}
 					}
+					count = count + 1;
 				} else {
 					AscendantMobsMod.LOGGER.error("Error in config files of attributes_list please check the syntaxt is correct");
 				}
@@ -145,10 +150,10 @@ public class MobsLevelSystemProcedure {
 			if (show) {
 				entity.setCustomName(Component.literal(("\u00A72[Lvl." + new java.text.DecimalFormat("##").format(level) + "]\u00A7f " + entity.getDisplayName().getString())));
 			}
-			if (entity instanceof LivingEntity _livingEntity57 && _livingEntity57.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
-				_livingEntity57.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
-			if (entity instanceof LivingEntity _livingEntity58 && _livingEntity58.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
-				_livingEntity58.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
+			if (entity instanceof LivingEntity _livingEntity39 && _livingEntity39.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
+				_livingEntity39.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
+			if (entity instanceof LivingEntity _livingEntity40 && _livingEntity40.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
+				_livingEntity40.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
 		}
 	}
 }

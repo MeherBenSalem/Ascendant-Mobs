@@ -19,7 +19,7 @@ public class GetMaxLevelProcedure {
 		dimName = "" + (world instanceof Level _lvl ? _lvl.dimension() : (world instanceof WorldGenLevel _wgl ? _wgl.getLevel().dimension() : Level.OVERWORLD));
 		toReturn = (double) MobsLevelsMainConfigConfiguration.BASE_LEVEL.get();
 		count = 0;
-		for (int index0 = 0; index0 < (int) (JaumlConfigLib.getArrayLength("ascendant_mobs", "dimensions_settings", "dimensions") - 1); index0++) {
+		for (int index0 = 0; index0 < (int) JaumlConfigLib.getArrayLength("ascendant_mobs", "dimensions_settings", "dimensions"); index0++) {
 			Line = JaumlConfigLib.getArrayElement("ascendant_mobs", "dimensions_settings", "dimensions", ((int) count));
 			if (dimName.contains(Line.substring(Line.indexOf("[maxEnd]", 0) + 8))) {
 				toReturn = new Object() {

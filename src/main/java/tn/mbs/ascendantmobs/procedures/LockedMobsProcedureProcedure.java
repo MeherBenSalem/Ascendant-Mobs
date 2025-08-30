@@ -1,6 +1,8 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
+
+import tn.mbs.ascendantmobs.AscendantMobsMod;
 
 import org.checkerframework.checker.units.qual.s;
 
@@ -13,9 +15,15 @@ public class LockedMobsProcedureProcedure {
 		if (entity == null)
 			return 0;
 		double level = 0;
+		double count = 0;
+		String line = "";
 		level = -1;
-		for (String stringiterator : MobsListConfigConfiguration.LOCKED_MOBS.get()) {
-			if ((ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()).equals(stringiterator.substring(4))) {
+		count = 0;
+		for (int index0 = 0; index0 < (int) JaumlConfigLib.getArrayLength("ascendant_mobs", "mobs_list_settings", "locked_mobs"); index0++) {
+			line = JaumlConfigLib.getArrayElement("ascendant_mobs", "mobs_list_settings", "locked_mobs", ((int) count));
+			AscendantMobsMod.LOGGER.info(line);
+			AscendantMobsMod.LOGGER.info(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString());
+			if (line.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) {
 				level = new Object() {
 					double convert(String s) {
 						try {
@@ -24,8 +32,10 @@ public class LockedMobsProcedureProcedure {
 						}
 						return 0;
 					}
-				}.convert(stringiterator.substring(0, 3));
+				}.convert(line.substring(0, 3));
+				break;
 			}
+			count = count + 1;
 		}
 		return level;
 	}

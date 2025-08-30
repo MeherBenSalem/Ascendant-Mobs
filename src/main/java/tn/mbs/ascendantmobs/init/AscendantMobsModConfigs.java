@@ -1,6 +1,5 @@
 package tn.mbs.ascendantmobs.init;
 
-import tn.mbs.ascendantmobs.configuration.MobsListConfigConfiguration;
 import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 import tn.mbs.ascendantmobs.AscendantMobsMod;
 
@@ -16,7 +15,6 @@ public class AscendantMobsModConfigs {
 	public static void register(FMLConstructModEvent event) {
 		event.enqueueWork(() -> {
 			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, MobsLevelsMainConfigConfiguration.SPEC, "AscendantMobs/main_config.toml");
-			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, MobsListConfigConfiguration.SPEC, "AscendantMobs/list_config.toml");
 		});
 	}
 }
