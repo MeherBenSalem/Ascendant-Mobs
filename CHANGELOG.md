@@ -1,4 +1,15 @@
 =============================================
+## Changelog 1.4.0
+=============================================
+
+- All configurations have been migrated to JSON format, utilizing the jauml library.
+- Locked Mobs now supports setting any mob level, not limited to the first three digits.
+- Updated base configuration to be more compatible with vanilla Minecraft settings (Github user @IOplus).
+- Fixed an issue where `hide_hud_for` was not functioning correctly.
+- Added marine life to the b
+- MOTP support will rollout with version 1.5.0 with the release of motp 1.8.0 !
+
+=============================================
 ## Changelog 1.3.0
 =============================================
 
