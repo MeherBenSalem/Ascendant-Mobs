@@ -3,7 +3,6 @@ package tn.mbs.ascendantmobs.procedures;
 import tn.naizo.jauml.JaumlConfigLib;
 
 import tn.mbs.ascendantmobs.init.AscendantMobsModAttributes;
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
 import tn.mbs.ascendantmobs.AscendantMobsMod;
 
 import org.checkerframework.checker.units.qual.s;
@@ -73,7 +72,7 @@ public class MobsLevelSystemProcedure {
 			} else {
 				baseLevel = GetBaseLevelProcedure.execute(world);
 				maxLevel = GetMaxLevelProcedure.execute(world);
-				level = Math.floor(baseLevel + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) * (double) MobsLevelsMainConfigConfiguration.SCALE_FACTOR.get());
+				level = Math.floor(baseLevel + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) * JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "scale_factor"));
 				if (level >= maxLevel) {
 					level = maxLevel;
 				}
@@ -133,27 +132,25 @@ public class MobsLevelSystemProcedure {
 			}
 			if (entity instanceof LivingEntity _entity)
 				_entity.setHealth(entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1);
-			if (MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS.get() && IsMobCanAscendantProcedure.execute(entity) && level >= (double) MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS_LEVEL.get()) {
-				if (Mth.nextDouble(RandomSource.create(), 0, 100) <= (double) MobsLevelsMainConfigConfiguration.RANDOM_EFFECTS_CHANCE.get()) {
+			if (JaumlConfigLib.getBooleanValue("ascendant_mobs", "global_settings", "random_effects") && IsMobCanAscendantProcedure.execute(entity)
+					&& level >= JaumlConfigLib.getNumberValue("ascendant_mobs", "global_settings", "ascendant_effects_min_level")) {
+				if (Mth.nextDouble(RandomSource.create(), 0, 100) <= JaumlConfigLib.getNumberValue("ascendant_mobs", "global_settings", "ascendant_effects_chance")) {
 					RandomEffectsEntityProcedureProcedure.execute(entity);
 				}
 			}
-			if (MobsLevelsMainConfigConfiguration.USE_LEGACY_HUD.get()) {
+			if (JaumlConfigLib.getBooleanValue("ascendant_mobs", "global_settings", "use_legacy_hud")) {
 				show = true;
-				for (String stringiterator : MobsLevelsMainConfigConfiguration.HIDE_HUD_FOR.get()) {
-					if (stringiterator.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) {
-						show = false;
-						break;
-					}
+				if (JaumlConfigLib.stringExistsInArray("ascendant_mobs", "global_settings", "use_legacy_hud", (ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString()))) {
+					show = false;
 				}
 			}
 			if (show) {
 				entity.setCustomName(Component.literal(("\u00A72[Lvl." + new java.text.DecimalFormat("##").format(level) + "]\u00A7f " + entity.getDisplayName().getString())));
 			}
-			if (entity instanceof LivingEntity _livingEntity39 && _livingEntity39.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
-				_livingEntity39.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
-			if (entity instanceof LivingEntity _livingEntity40 && _livingEntity40.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
-				_livingEntity40.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
+			if (entity instanceof LivingEntity _livingEntity38 && _livingEntity38.getAttributes().hasAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()))
+				_livingEntity38.getAttribute(AscendantMobsModAttributes.AMLEVEL_ATTRIBUTE.get()).setBaseValue(level);
+			if (entity instanceof LivingEntity _livingEntity39 && _livingEntity39.getAttributes().hasAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()))
+				_livingEntity39.getAttribute(AscendantMobsModAttributes.AM_GOT_LEVEL.get()).setBaseValue(1);
 		}
 	}
 }

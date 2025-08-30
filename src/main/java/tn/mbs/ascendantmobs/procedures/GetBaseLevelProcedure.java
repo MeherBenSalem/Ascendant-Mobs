@@ -2,8 +2,6 @@ package tn.mbs.ascendantmobs.procedures;
 
 import tn.naizo.jauml.JaumlConfigLib;
 
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
-
 import org.checkerframework.checker.units.qual.s;
 
 import net.minecraft.world.level.WorldGenLevel;
@@ -17,7 +15,7 @@ public class GetBaseLevelProcedure {
 		String dimName = "";
 		String stringToCheck = "";
 		dimName = "" + (world instanceof Level _lvl ? _lvl.dimension() : (world instanceof WorldGenLevel _wgl ? _wgl.getLevel().dimension() : Level.OVERWORLD));
-		toReturn = (double) MobsLevelsMainConfigConfiguration.BASE_LEVEL.get();
+		toReturn = JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "base_level");
 		count = 0;
 		for (int index0 = 0; index0 < (int) JaumlConfigLib.getArrayLength("ascendant_mobs", "dimensions_settings", "dimensions"); index0++) {
 			stringToCheck = JaumlConfigLib.getArrayElement("ascendant_mobs", "dimensions_settings", "dimensions", ((int) count));

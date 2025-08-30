@@ -1,6 +1,6 @@
 package tn.mbs.ascendantmobs.procedures;
 
-import tn.mbs.ascendantmobs.configuration.MobsLevelsMainConfigConfiguration;
+import tn.naizo.jauml.JaumlConfigLib;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +12,9 @@ public class GetDistanceFromSpawnCmdProcedure {
 		if (entity == null)
 			return;
 		if (entity instanceof Player _player && !_player.level().isClientSide())
-			_player.displayClientMessage(Component.literal(("\u00A74[Debug] \u00A7fAvreage level : " + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) + "(SpawnDiffrence) * "
-					+ (double) MobsLevelsMainConfigConfiguration.SCALE_FACTOR.get() + "(scale_factor) = " + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) * (double) MobsLevelsMainConfigConfiguration.SCALE_FACTOR.get())), false);
+			_player.displayClientMessage(Component
+					.literal(("\u00A74[Debug] \u00A7fAvreage level : " + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) + "(SpawnDiffrence) * " + JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "scale_factor")
+							+ "(scale_factor) = " + CalculateSpawnDifferenceProcedure.execute(world, x, y, z, entity) * JaumlConfigLib.getNumberValue("ascendant_mobs", "scale_settings", "scale_factor"))),
+					false);
 	}
 }
