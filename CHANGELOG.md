@@ -1,4 +1,11 @@
 =============================================
+## Changelog 1.4.1
+=============================================
+
+- Fixed a bug that caused the "motp" scale_type not to work properly.
+- Changed the mod icon to the new design.
+
+=============================================
 ## Changelog 1.4.0
 =============================================
 

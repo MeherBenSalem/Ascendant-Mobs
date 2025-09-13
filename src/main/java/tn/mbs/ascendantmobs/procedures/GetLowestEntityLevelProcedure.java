@@ -1,29 +1,28 @@
 package tn.mbs.ascendantmobs.procedures;
 
+import net.minecraftforge.registries.ForgeRegistries;
+
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
 import java.util.Comparator;
 
 public class GetLowestEntityLevelProcedure {
 	public static double execute(LevelAccessor world, double x, double y, double z) {
-		double lowestLevel = 0;
-		{
-			final Vec3 _center = new Vec3(x, y, z);
-			List<Entity> _entfound = world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(128 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center))).toList();
-			for (Entity entityiterator : _entfound) {
-				if (entityiterator instanceof Player || entityiterator instanceof ServerPlayer) {
-					if (entityiterator.getPersistentData().getDouble("motp_level") < lowestLevel) {
-						lowestLevel = entityiterator.getPersistentData().getDouble("motp_level");
-					}
-				}
+		Entity nearest = null;
+		nearest = (Entity) world.getEntitiesOfClass(Player.class, AABB.ofSize(new Vec3(x, y, z), 200, 200, 200), e -> true).stream().sorted(new Object() {
+			Comparator<Entity> compareDistOf(double _x, double _y, double _z) {
+				return Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_x, _y, _z));
 			}
+		}.compareDistOf(x, y, z)).findFirst().orElse(null);
+		if (!(nearest == null)) {
+			return ((LivingEntity) nearest).getAttribute(ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("memory_of_the_past", "motp_level"))).getBaseValue();
 		}
-		return lowestLevel;
+		return 0;
 	}
 }

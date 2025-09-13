@@ -17,7 +17,7 @@ public class CalculateSpawnDifferenceProcedure {
 		Entity lowestLevelEntity = null;
 		String scaletype = "";
 		scaletype = JaumlConfigLib.getStringValue("ascendant_mobs", "scale_settings", "scale_type");
-		if ((scaletype).equals("MOTP")) {
+		if (scaletype.contains("motp")) {
 			if (ModList.get().isLoaded("memory_of_the_past")) {
 				return GetLowestEntityLevelProcedure.execute(world, x, y, z);
 			}
