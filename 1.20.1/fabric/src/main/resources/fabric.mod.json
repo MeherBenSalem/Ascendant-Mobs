@@ -1,0 +1,36 @@
+{
+    "schemaVersion": 1,
+    "id": "rpgmoblevelingsystem",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://fabricmc.net/",
+        "sources": "https://github.com/FabricMC/fabric-example-mod"
+    },
+    "license": "${license}",
+    "icon": "assets/rpgmoblevelingsystem/textures/logo.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "tn.nightbeam.rpgmoblevelingsystem.fabric.RpgMobLevelingSystemFabric"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric-api": "*",
+        "minecraft": "${minecraft_version}",
+        "java": ">=17"
+    },
+    "suggests": {
+        "another-mod": "*"
+    }
+}
+  
