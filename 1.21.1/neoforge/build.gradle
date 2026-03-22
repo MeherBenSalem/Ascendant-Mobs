@@ -44,11 +44,12 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 // Add a simple mod jar output for easier distribution and identification.
+// Use the generated project jar (mod classes only) instead of the full NeoForge runtime bundle.
 tasks.register('modJar', Copy) {
-    dependsOn tasks.named('build')
-    from(file("${buildDir}/moddev/artifacts/neoforge-21.1.80-minecraft.jar"))
+    dependsOn(tasks.named('jar'))
+    from(tasks.named('jar').flatMap { it.archiveFile })
     into(file("${buildDir}/libs"))
-    rename('neoforge-21.1.80-minecraft.jar', 'rpgmoblevelingsystem-neoforge-1.5.0.jar')
+    rename { 'rpgmoblevelingsystem-neoforge-1.5.0.jar' }
 }
 
 tasks.named('build') {
