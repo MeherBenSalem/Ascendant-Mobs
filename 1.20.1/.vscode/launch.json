@@ -16,11 +16,11 @@
       ],
       "vmArgs": [
         "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\clientRunVmArgs.txt",
-        "-Dfml.modFolders\u003dRpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "RpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -40,11 +40,11 @@
       ],
       "vmArgs": [
         "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\dataRunVmArgs.txt",
-        "-Dfml.modFolders\u003dRpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "RpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -64,11 +64,11 @@
       ],
       "vmArgs": [
         "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\serverRunVmArgs.txt",
-        "-Dfml.modFolders\u003dRpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "RpgMobLevelingSystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
