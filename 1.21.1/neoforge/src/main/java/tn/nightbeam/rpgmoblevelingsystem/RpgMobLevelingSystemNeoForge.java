@@ -6,8 +6,13 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import tn.nightbeam.rpgmoblevelingsystem.command.RmlCommands;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.AscendantService;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelService;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelingLogic;
 import tn.nightbeam.rpgmoblevelingsystem.init.RpgMobLevelingSystemNeoForgeItems;
 
@@ -21,6 +26,8 @@ public final class RpgMobLevelingSystemNeoForge {
 
         NeoForge.EVENT_BUS.addListener(this::onEntityJoinLevel);
         NeoForge.EVENT_BUS.addListener(this::onLivingExperienceDrop);
+        NeoForge.EVENT_BUS.addListener(this::onLivingDeath);
+        NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
 
         Constants.LOG.info("Bootstrapping {} on NeoForge", Constants.MOD_NAME);
     }
@@ -40,7 +47,16 @@ public final class RpgMobLevelingSystemNeoForge {
     }
 
     private void onLivingExperienceDrop(LivingExperienceDropEvent event) {
-        int updated = MobLevelingLogic.adjustDroppedExperience(event.getEntity(), event.getDroppedExperience());
+        int updated = MobLevelService.adjustDroppedExperience(event.getEntity(), event.getDroppedExperience());
         event.setDroppedExperience(updated);
+    }
+
+    private void onLivingDeath(LivingDeathEvent event) {
+        MobLevelService.onMobDeath(event.getEntity());
+        AscendantService.onAscendantDeath(event.getEntity());
+    }
+
+    private void onRegisterCommands(RegisterCommandsEvent event) {
+        RmlCommands.register(event.getDispatcher());
     }
 }

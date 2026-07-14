@@ -49,7 +49,7 @@ tasks.register('modJar', Copy) {
     dependsOn(tasks.named('jar'))
     from(tasks.named('jar').flatMap { it.archiveFile })
     into(file("${buildDir}/libs"))
-    rename { 'rpgmoblevelingsystem-neoforge-1.5.0.jar' }
+    rename { 'rpgmoblevelingsystem-neoforge-2.0.0.jar' }
 }
 
 tasks.named('build') {

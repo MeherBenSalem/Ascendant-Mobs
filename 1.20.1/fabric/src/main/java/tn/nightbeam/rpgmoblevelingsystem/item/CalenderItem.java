@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.network.chat.Component;
-import tn.nightbeam.rpgmoblevelingsystem.fabric.gameplay.FabricMobLeveling;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelingLogic;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class CalenderItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player entity, InteractionHand hand) {
-        FabricMobLeveling.sendCalendarMessage(world, entity);
+        MobLevelingLogic.sendCalendarMessage(world, entity);
         return super.use(world, entity, hand);
     }
 }

@@ -1,9 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "tn.nightbeam.rpgmoblevelingsystem.mixin",
+  "package": "tn.nightbeam.rpgmoblevelingsystem.fabric.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
+  "mixins": [
+    "LivingEntityExperienceMixin"
+  ],
   "client": [],
   "injectors": {
     "defaultRequire": 1
