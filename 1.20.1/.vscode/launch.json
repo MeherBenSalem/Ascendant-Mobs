@@ -12,15 +12,15 @@
       "projectName": "forge",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\clientRunProgramArgs.txt"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\clientRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\clientRunVmArgs.txt",
-        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -36,15 +36,15 @@
       "projectName": "forge",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\dataRunProgramArgs.txt"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\dataRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\dataRunVmArgs.txt",
-        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -60,15 +60,15 @@
       "projectName": "forge",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\serverRunProgramArgs.txt"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\serverRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\serverRunVmArgs.txt",
-        "-Dfml.modFolders\u003drpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "@C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003drpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\forge\\run",
       "env": {
-        "MOD_CLASSES": "rpgmoblevelingsystem%%D:\\Projects\\NightBeam\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
+        "MOD_CLASSES": "rpgmoblevelingsystem%%C:\\Users\\mahou\\OneDrive\\Documents\\GitHub\\Ascendant-Mobs\\1.20.1\\forge\\bin\\main"
       },
       "console": "internalConsole",
       "shortenCommandLine": "none"
