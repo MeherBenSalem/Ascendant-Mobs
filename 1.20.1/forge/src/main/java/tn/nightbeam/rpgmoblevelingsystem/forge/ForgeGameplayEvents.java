@@ -3,16 +3,24 @@ package tn.nightbeam.rpgmoblevelingsystem.forge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import tn.nightbeam.rpgmoblevelingsystem.Constants;
 import tn.nightbeam.rpgmoblevelingsystem.command.RmlCommands;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.AscendantService;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelService;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.OutgoingDamageScaling;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public final class ForgeGameplayEvents {
     private ForgeGameplayEvents() {
+    }
+
+    @SubscribeEvent
+    public static void onLivingHurt(LivingHurtEvent event) {
+        float scaled = OutgoingDamageScaling.scale(event.getSource(), event.getAmount());
+        event.setAmount(scaled);
     }
 
     @SubscribeEvent

@@ -21,3 +21,4 @@
 | Jade name replacement | Client overwrote custom name | No `setCustomName` in overlay; tag-based level | Manual | Fixed |
 | Distance scaling bug | Squared distance divisor | Euclidean distance / scaleDistance | Unit | Fixed |
 | Day scaling | `dayTime` vs total days | `getGameTime() / 24000` | Unit | Fixed |
+| Ranged damage not scaling | Only `ATTACK_DAMAGE` attribute scaled | `OutgoingDamageScaling` for projectiles/sonic (ratio of level attack modifier) | Unit + build | Fixed |

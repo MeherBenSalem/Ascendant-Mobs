@@ -28,4 +28,14 @@ public class ScalingMathTest {
     void threeDimensionalDistance() {
         Assertions.assertEquals(5.0, ScalingMath.threeDimensionalDistance(3, 0, 4));
     }
+
+    @Test
+    void levelDamageRatioScalesNonMeleeLikeAttackAttribute() {
+        Assertions.assertEquals(204.0f, ScalingMath.applyLevelDamageRatio(4.0f, 102.0, 100.0), 0.001f);
+    }
+
+    @Test
+    void levelDamageRatioNoBonusLeavesAmountUnchanged() {
+        Assertions.assertEquals(10.0f, ScalingMath.applyLevelDamageRatio(10.0f, 30.0, 0.0));
+    }
 }

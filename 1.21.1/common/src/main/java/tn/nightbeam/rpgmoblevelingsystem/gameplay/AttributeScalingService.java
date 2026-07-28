@@ -58,6 +58,22 @@ public final class AttributeScalingService {
         living.setHealth((float) Math.min(living.getHealth(), living.getMaxHealth()));
     }
 
+    /**
+     * Applies the level attack-damage modifier ratio to non-melee damage (arrows, sonic boom, etc.).
+     */
+    public static float scaleOutgoingNonMeleeDamage(LivingEntity attacker, float amount) {
+        AttributeInstance instance = attacker.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (instance == null) {
+            return amount;
+        }
+        AttributeModifier modifier = instance.getModifier(LEVEL_MODIFIER_ID);
+        if (modifier == null) {
+            return amount;
+        }
+        return tn.nightbeam.rpgmoblevelingsystem.util.ScalingMath.applyLevelDamageRatio(
+                amount, instance.getValue(), modifier.amount());
+    }
+
     public static void clear(LivingEntity living) {
         for (ModConfig.AttributeRule rule : ModConfig.attributes().attributes) {
             var key = rule.attributeKey();

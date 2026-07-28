@@ -1,23 +1,87 @@
-# RPG Mob Leveling System 2.0.0
+# RPG Mob Leveling System — Patch Notes
 
-## Highlights
+## 2.0.1
 
-- Unified `LevelCalculationService`, `AttributeScalingService`, `EntityClassification`, `MobLevelService`
-- RPG Attribute System 4.1 integration (`RasApi` read API, player scaling modes, combat balance)
-- Gson JSON config (replaces Jauml on 1.20.1)
-- Additive + percentage attribute scaling via idempotent modifiers
-- Fixed distance (Euclidean) and day (`gameTime`) scaling
-- Configurable rounding, namespace bans, hostile-only, structure/boss locks
-- `/rml` debug commands + `RmlApi` public API
-- Ascendant elites ported to common
-- Fabric XP mixin parity
-- Builds: 1.21.1 Fabric/NeoForge, 1.20.1 Fabric/Forge
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)
 
-## Migration
+### Bug Fixes
+* **Ranged / special attack scaling** — projectile damage (arrows, etc.) and Warden sonic boom now scale with mob level using the same attack-damage modifier ratio as melee. Melee is unchanged (still attribute-based, not double-scaled).
 
-Existing Jauml configs on 1.20.1 are superseded by `config/rpgmoblevelingsystem/*.json` on first launch. Legacy bad `scaleDistance` values auto-migrate.
+### Compatibility
+* Drop-in replacement for 2.0.0 on all four loader targets.
 
-## Breaking changes
+### Upgrade Notes
+1. Replace previous jars with the matching 2.0.1 loader jar.
+2. No config changes required.
 
-- Config format is JSON-only in 2.0
-- Attribute application uses modifiers instead of permanent base mutation
+## 2.0.0
+
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)
+
+### New features
+
+- **Unified leveling architecture** — mob levels are calculated once on spawn through `LevelCalculationService`, with attribute scaling, classification, and storage handled by dedicated services.
+- **RPG Attribute System integration** — optional player-based scaling (`nearest`, `highest_nearby`, `average_nearby`) and combat rebalance when `rpg_attribute_system` 4.1+ is installed.
+- **Public API (`RmlApi`)** — other mods can read mob levels, force recalculation, and inspect level breakdowns.
+- **Debug commands** — `/rml inspect`, `/rml recalculate`, `/rml config`, `/rml distance` (op level 2).
+- **Percentage attribute scaling** — per-rule `additive` or `percent` modes in `attributes_settings.json`.
+- **Gson JSON config** — all settings live under `config/rpgmoblevelingsystem/` (replaces Jauml on 1.20.1).
+- **Namespace bans** — exclude entire mods (e.g. `cobblemon`) via `banned_namespaces`.
+- **Hostile-only scaling** — optional global or per-rule hostile filter.
+- **Structure & boss level locks** — `structureMinLevels` and `bossLevelLocks` in config.
+- **Custom loot by level** — optional `loot_by_level.json` for level-band drops.
+- **Configurable name format** — `%mob_name% [Lv. %level%]` in `global_settings.json`.
+- **Ascendant elites** — ported to common code on all loaders (buffs, boss bar, death loot).
+- **Documentation** — usage guide, API reference, and community feedback resolution report in `docs/`.
+
+### Bug fixes
+
+- **Distance scaling** — now uses Euclidean block distance divided by `scaleDistance` (was incorrectly using squared distance).
+- **Day scaling** — uses total elapsed world time (`gameTime / 24000`) instead of wrap-sensitive day time alone.
+- **Movement speed corruption** — attributes applied via idempotent named modifiers instead of mutating base values; speed skipped for non-hostiles by default.
+- **Locked mob HP** — locked/boss mobs no longer keep incorrect stacked HP forever.
+- **Zero XP in modded dimensions** — XP scaling works on Fabric (mixin) and NeoForge/Forge (event).
+- **Ender Dragon / boss scaling** — dedicated boss lock defaults and locked-level path.
+- **Overlay console spam** — removed periodic debug logging; optional `overlayDebug` flag.
+- **Jade / name display** — overlay no longer overwrites mob custom names with `Lv.N`.
+- **Performance** — levels applied once on spawn, never every tick; early exit for banned namespaces.
+- **Low-level mobs vs high RAS players** — optional `playerBalanceEnabled` scales mob power relative to nearby player combat snapshot.
+
+### Config changes
+
+New / updated files in `config/rpgmoblevelingsystem/`:
+
+| File | What's new |
+|------|------------|
+| `scale_settings.json` | `rounding_mode`, `playerScaleMode`, `playerScaleRadius`, `playerScaleFactor`, balance ratios |
+| `attributes_settings.json` | `mode` (`additive` / `percent`), `hostileOnly` per rule |
+| `mobs_list_settings.json` | `banned_namespaces`, `hostileOnly`, `bossLevelLocks`, `structureMinLevels` |
+| `global_settings.json` | `nameFormat`, `jadeEnabled`, `overlayDebug` |
+| `loot_by_level.json` | Level-band custom drops (disabled by default) |
+
+Legacy configs with `scaleDistance >= 100000` and near-zero progression auto-migrate on first launch.
+
+### Breaking changes
+
+- **Config format** — JSON only in 2.0; Jauml string configs on 1.20.1 are no longer read.
+- **Attribute application** — uses Minecraft attribute modifiers instead of permanent `setBaseValue` mutations. Existing worlds keep stored level tags; use `/rml recalculate` to refresh mobs if needed.
+
+### For mod developers
+
+```java
+import tn.nightbeam.rpgmoblevelingsystem.api.RmlApi;
+
+int level = RmlApi.getLevel(entity);
+RmlApi.recalculate(entity);
+LevelDebugBreakdown breakdown = RmlApi.getDebugBreakdown(entity);
+```
+
+See `docs/API.md` for full reference.
+
+---
+
+## 1.5.0
+
+- Initial MultiLoader release for 1.20.1 (Forge + Fabric) and partial 1.21.1 port.
+- Distance/time/random-based mob leveling with per-dimension min/max.
+- Attribute scaling, level overlay, calendar item, Ascendant elites (1.20.1 Forge).

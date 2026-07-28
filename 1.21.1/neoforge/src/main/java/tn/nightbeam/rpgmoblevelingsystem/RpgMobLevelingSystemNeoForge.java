@@ -10,10 +10,12 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import tn.nightbeam.rpgmoblevelingsystem.command.RmlCommands;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.AscendantService;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelService;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelingLogic;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.OutgoingDamageScaling;
 import tn.nightbeam.rpgmoblevelingsystem.init.RpgMobLevelingSystemNeoForgeItems;
 
 @Mod(Constants.MOD_ID)
@@ -25,6 +27,7 @@ public final class RpgMobLevelingSystemNeoForge {
         RpgMobLevelingSystemNeoForgeItems.register(modEventBus);
 
         NeoForge.EVENT_BUS.addListener(this::onEntityJoinLevel);
+        NeoForge.EVENT_BUS.addListener(this::onLivingIncomingDamage);
         NeoForge.EVENT_BUS.addListener(this::onLivingExperienceDrop);
         NeoForge.EVENT_BUS.addListener(this::onLivingDeath);
         NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
@@ -44,6 +47,11 @@ public final class RpgMobLevelingSystemNeoForge {
 
     private void onEntityJoinLevel(EntityJoinLevelEvent event) {
         MobLevelingLogic.onEntityLoaded(event.getLevel(), event.getEntity());
+    }
+
+    private void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
+        float scaled = OutgoingDamageScaling.scale(event.getSource(), event.getAmount());
+        event.setAmount(scaled);
     }
 
     private void onLivingExperienceDrop(LivingExperienceDropEvent event) {
