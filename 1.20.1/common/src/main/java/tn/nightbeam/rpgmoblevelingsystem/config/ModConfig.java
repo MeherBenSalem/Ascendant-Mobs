@@ -91,8 +91,20 @@ public final class ModConfig {
             }
         }
 
+        if (mobsListSettings.banned == null) {
+            mobsListSettings.banned = new ArrayList<>();
+            changedMobs = true;
+        }
         if (mobsListSettings.bannedNamespaces == null) {
             mobsListSettings.bannedNamespaces = new ArrayList<>();
+            changedMobs = true;
+        }
+        if (mobsListSettings.lockedMobs == null) {
+            mobsListSettings.lockedMobs = new HashMap<>();
+            changedMobs = true;
+        }
+        if (mobsListSettings.canBeAscendant == null) {
+            mobsListSettings.canBeAscendant = new ArrayList<>();
             changedMobs = true;
         }
         if (mobsListSettings.structureMinLevels == null) {
