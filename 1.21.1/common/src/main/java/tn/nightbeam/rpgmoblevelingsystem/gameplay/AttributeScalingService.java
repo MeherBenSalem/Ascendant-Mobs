@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
+import tn.nightbeam.rpgmoblevelingsystem.util.AttributeResolution;
 
 public final class AttributeScalingService {
     private static final ResourceLocation LEVEL_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath("rpgmoblevelingsystem", "level");
@@ -28,7 +29,7 @@ public final class AttributeScalingService {
                 continue;
             }
 
-            var key = rule.attributeKey();
+            var key = AttributeResolution.resolveKey(rule.attributeId);
             if (key == null) {
                 continue;
             }
@@ -76,7 +77,7 @@ public final class AttributeScalingService {
 
     public static void clear(LivingEntity living) {
         for (ModConfig.AttributeRule rule : ModConfig.attributes().attributes) {
-            var key = rule.attributeKey();
+            var key = AttributeResolution.resolveKey(rule.attributeId);
             if (key == null) {
                 continue;
             }

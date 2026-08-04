@@ -68,21 +68,28 @@ public final class LevelCalculationService {
         String scaleType = ModConfig.scale().scaleType;
         double scaleDistance = Math.max(1.0, ModConfig.scale().scaleDistance);
 
-        if ("vertical".equals(scaleType)) {
+        if (isMotpScaleType(scaleType)) {
+            if (MotpCompatibilityLayer.isMotpLoaded()) {
+                return applyRounding(MotpCompatibilityLayer.getNearestPlayerLevel(world, entity));
+            }
+            MotpCompatibilityLayer.warnIfMissing();
+        }
+
+        if ("vertical".equalsIgnoreCase(scaleType)) {
             double dy = Math.abs(entity.getY() - spawnPos.getY());
             return applyRounding(dy / scaleDistance);
         }
-        if ("horizontal".equals(scaleType)) {
+        if ("horizontal".equalsIgnoreCase(scaleType)) {
             double dx = entity.getX() - spawnPos.getX();
             double dz = entity.getZ() - spawnPos.getZ();
             double horizontal = Math.sqrt(dx * dx + dz * dz);
             return applyRounding(horizontal / scaleDistance);
         }
-        if ("time".equals(scaleType)) {
+        if ("time".equalsIgnoreCase(scaleType)) {
             double days = world.getLevelData().getGameTime() / 24000.0;
             return applyRounding(days / Math.max(1.0, ModConfig.scale().dayFactor));
         }
-        if ("random".equals(scaleType)) {
+        if ("random".equalsIgnoreCase(scaleType)) {
             int min = (int) Math.floor(getBaseLevel(world));
             int max = (int) Math.floor(getMaxLevel(world));
             if (max < min) {
@@ -194,5 +201,9 @@ public final class LevelCalculationService {
             }
         }
         return ModConfig.scale().baseLevel;
+    }
+
+    private static boolean isMotpScaleType(String scaleType) {
+        return scaleType != null && scaleType.toLowerCase().contains("motp");
     }
 }

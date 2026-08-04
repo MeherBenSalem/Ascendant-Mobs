@@ -91,5 +91,5 @@ Write-Host "Jars in dist/ ($($jars.Count)):" -ForegroundColor Cyan
 $jars | ForEach-Object { Write-Host "  $($_.Name)" }
 
 Write-Host ""
-Write-Host "Modrinth + CurseForge (upload-only workflow):" -ForegroundColor Yellow
-Write-Host "  gh workflow run publish.yml --repo MeherBenSalem/Ascendant-Mobs -f version=$Version"
+Write-Host "Modrinth + CurseForge (local upload from dist/):" -ForegroundColor Yellow
+Write-Host "  .\upload_local.ps1 -Version $Version"

@@ -21,13 +21,11 @@ import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber
+@Deprecated
 public class ExperienceDropBasedOnLevelProcedure {
-	@SubscribeEvent
+	@Deprecated
 	public static void onLivingDropXp(LivingExperienceDropEvent event) {
-		if (event != null && event.getEntity() != null) {
-			execute(event, event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
-		}
+		// Handled by ForgeGameplayEvents to avoid duplicate XP/level rewards (e.g. slime splits).
 	}
 
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {

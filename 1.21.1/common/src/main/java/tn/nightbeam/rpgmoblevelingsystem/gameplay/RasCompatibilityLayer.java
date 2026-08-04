@@ -13,7 +13,7 @@ public final class RasCompatibilityLayer {
     }
 
     public static boolean isRasLoaded() {
-        return tn.nightbeam.rpgmoblevelingsystem.platform.Services.PLATFORM.isModLoaded("rpg_attribute_system");
+        return tn.nightbeam.rpgmoblevelingsystem.platform.Services.platform().isModLoaded("rpg_attribute_system");
     }
 
     public static int getPlayerLevel(Player player) {

@@ -18,7 +18,7 @@ public final class JadeCompat {
     }
 
     public static void registerIfPresent() {
-        if (!ModConfig.global().jadeEnabled || !Services.PLATFORM.isModLoaded("jade")) {
+        if (!ModConfig.global().jadeEnabled || !Services.platform().isModLoaded("jade")) {
             return;
         }
         Constants.LOG.info("Jade detected; mob levels are exposed via am_level_* entity tags");

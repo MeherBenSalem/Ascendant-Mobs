@@ -32,6 +32,11 @@ public final class MobLevelStorage {
         entity.addTag(TAG_GOT_LEVEL);
     }
 
+    public static void clearLevel(Entity entity) {
+        entity.getTags().removeIf(tag -> tag.startsWith(TAG_LEVEL_PREFIX));
+        entity.getTags().remove(TAG_GOT_LEVEL);
+    }
+
     public static int getDisplayLevel(Entity entity) {
         Double stored = getStoredLevel(entity);
         return stored == null ? 0 : (int) Math.floor(stored);

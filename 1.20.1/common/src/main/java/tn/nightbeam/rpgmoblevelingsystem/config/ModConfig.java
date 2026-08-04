@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.resources.ResourceLocation;
 import tn.nightbeam.rpgmoblevelingsystem.Constants;
+import tn.nightbeam.rpgmoblevelingsystem.util.AttributeResolution;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -49,6 +50,7 @@ public final class ModConfig {
         boolean changedDimensions = false;
         boolean changedMobs = false;
         boolean changedGlobal = false;
+        boolean changedAttributes = false;
 
         if (scaleSettings.scaleDistance <= 0) {
             scaleSettings.scaleDistance = 2500;
@@ -121,6 +123,19 @@ public final class ModConfig {
             changedGlobal = true;
         }
 
+        if (attributesSettings.attributes != null) {
+            for (AttributeRule rule : attributesSettings.attributes) {
+                if (rule.attributeId == null) {
+                    continue;
+                }
+                String normalized = AttributeResolution.normalizeAttributeId(rule.attributeId);
+                if (!normalized.equals(rule.attributeId)) {
+                    rule.attributeId = normalized;
+                    changedAttributes = true;
+                }
+            }
+        }
+
         if (changedScale) {
             write(CONFIG_ROOT.resolve("scale_settings.json"), scaleSettings);
         }
@@ -132,6 +147,9 @@ public final class ModConfig {
         }
         if (changedGlobal) {
             write(CONFIG_ROOT.resolve("global_settings.json"), globalSettings);
+        }
+        if (changedAttributes) {
+            write(CONFIG_ROOT.resolve("attributes_settings.json"), attributesSettings);
         }
     }
 

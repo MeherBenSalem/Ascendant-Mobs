@@ -103,9 +103,9 @@ jobs:
             if (!curseforgeOnly) {
               for (const p of parsed) {
                 const body = {
-                  name: `Ascendant-Mobs ${version}`,
+                  name: `RPG Mob Leveling System ${version}`,
                   version_number: version,
-                  changelog: `## Ascendant-Mobs ${version}\n\n### Bug Fixes\n* Fixed NeoForge/Fabric config NPE when mobs_list_settings fields are null (#18).\n\n### File\n* ${p.name}`,
+                  changelog: `## RPG Mob Leveling System ${version}\n\n### Bug Fixes\n* Fixed NeoForge/Fabric config NPE when mobs_list_settings fields are null (#18).\n\n### File\n* ${p.name}`,
                   dependencies: [],
                   game_versions: [p.game],
                   version_type: 'release',
@@ -193,7 +193,7 @@ jobs:
               const loaderId = LOADER_IDS[p.loader];
               if (!loaderId) throw new Error('Unknown loader for ' + p.name);
               const meta = {
-                changelog: `## Ascendant-Mobs ${version}\n\n### Bug Fixes\n* Fixed config NPE when mobs_list_settings lists are null (#18).`,
+                changelog: `## RPG Mob Leveling System ${version}\n\n### Bug Fixes\n* Fixed config NPE when mobs_list_settings lists are null (#18).`,
                 changelogType: 'markdown',
                 displayName: p.name,
                 gameVersions: [clientId, serverId, loaderId, gameId],

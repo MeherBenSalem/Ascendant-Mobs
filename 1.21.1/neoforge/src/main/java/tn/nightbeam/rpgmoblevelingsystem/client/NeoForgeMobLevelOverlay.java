@@ -18,10 +18,12 @@ public final class NeoForgeMobLevelOverlay {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             return;
         }
+        if (!ModConfig.global().useLegacyHud) {
+            return;
+        }
         float offsetX = (float) ModConfig.global().overlayXOffset;
         float offsetY = (float) ModConfig.global().overlayYOffset;
         float offsetZ = (float) ModConfig.global().overlayZOffset;
-        // TODO: if RenderLevelStageEvent exposes a MultiBufferSource, use it instead of Minecraft renderer buffer.
-        MobLevelOverlayRenderer.render(event.getPoseStack(), event.getCamera(), Minecraft.getInstance().renderBuffers().bufferSource(), event.getPartialTick().getGameTimeDeltaTicks(), offsetX, offsetY, offsetZ);
+        MobLevelOverlayRenderer.render(event.getPoseStack(), event.getCamera(), event.getPartialTick().getGameTimeDeltaTicks(), offsetX, offsetY, offsetZ);
     }
 }

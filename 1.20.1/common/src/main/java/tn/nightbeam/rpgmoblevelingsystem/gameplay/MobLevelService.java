@@ -4,6 +4,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +23,7 @@ public final class MobLevelService {
         if (level.isClientSide() || !(level instanceof ServerLevel)) {
             return;
         }
-        applyMobLevel(level, entity, false);
+        applyMobLevel(level, entity, shouldForceRelevel(entity));
     }
 
     public static void recalculate(Level level, Entity entity) {
@@ -104,5 +106,18 @@ public final class MobLevelService {
         AttributeScalingService.apply(entity, living, level);
         living.setHealth(living.getMaxHealth());
         MobLevelStorage.storeLevel(entity, level);
+    }
+
+    private static boolean shouldForceRelevel(Entity entity) {
+        if (entity.getType() == EntityType.SLIME && MobLevelStorage.hasBeenLeveled(entity)) {
+            MobLevelStorage.clearLevel(entity);
+            return true;
+        }
+        if (entity instanceof AgeableMob ageable && ageable.isBaby()
+                && MobLevelStorage.hasBeenLeveled(entity) && MobLevelStorage.getStoredLevel(entity) == null) {
+            MobLevelStorage.clearLevel(entity);
+            return true;
+        }
+        return false;
     }
 }

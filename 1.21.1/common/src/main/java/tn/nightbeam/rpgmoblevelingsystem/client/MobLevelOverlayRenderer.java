@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
@@ -20,6 +21,12 @@ public final class MobLevelOverlayRenderer {
     private static final double MAX_RENDER_DISTANCE_SQR = 48.0D * 48.0D;
 
     private MobLevelOverlayRenderer() {
+    }
+
+    public static void render(PoseStack poseStack, Camera camera, float partialTick, float offsetX, float offsetY, float offsetZ) {
+        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        render(poseStack, camera, bufferSource, partialTick, offsetX, offsetY, offsetZ);
+        bufferSource.endBatch();
     }
 
     public static void render(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, float partialTick, float offsetX, float offsetY, float offsetZ) {
@@ -50,7 +57,7 @@ public final class MobLevelOverlayRenderer {
             double z = Mth.lerp(partialTick, entity.zOld, entity.getZ()) - camera.getPosition().z + offsetZ;
 
             poseStack.pushPose();
-            poseStack.translate(x, y + 0.8, z);
+            poseStack.translate(x, y + nameplateOffset(living), z);
             poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
             poseStack.scale(-TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
@@ -70,6 +77,13 @@ public final class MobLevelOverlayRenderer {
 
             poseStack.popPose();
         }
+    }
+
+    private static double nameplateOffset(LivingEntity entity) {
+        if (entity instanceof AgeableMob ageable && ageable.isBaby()) {
+            return entity.getBbHeight() + 0.35;
+        }
+        return 0.8;
     }
 
     private static int levelColor(int level) {

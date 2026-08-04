@@ -1,5 +1,28 @@
 # RPG Mob Leveling System — Patch Notes
 
+## 2.0.3
+
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)
+
+### Bug Fixes
+* **NeoForge 1.21.1 level overlays** — restored missing HUD rendering by flushing the font buffer (`endBatch`) and honoring `useLegacyHud` like other loaders.
+* **Random load crash (`IPlatformHelper`)** — platform services now load lazily with the mod classloader and fall back safely instead of crashing during parallel mod init.
+* **`scale_type = MOTP`** — reinstated Memories of the Past integration (nearest player `motp_level`); falls back to distance scaling with a one-time warning when the mod is absent.
+* **Movement speed not scaling** — legacy `minecraft:generic.*` attribute IDs are resolved to modern registry names; existing configs auto-migrate on launch.
+* **Slime split XP/level duplication (Forge 1.20.1)** — removed duplicate legacy XP handler that stacked rewards when slimes split on death.
+* **Slime split leveling** — child slimes from splits no longer inherit stale parent level tags; each split recalculates its level.
+* **Baby mob overlays** — improved nameplate height for baby mobs (zombies, animals, etc.).
+
+### Skipped / Future
+* **Relative danger colors (green/yellow/red)** — deferred; existing absolute level gradient remains.
+* **#15 multiplicative attribute scaling** — feature suggestion, not a bug fix.
+* **#12 Touhou Little Maid name garbling** — separate mod-compat issue.
+
+### Upgrade Notes
+1. Replace previous jars with the matching 2.0.3 loader jar.
+2. MOTP users: keep `scale_type` as `MOTP` (case-insensitive); ensure Memories of the Past is installed.
+3. If mobs still use old speed values, delete `attributes_settings.json` or let auto-migration rewrite attribute IDs on first launch.
+
 ## 2.0.1
 
 **Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)

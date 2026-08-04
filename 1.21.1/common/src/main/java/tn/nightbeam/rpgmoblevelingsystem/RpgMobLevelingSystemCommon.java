@@ -10,6 +10,6 @@ public final class RpgMobLevelingSystemCommon {
     public static void init() {
         ModConfig.ensureDefaults();
         tn.nightbeam.rpgmoblevelingsystem.compat.JadeCompat.registerIfPresent();
-        Constants.LOG.info("Initializing {} on {} ({})", Constants.MOD_NAME, Services.PLATFORM.getPlatformName(), Services.PLATFORM.getEnvironmentName());
+        Constants.LOG.info("Initializing {} on {} ({})", Constants.MOD_NAME, Services.platform().getPlatformName(), Services.platform().getEnvironmentName());
     }
 }
