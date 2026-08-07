@@ -128,11 +128,19 @@ public final class AttributeScalingService {
     }
 
     private static double computeAmount(AttributeInstance instance, ModConfig.AttributeRule rule, double level) {
+        double baseValue = instance.getBaseValue();
+        if (rule.isMultiplicative()) {
+            double amount = baseValue * (Math.pow(1 + rule.valuePerLevel / 100.0, level) - 1);
+            return Math.min(amount, rule.maxValue);
+        }
         if (rule.isPercent()) {
-            double boosted = instance.getBaseValue() * (level * rule.valuePerLevel / 100.0);
+            double boosted = baseValue * (level * rule.valuePerLevel / 100.0);
             return Math.min(boosted, rule.maxValue);
         }
         double additive = level * rule.valuePerLevel;
+        if (rule.referenceBase != null && rule.referenceBase > 0) {
+            additive *= baseValue / rule.referenceBase;
+        }
         return Math.min(additive, rule.maxValue);
     }
 

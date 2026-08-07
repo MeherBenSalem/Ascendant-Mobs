@@ -76,6 +76,10 @@ public final class ModConfig {
             scaleSettings.playerScaleMode = "none";
             changedScale = true;
         }
+        if (scaleSettings.motpSearchRadius <= 0) {
+            scaleSettings.motpSearchRadius = 128;
+            changedScale = true;
+        }
 
         if (scaleSettings.baseLevel == 0 && scaleSettings.scaleFactor == 0.05 && scaleSettings.scaleDistance >= 100000) {
             scaleSettings.baseLevel = 1;
@@ -120,6 +124,14 @@ public final class ModConfig {
 
         if (globalSettings.nameFormat == null || globalSettings.nameFormat.isBlank()) {
             globalSettings.nameFormat = "%mob_name% [Lv. %level%]";
+            changedGlobal = true;
+        }
+        if (globalSettings.hideHudFor == null) {
+            globalSettings.hideHudFor = new ArrayList<>(List.of("touhou_little_maid:"));
+            changedGlobal = true;
+        } else if (!globalSettings.hideHudFor.contains("touhou_little_maid:")) {
+            globalSettings.hideHudFor.removeIf(entry -> entry == null || entry.isBlank());
+            globalSettings.hideHudFor.add("touhou_little_maid:");
             changedGlobal = true;
         }
 
@@ -186,7 +198,7 @@ public final class ModConfig {
         settings.ascendantEffectsChance = 0.5;
         settings.randomEffects = true;
         settings.useLegacyHud = true;
-        settings.hideHudFor = new ArrayList<>(List.of(""));
+        settings.hideHudFor = new ArrayList<>(List.of("touhou_little_maid:"));
         settings.overlayXOffset = 0;
         settings.overlayYOffset = 0.45;
         settings.overlayZOffset = 0;
@@ -211,6 +223,7 @@ public final class ModConfig {
         settings.playerBalanceEnabled = true;
         settings.playerBalanceHealthRatio = 0.15;
         settings.playerBalanceDamageRatio = 0.1;
+        settings.motpSearchRadius = 128;
         return settings;
     }
 
@@ -322,6 +335,7 @@ public final class ModConfig {
         public boolean playerBalanceEnabled;
         public double playerBalanceHealthRatio;
         public double playerBalanceDamageRatio;
+        public double motpSearchRadius;
     }
 
     public static final class DimensionsSettings {
@@ -351,6 +365,8 @@ public final class ModConfig {
         public String mobFilter;
         public String mode;
         public boolean hostileOnly;
+        /** When set with additive mode, scales modifier by (baseValue / referenceBase). */
+        public Double referenceBase;
 
         public AttributeRule(String attributeId, double valuePerLevel, double maxValue, String mobFilter) {
             this(attributeId, valuePerLevel, maxValue, mobFilter, "additive", false);
@@ -371,6 +387,10 @@ public final class ModConfig {
 
         public boolean isPercent() {
             return "percent".equalsIgnoreCase(mode);
+        }
+
+        public boolean isMultiplicative() {
+            return "multiplicative".equalsIgnoreCase(mode);
         }
     }
 

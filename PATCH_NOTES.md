@@ -1,5 +1,22 @@
 # RPG Mob Leveling System — Patch Notes
 
+## 2.0.4
+
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)
+
+### Features
+* **Multiplicative attribute scaling** — new `multiplicative` mode: `baseValue * ((1 + valuePerLevel/100)^level - 1)`, capped by `maxValue`.
+* **Proportional additive scaling** — optional `referenceBase` on attribute rules scales additive modifiers by `(baseValue / referenceBase)` for size-variant mobs (e.g. slimes).
+
+### Bug Fixes / Compatibility
+* **Touhou Little Maid garbled names (#12)** — level overlay hidden for `touhou_little_maid:` entities via `hideHudFor`; name formatting uses Component composition instead of flattening translated names.
+* **MOTP player search (#14)** — nearest-player lookup limited to 128 blocks (`motpSearchRadius` in `scale_settings.json`); players with MOTP level ≤ 0 are skipped.
+
+### Upgrade Notes
+1. Replace previous jars with the matching 2.0.4 loader jar.
+2. `global_settings.json` auto-adds `touhou_little_maid:` to `hideHudFor` on first launch if missing.
+3. MOTP users can tune `motpSearchRadius` in `scale_settings.json` (default 128).
+
 ## 2.0.3
 
 **Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)

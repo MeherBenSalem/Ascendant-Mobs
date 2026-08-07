@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import tn.nightbeam.rpgmoblevelingsystem.Constants;
+import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
 import tn.nightbeam.rpgmoblevelingsystem.platform.Services;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public final class MotpCompatibilityLayer {
             new ResourceLocation("memory_of_the_past", "motp_level"),
             new ResourceLocation("memories_of_the_past", "motp_level")
     );
+    private static final double DEFAULT_SEARCH_RADIUS = 128;
     private static boolean warnedMissingMod;
 
     private MotpCompatibilityLayer() {
@@ -37,6 +39,11 @@ public final class MotpCompatibilityLayer {
         if (!(world instanceof ServerLevel serverLevel)) {
             return 0;
         }
+        double radius = ModConfig.scale().motpSearchRadius > 0
+                ? ModConfig.scale().motpSearchRadius
+                : DEFAULT_SEARCH_RADIUS;
+        double radiusSqr = radius * radius;
+
         Player nearest = null;
         double bestDistance = Double.MAX_VALUE;
         for (Player player : serverLevel.players()) {
@@ -44,6 +51,13 @@ public final class MotpCompatibilityLayer {
                 continue;
             }
             double distance = player.distanceToSqr(entity);
+            if (distance > radiusSqr) {
+                continue;
+            }
+            double level = getPlayerMotpLevel(player);
+            if (level <= 0) {
+                continue;
+            }
             if (distance < bestDistance) {
                 bestDistance = distance;
                 nearest = player;

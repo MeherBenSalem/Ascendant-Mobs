@@ -14,6 +14,7 @@ import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
+import tn.nightbeam.rpgmoblevelingsystem.gameplay.EntityClassification;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelService;
 
 public final class MobLevelOverlayRenderer {
@@ -40,6 +41,9 @@ public final class MobLevelOverlayRenderer {
                 continue;
             }
             if (minecraft.player.distanceToSqr(entity) > MAX_RENDER_DISTANCE_SQR) {
+                continue;
+            }
+            if (isHudHidden(entity)) {
                 continue;
             }
 
@@ -77,6 +81,27 @@ public final class MobLevelOverlayRenderer {
 
             poseStack.popPose();
         }
+    }
+
+    private static boolean isHudHidden(Entity entity) {
+        var hideHudFor = ModConfig.global().hideHudFor;
+        if (hideHudFor == null || hideHudFor.isEmpty()) {
+            return false;
+        }
+        String entityId = EntityClassification.entityTypeId(entity);
+        for (String entry : hideHudFor) {
+            if (entry == null || entry.isBlank()) {
+                continue;
+            }
+            if (entry.endsWith(":")) {
+                if (entityId.startsWith(entry)) {
+                    return true;
+                }
+            } else if (entityId.equals(entry)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static double nameplateOffset(LivingEntity entity) {

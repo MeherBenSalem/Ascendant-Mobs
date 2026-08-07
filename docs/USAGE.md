@@ -1,19 +1,26 @@
-# RPG Mob Leveling System 2.0.1
+# RPG Mob Leveling System 2.0.4
 
 ## Overview
 
-RPG Mob Leveling System assigns levels to hostile mobs based on distance from spawn, world age, dimension, nearby player RPG progression (RPG Attribute System), and configuration. Levels scale mob attributes using additive or percentage modifiers without corrupting base entity stats.
+RPG Mob Leveling System assigns levels to hostile mobs based on distance from spawn, world age, dimension, nearby player RPG progression (RPG Attribute System), and configuration. Levels scale mob attributes using additive, multiplicative, or percentage modifiers without corrupting base entity stats.
 
 ## Config (`config/rpgmoblevelingsystem/`)
 
 | File | Purpose |
 |------|---------|
-| `scale_settings.json` | Scale type, distance, day factor, rounding, player scaling, balance |
+| `scale_settings.json` | Scale type, distance, day factor, rounding, player scaling, MOTP search radius, balance |
 | `dimensions_settings.json` | Per-dimension min/max levels |
-| `attributes_settings.json` | Attribute rules (`additive` or `percent`, `hostileOnly`) |
+| `attributes_settings.json` | Attribute rules (`additive`, `multiplicative`, or `percent`; optional `referenceBase`; `hostileOnly`) |
 | `mobs_list_settings.json` | Banned entities/namespaces, boss locks, structure mins |
-| `global_settings.json` | Overlay, Jade, name format |
+| `global_settings.json` | Overlay, Jade, name format, `hideHudFor` entity filters |
 | `loot_by_level.json` | Optional level-band custom drops |
+
+### Attribute scaling modes
+
+- **additive** — flat `level * valuePerLevel` per level (default)
+- **multiplicative** — `baseValue * ((1 + valuePerLevel/100)^level - 1)`, capped by `maxValue`
+- **percent** — `baseValue * (level * valuePerLevel / 100)`, capped by `maxValue`
+- **referenceBase** (additive only) — scales modifier by `(baseValue / referenceBase)` so differently-sized mobs (e.g. slimes) keep proportional stats
 
 ### Player scaling (RAS)
 
