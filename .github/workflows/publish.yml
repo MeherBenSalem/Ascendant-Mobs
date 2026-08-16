@@ -57,6 +57,25 @@ jobs:
           printf '%s\n' "${JARS[@]}" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
 
+      - name: Load release changelog
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes="$(gh release view "v${VERSION}" --repo "${{ github.repository }}" --json body --jq .body)"
+          if [ -z "${notes// }" ]; then
+            notes="## RPG Mob Leveling System ${VERSION}
+
+          See https://github.com/${{ github.repository }}/releases/tag/v${VERSION}"
+          fi
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "changelog<<$EOF" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$notes" >> "$GITHUB_OUTPUT"
+          echo "$EOF" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -72,6 +91,7 @@ jobs:
           VERSION: ${{ steps.ver.outputs.version }}
           JAR_LIST: ${{ steps.jars.outputs.list }}
           CURSEFORGE_ONLY: ${{ inputs.curseforge_only }}
+          CHANGELOG: ${{ steps.notes.outputs.changelog }}
         shell: bash
         run: |
           set -euo pipefail
@@ -80,6 +100,7 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const version = process.env.VERSION;
+          const changelog = process.env.CHANGELOG || `## RPG Mob Leveling System ${version}\n\nSee GitHub release notes.`;
           const curseforgeOnly = process.env.CURSEFORGE_ONLY === 'true';
           const jars = process.env.JAR_LIST.split(/\n/).map(s => s.trim()).filter(Boolean);
 
@@ -105,7 +126,7 @@ jobs:
                 const body = {
                   name: `RPG Mob Leveling System ${version}`,
                   version_number: version,
-                  changelog: `## RPG Mob Leveling System ${version}\n\n### Bug Fixes\n* Fixed NeoForge/Fabric config NPE when mobs_list_settings fields are null (#18).\n\n### File\n* ${p.name}`,
+                  changelog,
                   dependencies: [],
                   game_versions: [p.game],
                   version_type: 'release',
@@ -193,7 +214,7 @@ jobs:
               const loaderId = LOADER_IDS[p.loader];
               if (!loaderId) throw new Error('Unknown loader for ' + p.name);
               const meta = {
-                changelog: `## RPG Mob Leveling System ${version}\n\n### Bug Fixes\n* Fixed config NPE when mobs_list_settings lists are null (#18).`,
+                changelog,
                 changelogType: 'markdown',
                 displayName: p.name,
                 gameVersions: [clientId, serverId, loaderId, gameId],
