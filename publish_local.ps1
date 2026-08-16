@@ -27,7 +27,11 @@ $distDir = Join-Path $root "dist"
 if (-not $SkipBuild) {
     New-Item -ItemType Directory -Force -Path $distDir | Out-Null
     $jdk17 = "C:\Program Files\Java\jdk-17"
-    $jdk21 = "C:\Program Files\Java\jdk-21.0.11"
+    $jdk21 = if (Test-Path "C:\Program Files\Java\jdk-21.0.11") {
+        "C:\Program Files\Java\jdk-21.0.11"
+    } else {
+        "C:\Program Files\Java\jdk-21"
+    }
 
     Write-Host "Building 1.20.1 (Forge + Fabric)..." -ForegroundColor Cyan
     $env:JAVA_HOME = $jdk17

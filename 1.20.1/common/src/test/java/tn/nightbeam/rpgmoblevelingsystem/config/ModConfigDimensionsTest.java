@@ -52,6 +52,18 @@ class ModConfigDimensionsTest {
                 }
                 """;
         Files.writeString(configDir.resolve("dimensions_settings.json"), body, StandardCharsets.UTF_8);
+        // Stub sibling configs so ensureDefaults does not regenerate defaults that touch Minecraft classes.
+        Files.writeString(configDir.resolve("attributes_settings.json"), "{\"attributes\":[]}", StandardCharsets.UTF_8);
+        Files.writeString(configDir.resolve("global_settings.json"),
+                "{\"ascendantLootTable\":\"minecraft:chests/end_city_treasure\",\"ascendantEffectsMinLevel\":50,\"ascendantEffectsChance\":0.5,\"randomEffects\":true,\"useLegacyHud\":true,\"hideHudFor\":[\"touhou_little_maid:\"],\"overlayXOffset\":0,\"overlayYOffset\":0.45,\"overlayZOffset\":0,\"nameFormat\":\"%mob_name% [Lv. %level%]\",\"jadeEnabled\":true,\"overlayDebug\":false}",
+                StandardCharsets.UTF_8);
+        Files.writeString(configDir.resolve("scale_settings.json"),
+                "{\"scaleType\":\"both\",\"baseLevel\":1,\"scaleFactor\":0.2,\"scaleDistance\":2500,\"dayFactor\":1,\"xpModifier\":5,\"roundingMode\":\"floor\",\"playerScaleMode\":\"none\",\"playerScaleRadius\":64,\"playerScaleFactor\":0.5,\"playerBalanceEnabled\":true,\"playerBalanceHealthRatio\":0.15,\"playerBalanceDamageRatio\":0.1,\"motpSearchRadius\":128}",
+                StandardCharsets.UTF_8);
+        Files.writeString(configDir.resolve("mobs_list_settings.json"),
+                "{\"banned\":[],\"bannedNamespaces\":[],\"hostileOnly\":false,\"deathMessages\":false,\"lockedMobs\":{},\"bossLevelLocks\":{},\"structureMinLevels\":{},\"canBeAscendant\":[]}",
+                StandardCharsets.UTF_8);
+        Files.writeString(configDir.resolve("loot_by_level.json"), "{\"enabled\":false,\"bands\":[]}", StandardCharsets.UTF_8);
 
         ModConfig.setConfigRootForTests(configDir);
         ModConfig.ensureDefaults();
