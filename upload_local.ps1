@@ -1,5 +1,5 @@
 # Upload dist/ jars to Modrinth + CurseForge locally (no GitHub Actions).
-# Tokens from env or C:\Users\mahou\NightBeam-Knowledge-Base\secrets\local.env
+# Tokens from env or C:\Users\Meher\Desktop\local.env (also NightBeam-Knowledge-Base/secrets/local.env)
 #
 # Usage:
 #   .\upload_local.ps1

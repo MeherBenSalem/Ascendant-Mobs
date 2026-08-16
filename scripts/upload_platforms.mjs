@@ -21,7 +21,9 @@ const MOD_TITLE = "RPG Mob Leveling System";
 async function loadEnv() {
   const candidates = [
     path.join(ROOT, "secrets", "local.env"),
+    path.join(process.env.USERPROFILE || "", "Desktop", "local.env"),
     path.join(process.env.USERPROFILE || "", "NightBeam-Knowledge-Base", "secrets", "local.env"),
+    "C:\\Users\\Meher\\Desktop\\local.env",
     "C:\\Users\\mahou\\NightBeam-Knowledge-Base\\secrets\\local.env",
   ];
   for (const envPath of candidates) {
