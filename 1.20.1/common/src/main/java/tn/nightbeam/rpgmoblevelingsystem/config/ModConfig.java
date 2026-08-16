@@ -18,7 +18,11 @@ import java.util.Map;
 
 public final class ModConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_ROOT = Path.of("config", Constants.MOD_ID);
+    private static Path CONFIG_ROOT = Path.of("config", Constants.MOD_ID);
+
+    static void setConfigRootForTests(Path root) {
+        CONFIG_ROOT = root != null ? root : Path.of("config", Constants.MOD_ID);
+    }
 
     private static GlobalSettings globalSettings = new GlobalSettings();
     private static ScaleSettings scaleSettings = new ScaleSettings();
@@ -47,7 +51,6 @@ public final class ModConfig {
 
     private static void normalizeAndPersist() throws IOException {
         boolean changedScale = false;
-        boolean changedDimensions = false;
         boolean changedMobs = false;
         boolean changedGlobal = false;
         boolean changedAttributes = false;
@@ -86,15 +89,6 @@ public final class ModConfig {
             scaleSettings.scaleFactor = 0.2;
             scaleSettings.scaleDistance = 2500;
             changedScale = true;
-        }
-
-        if (dimensionsSettings.dimensions != null) {
-            for (DimensionRange range : dimensionsSettings.dimensions) {
-                if ("minecraft:overworld".equals(range.dimensionId) && range.min <= 0) {
-                    range.min = 1;
-                    changedDimensions = true;
-                }
-            }
         }
 
         if (mobsListSettings.banned == null) {
@@ -150,9 +144,6 @@ public final class ModConfig {
 
         if (changedScale) {
             write(CONFIG_ROOT.resolve("scale_settings.json"), scaleSettings);
-        }
-        if (changedDimensions) {
-            write(CONFIG_ROOT.resolve("dimensions_settings.json"), dimensionsSettings);
         }
         if (changedMobs) {
             write(CONFIG_ROOT.resolve("mobs_list_settings.json"), mobsListSettings);
@@ -347,6 +338,9 @@ public final class ModConfig {
         public double min;
         public double max;
 
+        public DimensionRange() {
+        }
+
         public DimensionRange(String dimensionId, double min, double max) {
             this.dimensionId = dimensionId;
             this.min = min;
@@ -367,6 +361,9 @@ public final class ModConfig {
         public boolean hostileOnly;
         /** When set with additive mode, scales modifier by (baseValue / referenceBase). */
         public Double referenceBase;
+
+        public AttributeRule() {
+        }
 
         public AttributeRule(String attributeId, double valuePerLevel, double maxValue, String mobFilter) {
             this(attributeId, valuePerLevel, maxValue, mobFilter, "additive", false);
