@@ -29,16 +29,34 @@ public final class OutgoingDamageScaling {
     }
 
     private static LivingEntity resolveAttacker(DamageSource source) {
-        Entity causing = source.getEntity();
+        return resolveAttackerFromEntities(source.getEntity(), source.getDirectEntity());
+    }
+
+    /**
+     * Attribution order matches {@link tn.nightbeam.rpgmoblevelingsystem.util.DamageAttributionPaths#choose}.
+     * Package-visible for tests of projectile-as-causing-entity handling.
+     */
+    static LivingEntity resolveAttackerFromEntities(Entity causing, Entity direct) {
         if (causing instanceof LivingEntity living) {
             return living;
         }
-        Entity direct = source.getDirectEntity();
-        if (direct instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner) {
-            return owner;
+        LivingEntity fromCausingProjectile = ownerIfProjectile(causing);
+        if (fromCausingProjectile != null) {
+            return fromCausingProjectile;
+        }
+        LivingEntity fromDirectProjectile = ownerIfProjectile(direct);
+        if (fromDirectProjectile != null) {
+            return fromDirectProjectile;
         }
         if (direct instanceof LivingEntity livingDirect) {
             return livingDirect;
+        }
+        return null;
+    }
+
+    private static LivingEntity ownerIfProjectile(Entity entity) {
+        if (entity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner) {
+            return owner;
         }
         return null;
     }

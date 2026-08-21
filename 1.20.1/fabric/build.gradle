@@ -13,6 +13,30 @@ dependencies {
     modImplementation files(rootProject.file("libs/jauml-fabric-1.20.1-1.2.0.jar"))
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
+    // Soft-dep: compile against Neat for mixin; runtime copy keeps JiJ (Fiber) intact
+    modCompileOnly "maven.modrinth:neat:${neat_fabric_version}"
+}
+
+def neatFabricDep = dependencies.create("maven.modrinth:neat:${neat_fabric_version}")
+configurations {
+    neatRuntimeJar {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = false
+    }
+}
+dependencies {
+    neatRuntimeJar neatFabricDep
+}
+
+tasks.register('copyNeatForRunClient', Copy) {
+    from({ configurations.neatRuntimeJar.singleFile })
+    into(layout.projectDirectory.dir('run/mods'))
+    rename { 'neat-dev.jar' }
+}
+
+tasks.named('runClient') {
+    dependsOn('copyNeatForRunClient')
 }
 
 loom {

@@ -2,6 +2,7 @@ package tn.nightbeam.rpgmoblevelingsystem.fabric.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import tn.nightbeam.rpgmoblevelingsystem.client.MobLevelOverlayRenderer;
+import tn.nightbeam.rpgmoblevelingsystem.compat.NeatCompat;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
 
 public final class FabricMobLevelOverlay {
@@ -10,7 +11,7 @@ public final class FabricMobLevelOverlay {
 
     public static void register() {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (!ModConfig.global().useLegacyHud) {
+            if (!NeatCompat.shouldUseLegacyHud()) {
                 return;
             }
             float offsetX = (float) ModConfig.global().overlayXOffset;

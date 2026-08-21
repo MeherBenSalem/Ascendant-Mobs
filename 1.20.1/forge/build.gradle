@@ -41,6 +41,8 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     compileOnly project(":common")
     implementation files(rootProject.file("libs/jauml-forge-1.20.1-1.2.0.jar"))
+    // Soft-dep compile-only (no runtime) so Forge runClient verifies legacy HUD fallback
+    compileOnly "maven.modrinth:neat:${neat_forge_version}"
 }
 
 jar {

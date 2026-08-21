@@ -13,12 +13,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
+import tn.nightbeam.rpgmoblevelingsystem.compat.NeatCompat;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
-import tn.nightbeam.rpgmoblevelingsystem.gameplay.EntityClassification;
 import tn.nightbeam.rpgmoblevelingsystem.gameplay.MobLevelService;
 
 public final class MobLevelOverlayRenderer {
-    private static final float TEXT_SCALE = 0.11F;
+    private static final float TEXT_SCALE = 0.03F;
     private static final double MAX_RENDER_DISTANCE_SQR = 48.0D * 48.0D;
 
     private MobLevelOverlayRenderer() {
@@ -31,6 +31,9 @@ public final class MobLevelOverlayRenderer {
     }
 
     public static void render(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, float partialTick, float offsetX, float offsetY, float offsetZ) {
+        if (!NeatCompat.shouldUseLegacyHud()) {
+            return;
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null) {
             return;
@@ -43,7 +46,7 @@ public final class MobLevelOverlayRenderer {
             if (minecraft.player.distanceToSqr(entity) > MAX_RENDER_DISTANCE_SQR) {
                 continue;
             }
-            if (isHudHidden(entity)) {
+            if (NeatCompat.isHudHidden(entity)) {
                 continue;
             }
 
@@ -81,27 +84,6 @@ public final class MobLevelOverlayRenderer {
 
             poseStack.popPose();
         }
-    }
-
-    private static boolean isHudHidden(Entity entity) {
-        var hideHudFor = ModConfig.global().hideHudFor;
-        if (hideHudFor == null || hideHudFor.isEmpty()) {
-            return false;
-        }
-        String entityId = EntityClassification.entityTypeId(entity);
-        for (String entry : hideHudFor) {
-            if (entry == null || entry.isBlank()) {
-                continue;
-            }
-            if (entry.endsWith(":")) {
-                if (entityId.startsWith(entry)) {
-                    return true;
-                }
-            } else if (entityId.equals(entry)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static double nameplateOffset(LivingEntity entity) {

@@ -43,6 +43,11 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+dependencies {
+    // Soft-dep compile-only (no runtime) so NeoForge runClient verifies legacy HUD + partial-tick fix
+    compileOnly "maven.modrinth:neat:${neat_neoforge_version}"
+}
+
 // Add a simple mod jar output for easier distribution and identification.
 // Use the generated project jar (mod classes only) instead of the full NeoForge runtime bundle.
 tasks.register('modJar', Copy) {

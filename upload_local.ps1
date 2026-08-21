@@ -20,6 +20,9 @@ $notes = Join-Path $root "Ascendant-Mobs-$Version-PatchNotes.md"
 if (-not (Test-Path $notes)) {
     $notes = Join-Path $root "RPG-Mob-Leveling-System-$Version-PatchNotes.md"
 }
+if (-not (Test-Path $notes)) {
+    $notes = Join-Path $root "PATCH_NOTES.md"
+}
 
 $nodeArgs = @("scripts/upload_platforms.mjs", "--version", $Version, "--changelog-file", $notes)
 if ($CurseForgeOnly) { $nodeArgs += "--curseforge-only" }

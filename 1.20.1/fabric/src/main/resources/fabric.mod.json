@@ -8,8 +8,8 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "homepage": "https://modrinth.com/mod/rpg-mob-leveling-system",
+        "sources": "https://github.com/MeherBenSalem/Ascendant-Mobs"
     },
     "license": "${license}",
     "icon": "assets/rpgmoblevelingsystem/textures/logo.png",
@@ -21,7 +21,8 @@
     },
     "mixins": [
         "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
+        "${mod_id}.fabric.mixins.json",
+        "${mod_id}.neat.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=0.14",
@@ -30,7 +31,7 @@
         "java": ">=17"
     },
     "suggests": {
-        "another-mod": "*"
+        "neat": "*"
     }
 }
   

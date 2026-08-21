@@ -6,6 +6,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import tn.nightbeam.rpgmoblevelingsystem.Constants;
+import tn.nightbeam.rpgmoblevelingsystem.compat.NeatCompat;
 import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
@@ -18,7 +19,7 @@ public final class ForgeMobLevelOverlay {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             return;
         }
-        if (!ModConfig.global().useLegacyHud) {
+        if (!NeatCompat.shouldUseLegacyHud()) {
             return;
         }
         PoseStack poseStack = event.getPoseStack();

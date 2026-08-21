@@ -1,12 +1,37 @@
+# Root ignores (monorepo)
 ascendant_mobs.mcreator
-.gradle
 .mcreator
-.eclipse
-.settings
-bin
-elements
-run
-runs
 mcreator.gradle
+elements
+
+# Build / Gradle
+.gradle/
+**/build/
 /build/
-**/build
+bin/
+
+# Runs / IDE
+run/
+runs/
+.idea/
+.vscode/
+.eclipse/
+.settings/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+
+# Release / secrets / generated
+dist/
+graphify-out/
+.env
+.env.*
+secrets/
+*.log
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

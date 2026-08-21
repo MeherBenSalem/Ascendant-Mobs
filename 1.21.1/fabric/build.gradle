@@ -11,6 +11,37 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    // Soft-dep: compile against Neat for mixin; runtime copy keeps JiJ (Fiber) intact
+    modCompileOnly "maven.modrinth:neat:${neat_fabric_version}"
+}
+
+def neatFabricDep = dependencies.create("maven.modrinth:neat:${neat_fabric_version}")
+def clothConfigDep = dependencies.create("maven.modrinth:cloth-config:${cloth_config_fabric_version}")
+configurations {
+    neatRuntimeJar {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = false
+    }
+}
+dependencies {
+    neatRuntimeJar neatFabricDep
+    neatRuntimeJar clothConfigDep
+}
+
+tasks.register('copyNeatForRunClient', Copy) {
+    from({ configurations.neatRuntimeJar })
+    into(layout.projectDirectory.dir('runs/client/mods'))
+    rename { String fileName ->
+        if (fileName.toLowerCase().contains('cloth')) {
+            return 'cloth-config-dev.jar'
+        }
+        return 'neat-dev.jar'
+    }
+}
+
+tasks.named('runClient') {
+    dependsOn('copyNeatForRunClient')
 }
 
 loom {
