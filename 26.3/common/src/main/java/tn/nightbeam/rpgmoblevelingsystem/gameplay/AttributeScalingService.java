@@ -1,0 +1,141 @@
+package tn.nightbeam.rpgmoblevelingsystem.gameplay;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import tn.nightbeam.rpgmoblevelingsystem.config.ModConfig;
+import tn.nightbeam.rpgmoblevelingsystem.util.AttributeResolution;
+
+public final class AttributeScalingService {
+    private static final Identifier LEVEL_MODIFIER_ID = Identifier.fromNamespaceAndPath("rpgmoblevelingsystem", "level");
+
+    private AttributeScalingService() {
+    }
+
+    public static void apply(Entity entity, LivingEntity living, double level) {
+        for (ModConfig.AttributeRule rule : ModConfig.attributes().attributes) {
+            if (rule.mobFilter != null && !rule.mobFilter.isEmpty() && !EntityClassification.entityTypeId(entity).equals(rule.mobFilter)) {
+                continue;
+            }
+            if (rule.hostileOnly && !EntityClassification.isHostile(living)) {
+                continue;
+            }
+            if (ModConfig.mobs().hostileOnly && !EntityClassification.isHostile(living)) {
+                continue;
+            }
+
+            Holder<Attribute> attributeHolder = AttributeResolution.resolveHolder(rule.attributeId);
+            if (attributeHolder == null) {
+                continue;
+            }
+
+            AttributeInstance instance = living.getAttribute(attributeHolder);
+            if (instance == null) {
+                continue;
+            }
+
+            removeLevelModifier(instance);
+
+            double amount = computeAmount(instance, rule, level);
+            if (amount == 0) {
+                continue;
+            }
+
+            instance.addPermanentModifier(new AttributeModifier(LEVEL_MODIFIER_ID, amount, AttributeModifier.Operation.ADD_VALUE));
+        }
+
+        applyPlayerBalance(living, level);
+        living.setHealth((float) Math.min(living.getHealth(), living.getMaxHealth()));
+    }
+
+    /**
+     * Applies the level attack-damage modifier ratio to non-melee damage (arrows, sonic boom, etc.).
+     */
+    public static float scaleOutgoingNonMeleeDamage(LivingEntity attacker, float amount) {
+        AttributeInstance instance = attacker.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (instance == null) {
+            return amount;
+        }
+        AttributeModifier modifier = instance.getModifier(LEVEL_MODIFIER_ID);
+        if (modifier == null) {
+            return amount;
+        }
+        return tn.nightbeam.rpgmoblevelingsystem.util.ScalingMath.applyLevelDamageRatio(
+                amount, instance.getValue(), modifier.amount());
+    }
+
+    public static void clear(LivingEntity living) {
+        for (ModConfig.AttributeRule rule : ModConfig.attributes().attributes) {
+            Holder<Attribute> attributeHolder = AttributeResolution.resolveHolder(rule.attributeId);
+            if (attributeHolder == null) {
+                continue;
+            }
+            AttributeInstance instance = living.getAttribute(attributeHolder);
+            if (instance != null) {
+                removeLevelModifier(instance);
+            }
+        }
+        living.entityTags().removeIf(tag -> tag.startsWith(MobLevelStorage.TAG_LEVEL_PREFIX));
+        living.removeTag(MobLevelStorage.TAG_GOT_LEVEL);
+    }
+
+    private static void applyPlayerBalance(LivingEntity living, double level) {
+        if (!ModConfig.scale().playerBalanceEnabled || !RasCompatibilityLayer.isRasLoaded()) {
+            return;
+        }
+        if (!(living.level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+            return;
+        }
+        var players = serverLevel.getEntitiesOfClass(net.minecraft.world.entity.player.Player.class,
+                living.getBoundingBox().inflate(ModConfig.scale().playerScaleRadius), net.minecraft.world.entity.player.Player::isAlive);
+        if (players.isEmpty()) {
+            return;
+        }
+        RasCompatibilityLayer.PlayerCombatSnapshot snapshot = RasCompatibilityLayer.getCombatSnapshot(players.get(0));
+        if (snapshot.rpgLevel() <= 0) {
+            return;
+        }
+
+        AttributeInstance health = living.getAttribute(Attributes.MAX_HEALTH);
+        AttributeInstance damage = living.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (health != null && level < snapshot.rpgLevel()) {
+            double target = snapshot.maxHealth() * ModConfig.scale().playerBalanceHealthRatio * (level / Math.max(1, snapshot.rpgLevel()));
+            if (health.getBaseValue() > target && target > 0) {
+                health.setBaseValue(target);
+            }
+        }
+        if (damage != null && level < snapshot.rpgLevel()) {
+            double target = snapshot.attackDamage() * ModConfig.scale().playerBalanceDamageRatio * (level / Math.max(1, snapshot.rpgLevel()));
+            if (damage.getBaseValue() > target && target > 0) {
+                damage.setBaseValue(target);
+            }
+        }
+    }
+
+    private static double computeAmount(AttributeInstance instance, ModConfig.AttributeRule rule, double level) {
+        double baseValue = instance.getBaseValue();
+        if (rule.isMultiplicative()) {
+            double amount = baseValue * (Math.pow(1 + rule.valuePerLevel / 100.0, level) - 1);
+            return Math.min(amount, rule.maxValue);
+        }
+        if (rule.isPercent()) {
+            double boosted = baseValue * (level * rule.valuePerLevel / 100.0);
+            return Math.min(boosted, rule.maxValue);
+        }
+        double additive = level * rule.valuePerLevel;
+        if (rule.referenceBase != null && rule.referenceBase > 0) {
+            additive *= baseValue / rule.referenceBase;
+        }
+        return Math.min(additive, rule.maxValue);
+    }
+
+    private static void removeLevelModifier(AttributeInstance instance) {
+        instance.removeModifier(LEVEL_MODIFIER_ID);
+    }
+}

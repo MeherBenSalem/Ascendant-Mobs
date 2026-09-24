@@ -8,8 +8,8 @@ and rewards. Formerly known as Ascendant Mobs. Mod ID: `rpgmoblevelingsystem`.
 - Distance / day / MOTP / RPG Attribute System based leveling
 - Configurable attribute scaling (additive, percent, multiplicative)
 - Optional Ascendant elites, structure/boss level locks, loot-by-level
-- Client level display via legacy overlay, or soft integration with [Neat](https://modrinth.com/mod/neat) plates
-- MultiLoader: Fabric + Forge (1.20.1), Fabric + NeoForge (1.21.1)
+- Client level display via nametag overlay; on 1.20.1 / 1.21.1 also soft [Neat](https://modrinth.com/mod/neat) plates when present
+- MultiLoader: Fabric + Forge (1.20.1), Fabric + NeoForge (1.21.1), Fabric + NeoForge (26.3)
 
 ## Requirements
 
@@ -17,6 +17,7 @@ and rewards. Formerly known as Ascendant Mobs. Mod ID: `rpgmoblevelingsystem`.
 |-----------|---------|------|
 | 1.20.1 | Fabric, Forge | 17 |
 | 1.21.1 | Fabric, NeoForge | 21 |
+| 26.3 | Fabric, NeoForge | 25 |
 
 ## Installation
 
@@ -36,6 +37,9 @@ cd 1.20.1 && ./gradlew build
 
 # 1.21.1 (Java 21)
 cd 1.21.1 && ./gradlew build
+
+# 26.3 (Java 25)
+cd 26.3 && ./gradlew build
 ```
 
 Local release helpers: `publish_local.ps1` (build + GitHub release) and

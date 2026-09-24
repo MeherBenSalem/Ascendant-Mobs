@@ -2,10 +2,15 @@
 
 ## 2.0.7
 
-**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge)
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · Minecraft 1.21.1 (Fabric, NeoForge) · Minecraft 26.3 (Fabric, NeoForge)
+
+### Minecraft 26.3
+* New MultiLoader workspace (`26.3/`) for Fabric + NeoForge on Minecraft 26.3 (Java 25, NeoForge 26.3.0.16-beta, Fabric Loader 0.19.5, Fabric API 0.160.6+26.3).
+* Gameplay is the existing 2.0.7 feature set: spawn leveling, attribute/XP scaling, configs, `/rml` commands, calendar item, Ascendant elites, and level display on vanilla name tags.
+* **Neat plate integration is omitted** on 26.3 — Neat has no 26.3 build. Levels use the vanilla name-tag path instead. Cloth Config stays optional/unused (it was only a 1.21.1 Neat run-client companion, not a required dependency).
 
 ### Features / Compatibility
-* **Neat soft integration** — when [Neat](https://modrinth.com/mod/neat) is installed, mob levels appear on Neat unit-frame name plates using `nameFormat` (default `%mob_name% [Lv. %level%]`). Neat remains fully optional.
+* **Neat soft integration** (1.20.1 / 1.21.1) — when [Neat](https://modrinth.com/mod/neat) is installed, mob levels appear on Neat unit-frame name plates using `nameFormat` (default `%mob_name% [Lv. %level%]`). Neat remains fully optional.
 * **Legacy HUD auto-disable** — floating level digits are suppressed while Neat is present to avoid double UI.
 
 ### Bug Fixes / Polish
