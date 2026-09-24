@@ -53,6 +53,27 @@ if (-not $SkipBuild) {
         Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
         ForEach-Object { Copy-Item $_.FullName $distDir -Force }
 
+    $jdk25 = if (Test-Path "C:\Program Files\Java\jdk-25") {
+        "C:\Program Files\Java\jdk-25"
+    } elseif (Test-Path "C:\Program Files\Eclipse Adoptium\jdk-25") {
+        "C:\Program Files\Eclipse Adoptium\jdk-25"
+    } else {
+        $null
+    }
+    if ($jdk25) {
+        Write-Host "Building 26.3 (NeoForge + Fabric)..." -ForegroundColor Cyan
+        $env:JAVA_HOME = $jdk25
+        $env:Path = "$jdk25\bin;" + $env:Path
+        Set-Location (Join-Path $root "26.3")
+        .\gradlew.bat clean build --no-daemon
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        Get-ChildItem "fabric\build\libs","neoforge\build\libs" -Filter "rpgmoblevelingsystem-*.jar" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
+            ForEach-Object { Copy-Item $_.FullName $distDir -Force }
+    } else {
+        Write-Host "Skipping 26.3 build (JDK 25 not found). Copy jars from 26.3/*/build/libs or releases/." -ForegroundColor Yellow
+    }
+
     Set-Location $root
 }
 
