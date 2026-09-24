@@ -23,6 +23,10 @@ loom {
             if (graphicsBackend) {
                 programArgs('--graphicsBackend', graphicsBackend)
             }
+            def quickPlayWorld = System.getenv('RML_QUICKPLAY_WORLD')
+            if (quickPlayWorld) {
+                programArgs('--quickPlaySingleplayer', quickPlayWorld)
+            }
         }
         server {
             server()

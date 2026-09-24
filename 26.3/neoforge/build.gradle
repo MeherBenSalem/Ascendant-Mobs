@@ -22,6 +22,10 @@ neoForge {
             if (graphicsBackend) {
                 programArguments.addAll('--graphicsBackend', graphicsBackend)
             }
+            def quickPlayWorld = System.getenv('RML_QUICKPLAY_WORLD')
+            if (quickPlayWorld) {
+                programArguments.addAll('--quickPlaySingleplayer', quickPlayWorld)
+            }
         }
         data {
             clientData()
