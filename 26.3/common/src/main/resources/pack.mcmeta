@@ -1,7 +1,7 @@
 {
-    "pack": {
-        "description": "${mod_name}",
-        "min_format": 121,
-        "max_format": 121
-    }
+  "pack": {
+    "description": "Remnants: RPG Mobs - monsters with levels, ranks and traits",
+    "min_format": 121,
+    "max_format": 121
+  }
 }

@@ -18,14 +18,6 @@ neoForge {
         client {
             client()
             gameDirectory = this.mkdir(this.file('runs/client'))
-            def graphicsBackend = System.getenv('RML_GRAPHICS_BACKEND')
-            if (graphicsBackend) {
-                programArguments.addAll('--graphicsBackend', graphicsBackend)
-            }
-            def quickPlayWorld = System.getenv('RML_QUICKPLAY_WORLD')
-            if (quickPlayWorld) {
-                programArguments.addAll('--quickPlaySingleplayer', quickPlayWorld)
-            }
         }
         data {
             clientData()
@@ -38,6 +30,12 @@ neoForge {
             server()
             this.file('runs/server').createParentDirectories()
             gameDirectory = this.mkdir(this.file('runs/server'))
+        }
+        // QA client: joins a server on localhost:25565 straight away (see tools/qa/).
+        qaClient {
+            client()
+            gameDirectory = this.mkdir(this.file('runs/client'))
+            programArguments.addAll '--quickPlayMultiplayer', 'localhost:25565', '--username', 'RemnantHunter', '--width', '1920', '--height', '1080'
         }
     }
     mods {

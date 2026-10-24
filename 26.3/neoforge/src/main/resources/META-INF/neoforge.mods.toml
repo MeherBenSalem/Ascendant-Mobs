@@ -7,14 +7,13 @@ modId = "${mod_id}" #mandatory
 version = "${version}" #mandatory
 displayName = "${mod_name}" #mandatory
 displayURL="https://github.com/MeherBenSalem/Ascendant-Mobs"
-iconFile="${mod_id}.png" #optional (logoFile shows a blocking warning screen on 26.3)
+logoFile = "logo.png" #optional
+iconFile = "${mod_id}.png" #optional
 credits="${credits}" #optional
 authors = "${mod_author}" #optional
 description = '''${description}''' #mandatory (Supports multiline text)
 [[mixins]]
 config = "${mod_id}.mixins.json"
-[[mixins]]
-config = "${mod_id}.neoforge.mixins.json"
 [[dependencies.${mod_id}]] #optional
 modId = "neoforge" #mandatory
 type="required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
@@ -25,5 +24,18 @@ side = "BOTH"
 modId = "minecraft"
 type="required"
 versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "rpg_attribute_system"
+type="optional"
+versionRange = "[4.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "rpgmoblevelingsystem"
+type="incompatible"
+reason="Remnants: RPG Mobs replaces RPG Mob Leveling System; remove the old jar."
+versionRange = "[0,)"
 ordering = "NONE"
 side = "BOTH"

@@ -1,0 +1,131 @@
+"""en_us translations."""
+
+NS = 'remnant_mobs'
+
+TRAITS = {
+    'vampiric': ('Vampiric', 'Heals for part of the damage it deals.'),
+    'frostbite': ('Frostbite', 'Hits slow and freeze you. Cannot be frozen.'),
+    'infernal': ('Infernal', 'Immune to fire. Hits set you ablaze.'),
+    'venomous': ('Venomous', 'Hits poison you; Champions and Remnants poison harder.'),
+    'withering': ('Withering', 'Hits wither you.'),
+    'berserk': ('Berserk', 'Below half health it hits harder and moves faster.'),
+    'crushing': ('Crushing', 'Hits knock you far back and break through shields.'),
+    'juggernaut': ('Juggernaut', 'Cannot be knocked back. More health and armor, but slower.'),
+    'thornskin': ('Thornskin', 'Melee attackers take part of their damage back.'),
+    'warded': ('Warded', 'A shield of absorption that regrows when it is left alone.'),
+    'regenerating': ('Regenerating', 'Steadily regains health, quickly out of combat.'),
+    'deflecting': ('Deflecting', 'Takes much less damage from projectiles.'),
+    'swift': ('Swift', 'Moves much faster.'),
+    'blinking': ('Blinking', 'When hit, may teleport behind its attacker.'),
+    'packleader': ('Packleader', 'Once wounded, calls lesser copies of itself to its side.'),
+    'volatile': ('Volatile', 'Explodes shortly after it dies. Step away.'),
+}
+
+ADVANCEMENTS = {
+    'root': ('Remnants', 'Not every monster is the same. Some have levels, ranks and traits'),
+    'proven_hunter': ('Proven Hunter', 'Slay an Elite monster'),
+    'champions_bane': ("Champion's Bane", 'Slay a Champion'),
+    'remnants_end': ("A Remnant's End", 'Slay a Remnant, the rarest and deadliest of monsters'),
+    'punching_up': ('Punching Up', 'Slay a ranked monster ten or more levels above your own'),
+    'under_the_hunters_moon': ("Under the Hunter's Moon", "Slay a ranked monster while a Hunter's Moon is up"),
+    'taste_of_valor': ('Taste of Valor', 'Absorb a Remnant Shard'),
+    'know_thy_enemy': ('Know Thy Enemy', "Look through a Hunter's Lens"),
+    'accept_the_challenge': ('Accept the Challenge', 'Mark a monster with a Brand of Challenge'),
+    'nothing_left_to_hide': ('Nothing Left to Hide', 'Slay a monster with four traits'),
+}
+
+EN_US = {
+    'item.remnant_mobs.remnant_shard': 'Remnant Shard',
+    'item.remnant_mobs.remnant_shard.tooltip': 'Use to absorb: Valor with RPG Attribute System, experience without it',
+    'item.remnant_mobs.remnant_shard.tooltip.sneak': 'Sneak to absorb the whole stack',
+    'item.remnant_mobs.hunters_lens': "Hunter's Lens",
+    'item.remnant_mobs.hunters_lens.tooltip': 'Held: shows the threat level of the area',
+    'item.remnant_mobs.hunters_lens.tooltip.scope': "Look through it at a monster to read its level, rank, traits and stats",
+    'item.remnant_mobs.brand_of_challenge': 'Brand of Challenge',
+    'item.remnant_mobs.brand_of_challenge.tooltip': 'Use on a leveled monster: one rank higher, five levels stronger, one more trait',
+    'item.remnant_mobs.brand_of_challenge.tooltip.reward': 'Its rewards are doubled',
+
+    'rank.remnant_mobs.common': 'Common',
+    'rank.remnant_mobs.veteran': 'Veteran',
+    'rank.remnant_mobs.elite': 'Elite',
+    'rank.remnant_mobs.champion': 'Champion',
+    'rank.remnant_mobs.remnant': 'Remnant',
+
+    'plate.remnant_mobs.level': 'Lv. %s',
+    'plate.remnant_mobs.ranked_name': '%s %s',
+
+    'message.remnant_mobs.remnant_near': 'A Remnant stirs nearby: %s',
+    'message.remnant_mobs.remnant_slain': '%s (Lv. %s) has been slain by %s',
+    'message.remnant_mobs.remnant_fallen': '%s (Lv. %s) has fallen',
+    'message.remnant_mobs.valor': '%s slain  %s Valor',
+    'message.remnant_mobs.shard_valor': 'Absorbed  %s Valor',
+    'message.remnant_mobs.brand.applied': 'Challenge accepted: it rises to %s',
+    'message.remnant_mobs.brand.not_leveled': 'Only leveled monsters can be challenged',
+    'message.remnant_mobs.brand.cannot': 'This creature cannot be challenged',
+    'message.remnant_mobs.brand.already': 'It already bears a Brand of Challenge',
+    'message.remnant_mobs.brand.max': 'A Remnant cannot rise any higher',
+
+    'event.remnant_mobs.hunters_moon.title': "The Hunter's Moon",
+    'event.remnant_mobs.hunters_moon.subtitle': 'Monsters grow stronger until dawn',
+    'event.remnant_mobs.hunters_moon.chat': "A Hunter's Moon rises. Until dawn, monsters spawn stronger, ranks come more often and shards drop more.",
+    'event.remnant_mobs.hunters_moon.end': "The Hunter's Moon sets.",
+
+    'hud.remnant_mobs.hunters_moon': "Hunter's Moon",
+    'hud.remnant_mobs.threat': 'Threat',
+    'hud.remnant_mobs.you': 'You: %s',
+    'hud.remnant_mobs.band': 'Levels here: %s - %s',
+    'hud.remnant_mobs.band_structure': 'Levels here: %s - %s  ·  this ruin: %s+',
+    'hud.remnant_mobs.above': '%s above you',
+    'hud.remnant_mobs.below': '%s below you',
+    'hud.remnant_mobs.even': 'your level',
+    'hud.remnant_mobs.rewards': 'Rewards: x%s experience',
+    'hud.remnant_mobs.rewards_shards': '%s Remnant Shards',
+    'hud.remnant_mobs.branded': 'Branded: double rewards',
+
+    'commands.remnant_mobs.inspect.none': 'No monster in sight (look at one within 32 blocks)',
+    'commands.remnant_mobs.not_a_mob': '%s is not a monster',
+    'commands.remnant_mobs.unknown_rank': 'Unknown rank: %s',
+    'commands.remnant_mobs.unknown_trait': 'Unknown trait: %s',
+    'commands.remnant_mobs.threat.header': 'Threat here: %s  (%s, levels %s-%s)',
+    'commands.remnant_mobs.threat.parts': '  base %s + distance %s + days %s + depth %s + moon %s',
+    'commands.remnant_mobs.threat.structure': '  inside %s: at least level %s',
+    'commands.remnant_mobs.threat.players': '  %s player(s) nearby at level %s pull it %s%% of the way',
+    'commands.remnant_mobs.threat.no_ras': '  (install RPG Attribute System to scale with player levels)',
+    'commands.remnant_mobs.threat.range': 'Monsters spawning here: level %s to %s',
+    'commands.remnant_mobs.inspect.unleveled': '%s has no level',
+    'commands.remnant_mobs.inspect.header': '%s  ·  Level %s  ·  %s',
+    'commands.remnant_mobs.inspect.stats': '  Health %s / %s  ·  Damage %s  ·  Armor %s  ·  Speed %s',
+    'commands.remnant_mobs.inspect.flag.branded': 'Branded',
+    'commands.remnant_mobs.inspect.flag.moonlit': "Born under a Hunter's Moon",
+    'commands.remnant_mobs.inspect.flag.spawner': 'From a spawner',
+    'commands.remnant_mobs.inspect.flag.minion': 'Minion',
+    'commands.remnant_mobs.inspect.flag.boss': 'Boss',
+    'commands.remnant_mobs.spawn': 'Spawned %s at level %s (%s)',
+    'commands.remnant_mobs.set': 'Updated %s monster(s)',
+    'commands.remnant_mobs.cleared': 'Cleared %s monster(s)',
+    'commands.remnant_mobs.moon.started': "A Hunter's Moon rises until dawn",
+    'commands.remnant_mobs.moon.stopped': "The Hunter's Moon sets",
+    'commands.remnant_mobs.moon.active': "A Hunter's Moon is up: %s min %s s until dawn",
+    'commands.remnant_mobs.moon.inactive': "No Hunter's Moon tonight",
+    'commands.remnant_mobs.moon.disabled': "The Hunter's Moon is turned off in levels.json",
+    'commands.remnant_mobs.reload': 'Reloaded Remnants: RPG Mobs config',
+
+    'subtitles.remnant_mobs.item.shard.absorb': 'Remnant Shard absorbed',
+    'subtitles.remnant_mobs.item.brand.apply': 'Brand burns',
+    'subtitles.remnant_mobs.mob.remnant.horn': 'A Remnant awakens',
+    'subtitles.remnant_mobs.mob.remnant.slain': 'A Remnant falls',
+    'subtitles.remnant_mobs.mob.rank_slain': 'Champion falls',
+    'subtitles.remnant_mobs.event.hunters_moon': "Hunter's Moon tolls",
+    'subtitles.remnant_mobs.trait.blink': 'Monster blinks',
+    'subtitles.remnant_mobs.trait.ward_break': 'Ward shatters',
+    'subtitles.remnant_mobs.trait.ward_restore': 'Ward restored',
+    'subtitles.remnant_mobs.trait.pack_call': 'Packleader howls',
+    'subtitles.remnant_mobs.trait.volatile_fuse': 'Corpse hisses',
+}
+
+for key, (name, desc) in TRAITS.items():
+    EN_US[f'trait.{NS}.{key}'] = name
+    EN_US[f'trait.{NS}.{key}.desc'] = desc
+for key, (title, desc) in ADVANCEMENTS.items():
+    EN_US[f'advancements.{NS}.{key}.title'] = title
+    EN_US[f'advancements.{NS}.{key}.description'] = desc

@@ -35,3 +35,8 @@ secrets/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Generated asset cache and Python bytecode
+tools/assets/.cache/
+__pycache__/
+logs/
