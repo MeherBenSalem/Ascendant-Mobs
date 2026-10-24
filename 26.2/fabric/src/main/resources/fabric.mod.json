@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://modrinth.com/mod/rpg-mob-leveling-system",
+        "sources": "https://github.com/MeherBenSalem/Ascendant-Mobs",
+        "issues": "https://github.com/MeherBenSalem/Ascendant-Mobs/issues"
+    },
+    "license": "${license}",
+    "icon": "${mod_id}.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.nightbeam.remnants.mobs.fabric.RemnantMobsFabric"
+        ],
+        "client": [
+            "com.nightbeam.remnants.mobs.fabric.RemnantMobsFabricClient"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
+    },
+    "suggests": {
+        "rpg_attribute_system": "*"
+    },
+    "breaks": {
+        "rpgmoblevelingsystem": "*"
+    }
+}

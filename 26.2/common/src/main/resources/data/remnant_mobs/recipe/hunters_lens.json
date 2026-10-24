@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " S ",
+    "SGS",
+    " S "
+  ],
+  "key": {
+    "S": "remnant_mobs:remnant_shard",
+    "G": "minecraft:spyglass"
+  },
+  "result": {
+    "id": "remnant_mobs:hunters_lens"
+  }
+}

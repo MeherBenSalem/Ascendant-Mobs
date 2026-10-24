@@ -60,11 +60,16 @@ def recipes(profile):
     }
 
 
+REMNANT_BOSSES = ['ossukage', 'forgotten_watcher', 'hollow_sovereign', 'gravebound_warden', 'burial_guardian']
+
+
 def tags(profile):
     return {
         ('tags/entity_type', 'bosses'): {'replace': False, 'values': [
             'minecraft:ender_dragon', 'minecraft:wither', 'minecraft:warden', 'minecraft:elder_guardian',
-            {'id': '#c:bosses', 'required': False}, {'id': '#forge:bosses', 'required': False}]},
+            {'id': '#c:bosses', 'required': False}, {'id': '#forge:bosses', 'required': False}]
+            # Remnant Bosses: its bosses already have their own health, phases and boss bars.
+            + [{'id': f'remnants:{boss}', 'required': False} for boss in REMNANT_BOSSES]},
         ('tags/entity_type', 'never_leveled'): {'replace': False, 'values': []},
         ('tags/entity_type', 'never_ranked'): {'replace': False, 'values': [
             'minecraft:vex', 'minecraft:silverfish', 'minecraft:endermite']},

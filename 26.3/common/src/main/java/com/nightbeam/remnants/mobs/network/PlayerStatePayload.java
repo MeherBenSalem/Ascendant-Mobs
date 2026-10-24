@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * Server to client: the player's own hunter level (-1 when levels are not compared), whether a Hunter's Moon is up,
  * and while they hold a Hunter's Lens, the threat where they stand (-1 otherwise).
  */
-public record PlayerStatePayload(int hunterLevel, boolean ras, boolean moon, int threat, int bandMin, int bandMax, int structure)
+public record PlayerStatePayload(int hunterLevel, boolean ras, boolean moon, int threat, int rangeMin, int rangeMax, int structure)
         implements CustomPacketPayload {
     public static final Type<PlayerStatePayload> TYPE = new Type<>(RemnantMobs.id("player_state"));
     public static final StreamCodec<FriendlyByteBuf, PlayerStatePayload> CODEC =
@@ -20,8 +20,8 @@ public record PlayerStatePayload(int hunterLevel, boolean ras, boolean moon, int
         buf.writeBoolean(ras);
         buf.writeBoolean(moon);
         buf.writeVarInt(threat + 1);
-        buf.writeVarInt(bandMin);
-        buf.writeVarInt(bandMax);
+        buf.writeVarInt(rangeMin);
+        buf.writeVarInt(rangeMax);
         buf.writeVarInt(structure);
     }
 

@@ -80,10 +80,10 @@ public final class LensHud {
             int x = graphics.guiWidth() / 2 - font.width(line) / 2;
             int y = graphics.guiHeight() / 2 + 24;
             graphics.text(font, line, x, y, 0xFFFFFFFF, true);
-            Component band = state.structure() > 0
-                    ? Component.translatable("hud.remnant_mobs.band_structure", state.bandMin(), state.bandMax(), state.structure())
-                    : Component.translatable("hud.remnant_mobs.band", state.bandMin(), state.bandMax());
-            graphics.text(font, band, graphics.guiWidth() / 2 - font.width(band) / 2, y + 11, MUTED, true);
+            Component range = state.structure() > 0
+                    ? Component.translatable("hud.remnant_mobs.range_structure", state.rangeMin(), state.rangeMax(), state.structure())
+                    : Component.translatable("hud.remnant_mobs.range", state.rangeMin(), state.rangeMax());
+            graphics.text(font, range, graphics.guiWidth() / 2 - font.width(range) / 2, y + 11, MUTED, true);
         }
     }
 

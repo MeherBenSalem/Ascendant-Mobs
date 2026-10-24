@@ -48,8 +48,10 @@ class Rcon:
     def command(self, cmd):
         """Runs a command; long replies come split over several packets, so a marker packet ends the read."""
         rid = self._packet(2, cmd)
+        # The server reads one packet per socket read, so the marker goes out only once the reply has started.
+        got, _, text = self._read()
+        parts = [text] if got == rid else []
         marker = self._packet(0, '')
-        parts = []
         while True:
             got, _, text = self._read()
             if got == marker:

@@ -21,10 +21,11 @@ neoForge {
         }
         client {
             client()
+            gameDirectory = this.mkdir(this.file('runs/client'))
         }
         data {
             data()
-
+            gameDirectory = this.mkdir(this.file('runs/data'))
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
@@ -32,6 +33,13 @@ neoForge {
         }
         server {
             server()
+            gameDirectory = this.mkdir(this.file('runs/server'))
+        }
+        // QA client: joins a server on localhost:25565 straight away (see tools/qa/).
+        qaClient {
+            client()
+            gameDirectory = this.mkdir(this.file('runs/client'))
+            programArguments.addAll '--quickPlayMultiplayer', 'localhost:25565', '--username', 'RemnantHunter', '--width', '1920', '--height', '1080'
         }
     }
     mods {
@@ -42,22 +50,3 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-dependencies {
-    // Soft-dep compile-only (no runtime) so NeoForge runClient verifies legacy HUD + partial-tick fix
-    compileOnly "maven.modrinth:neat:${neat_neoforge_version}"
-}
-
-// Add a simple mod jar output for easier distribution and identification.
-// Use the generated project jar (mod classes only) instead of the full NeoForge runtime bundle.
-tasks.register('modJar', Copy) {
-    dependsOn(tasks.named('jar'))
-    from(tasks.named('jar').flatMap { it.archiveFile })
-    into(file("${buildDir}/libs"))
-    rename { 'rpgmoblevelingsystem-neoforge-2.0.0.jar' }
-}
-
-tasks.named('build') {
-    finalizedBy(tasks.named('modJar'))
-}
-

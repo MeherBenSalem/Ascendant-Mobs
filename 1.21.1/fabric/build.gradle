@@ -2,7 +2,6 @@ plugins {
     id 'multiloader-loader'
     id 'fabric-loom'
 }
-
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
@@ -11,46 +10,12 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    // Soft-dep: compile against Neat for mixin; runtime copy keeps JiJ (Fiber) intact
-    modCompileOnly "maven.modrinth:neat:${neat_fabric_version}"
-}
-
-def neatFabricDep = dependencies.create("maven.modrinth:neat:${neat_fabric_version}")
-def clothConfigDep = dependencies.create("maven.modrinth:cloth-config:${cloth_config_fabric_version}")
-configurations {
-    neatRuntimeJar {
-        canBeResolved = true
-        canBeConsumed = false
-        transitive = false
-    }
-}
-dependencies {
-    neatRuntimeJar neatFabricDep
-    neatRuntimeJar clothConfigDep
-}
-
-tasks.register('copyNeatForRunClient', Copy) {
-    from({ configurations.neatRuntimeJar })
-    into(layout.projectDirectory.dir('runs/client/mods'))
-    rename { String fileName ->
-        if (fileName.toLowerCase().contains('cloth')) {
-            return 'cloth-config-dev.jar'
-        }
-        return 'neat-dev.jar'
-    }
-}
-
-tasks.named('runClient') {
-    dependsOn('copyNeatForRunClient')
 }
 
 loom {
     def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
-    }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
     }
     runs {
         client {
@@ -64,6 +29,14 @@ loom {
             setConfigName('Fabric Server')
             ideConfigGenerated(true)
             runDir('runs/server')
+        }
+        // QA client: joins a server on localhost:25565 straight away (see tools/qa/).
+        qaClient {
+            client()
+            setConfigName('Fabric QA Client')
+            ideConfigGenerated(false)
+            runDir('runs/client')
+            programArgs('--quickPlayMultiplayer', 'localhost:25565', '--username', 'RemnantHunter', '--width', '1920', '--height', '1080')
         }
     }
 }

@@ -42,10 +42,6 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
-    maven {
-        name = 'Modrinth'
-        url = 'https://api.modrinth.com/maven'
-    }
 }
 
 // Declare capabilities on the outgoing configurations.
@@ -62,19 +58,19 @@ repositories {
 }
 
 sourcesJar {
-    from(rootProject.file('LICENSE')) {
+    from(rootProject.file('../LICENSE')) {
         rename { "${it}_${mod_name}" }
     }
-    from(rootProject.file('NOTICE')) {
+    from(rootProject.file('../NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 }
 
 jar {
-    from(rootProject.file('LICENSE')) {
+    from(rootProject.file('../LICENSE')) {
         rename { "${it}_${mod_name}" }
     }
-    from(rootProject.file('NOTICE')) {
+    from(rootProject.file('../NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 
@@ -110,7 +106,7 @@ processResources {
             'java_version'                 : java_version
     ]
 
-    filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
+    filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
         expand expandProps
     }
     inputs.properties(expandProps)

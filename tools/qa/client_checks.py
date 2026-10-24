@@ -133,7 +133,7 @@ def main():
     s.click(3)
     s.wait(1)
     inv = c(f'data get entity {PLAYER} Inventory')
-    left = re.search(r'remnant_mobs:remnant_shard"[^}]*?count: (\d+)|count: (\d+)[^}]*?remnant_mobs:remnant_shard', inv)
+    left = re.search(r'remnant_mobs:remnant_shard"[^}]*?count: (\d+)|count: (\d+)b?[^}]*?remnant_mobs:remnant_shard', inv, re.I)
     count = int(next(g for g in left.groups() if g)) if left else 0
     check('using a shard absorbs one', count == 4, inv[:300])
     if args.ras:

@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "id": "remnant_mobs:remnant_shard"
+    },
+    "title": {
+      "translate": "advancements.remnant_mobs.taste_of_valor.title"
+    },
+    "description": {
+      "translate": "advancements.remnant_mobs.taste_of_valor.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "remnant_mobs:root"
+}

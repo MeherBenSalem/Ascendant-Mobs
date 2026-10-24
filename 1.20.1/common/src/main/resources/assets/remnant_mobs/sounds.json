@@ -1,0 +1,101 @@
+{
+  "item.shard.absorb": {
+    "subtitle": "subtitles.remnant_mobs.item.shard.absorb",
+    "sounds": [
+      {
+        "name": "remnant_mobs:shard_absorb",
+        "stream": false
+      }
+    ]
+  },
+  "item.brand.apply": {
+    "subtitle": "subtitles.remnant_mobs.item.brand.apply",
+    "sounds": [
+      {
+        "name": "remnant_mobs:brand_apply",
+        "stream": false
+      }
+    ]
+  },
+  "mob.remnant.horn": {
+    "subtitle": "subtitles.remnant_mobs.mob.remnant.horn",
+    "sounds": [
+      {
+        "name": "remnant_mobs:remnant_horn",
+        "stream": false
+      }
+    ]
+  },
+  "mob.remnant.slain": {
+    "subtitle": "subtitles.remnant_mobs.mob.remnant.slain",
+    "sounds": [
+      {
+        "name": "remnant_mobs:remnant_slain",
+        "stream": false
+      }
+    ]
+  },
+  "mob.rank_slain": {
+    "subtitle": "subtitles.remnant_mobs.mob.rank_slain",
+    "sounds": [
+      {
+        "name": "remnant_mobs:rank_slain",
+        "stream": false
+      }
+    ]
+  },
+  "event.hunters_moon": {
+    "subtitle": "subtitles.remnant_mobs.event.hunters_moon",
+    "sounds": [
+      {
+        "name": "remnant_mobs:hunters_moon",
+        "stream": false
+      }
+    ]
+  },
+  "trait.blink": {
+    "subtitle": "subtitles.remnant_mobs.trait.blink",
+    "sounds": [
+      {
+        "name": "remnant_mobs:blink",
+        "stream": false
+      }
+    ]
+  },
+  "trait.ward_break": {
+    "subtitle": "subtitles.remnant_mobs.trait.ward_break",
+    "sounds": [
+      {
+        "name": "remnant_mobs:ward_break",
+        "stream": false
+      }
+    ]
+  },
+  "trait.ward_restore": {
+    "subtitle": "subtitles.remnant_mobs.trait.ward_restore",
+    "sounds": [
+      {
+        "name": "remnant_mobs:ward_restore",
+        "stream": false
+      }
+    ]
+  },
+  "trait.pack_call": {
+    "subtitle": "subtitles.remnant_mobs.trait.pack_call",
+    "sounds": [
+      {
+        "name": "remnant_mobs:pack_call",
+        "stream": false
+      }
+    ]
+  },
+  "trait.volatile_fuse": {
+    "subtitle": "subtitles.remnant_mobs.trait.volatile_fuse",
+    "sounds": [
+      {
+        "name": "remnant_mobs:volatile_fuse",
+        "stream": false
+      }
+    ]
+  }
+}

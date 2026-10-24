@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "id": "remnant_mobs:brand_of_challenge"
+    },
+    "title": {
+      "translate": "advancements.remnant_mobs.accept_the_challenge.title"
+    },
+    "description": {
+      "translate": "advancements.remnant_mobs.accept_the_challenge.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "remnant_mobs:taste_of_valor"
+}

@@ -13,6 +13,14 @@ java {
     withJavadocJar()
 }
 
+// Java 17 still reads sources in the platform charset (US-ASCII on a POSIX locale); the sources and resources are UTF-8.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 repositories {
     mavenCentral()
     // https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository
@@ -42,10 +50,6 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
-    maven {
-        name = 'Modrinth'
-        url = 'https://api.modrinth.com/maven'
-    }
 }
 
 // Declare capabilities on the outgoing configurations.
@@ -63,19 +67,19 @@ repositories {
 }
 
 sourcesJar {
-    from(rootProject.file('LICENSE')) {
+    from(rootProject.file('../LICENSE')) {
         rename { "${it}_${mod_name}" }
     }
-    from(rootProject.file('NOTICE')) {
+    from(rootProject.file('../NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 }
 
 jar {
-    from(rootProject.file('LICENSE')) {
+    from(rootProject.file('../LICENSE')) {
         rename { "${it}_${mod_name}" }
     }
-    from(rootProject.file('NOTICE')) {
+    from(rootProject.file('../NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 
@@ -93,6 +97,7 @@ jar {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
     var expandProps = [
             'version'                      : version,
             'group'                        : project.group, //Else we target the task's group.

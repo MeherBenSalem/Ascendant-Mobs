@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "id": "remnant_mobs:remnant_shard"
+    },
+    "title": {
+      "translate": "advancements.remnant_mobs.root.title"
+    },
+    "description": {
+      "translate": "advancements.remnant_mobs.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "remnant_mobs:gui/advancements/backgrounds/remnants"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "SES",
+    "SSS"
+  ],
+  "key": {
+    "S": "remnant_mobs:remnant_shard",
+    "E": "minecraft:echo_shard"
+  },
+  "result": {
+    "id": "remnant_mobs:brand_of_challenge"
+  }
+}

@@ -1,6 +1,7 @@
 package com.nightbeam.remnants.mobs.network;
 
 import com.nightbeam.remnants.mobs.RemnantMobs;
+import com.nightbeam.remnants.mobs.config.RemnantsConfig;
 import com.nightbeam.remnants.mobs.compat.RasBridge;
 import com.nightbeam.remnants.mobs.content.ModContent;
 import com.nightbeam.remnants.mobs.event.HuntersMoon;
@@ -58,10 +59,12 @@ public final class Network {
         int max = 0;
         int structure = 0;
         if (holdsLens(player)) {
-            Threat t = Threat.at(player.level(), player.blockPosition(), false);
+            // What monsters spawning here get: nearby players included, then each mob's personal spread.
+            Threat t = Threat.at(player.level(), player.blockPosition(), true);
+            int spread = RemnantsConfig.levels().spread;
             threat = t.level();
-            min = t.min();
-            max = t.max();
+            min = Math.max(t.min(), t.level() - spread);
+            max = Math.min(t.max(), t.level() + spread);
             structure = t.structure();
         }
         PlayerStatePayload payload = new PlayerStatePayload(Threat.hunterLevel(player), RasBridge.present(), HuntersMoon.active(),

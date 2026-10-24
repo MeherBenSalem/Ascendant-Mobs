@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.nightbeam.remnants.mobs.mixin",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "EntityMixin",
+    "LivingEntityMixin",
+    "MobMixin",
+    "PlayerMixin",
+    "ServerEntityMixin"
+  ],
+  "client": [
+    "client.EntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

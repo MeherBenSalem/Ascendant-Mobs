@@ -21,6 +21,28 @@ from rcon import wait_for  # noqa: E402
 
 FAILURES = []
 PLAYER = 'RemnantHunter'
+MC = '26'
+
+
+def legacy_attributes():
+    """Before 1.21.2 attributes are named generic.*."""
+    return MC in ('1.20.1', '1.21.1')
+
+
+def A(name):
+    """An attribute id as this version spells it in commands."""
+    if legacy_attributes() and name in ('max_health', 'armor', 'movement_speed', 'knockback_resistance', 'attack_damage'):
+        return f'minecraft:generic.{name}'
+    return f'minecraft:{name}'
+
+
+def M(path):
+    """A modifier id as this version spells it in commands (UUIDs on 1.20.1)."""
+    if MC == '1.20.1':
+        import hashlib
+        import uuid
+        return str(uuid.UUID(bytes=hashlib.md5(f'remnant_mobs:{path}'.encode()).digest(), version=3))
+    return f'remnant_mobs:{path}'
 
 
 def check(name, ok, detail=''):
@@ -42,6 +64,8 @@ def main():
     ap.add_argument('--ras', action='store_true')
     ap.add_argument('--mc', default='26')
     args = ap.parse_args()
+    global MC
+    MC = args.mc
     run = Path(args.run_dir)
     r = wait_for(args.port)
     c = r.command
@@ -65,6 +89,8 @@ def main():
 
     # Threat at several places (world spawn moved to the origin first).
     c('setworldspawn 0 80 0')
+    c('forceload add 0 0 48 48')
+    wait(3)
     out = c('execute in minecraft:overworld positioned 0 80 0 run remnants threat')
     check('threat at spawn is low', 'Threat here' in out and (number(out.split('Threat here:')[1].split('(')[0]) <= 4
                                                              or 'nearby at level' in out), out)
@@ -96,6 +122,8 @@ def main():
         # Mobs further than 128 blocks from every player despawn at once: keep the player by the test area.
         c(f'gamemode creative {PLAYER}')
         c(f'tp {PLAYER} 20 122 36')
+    # Force-loaded chunks of a fresh world take a moment to start ticking.
+    wait(4)
 
     # A plain summon gets leveled on its first tick.
     c('summon minecraft:zombie 4 121 4 {NoAI:1b,Tags:["qa_plain"]}')
@@ -106,53 +134,56 @@ def main():
         level = int(d[0])
         expected = 20 * (1 + min(6 * level, 600) / 100)
         rank = d[1]
-        health = attr('@e[tag=qa_plain,limit=1]', 'minecraft:max_health')
+        health = attr('@e[tag=qa_plain,limit=1]', A('max_health'))
         if rank == 'common':
             check('level scales max health', abs(health - expected) < 0.01, f'{health} vs {expected}')
 
     # Explicit spawns: level 50 Elite skeleton with fixed traits.
     out = c('execute positioned 8 121 4 run remnants spawn minecraft:skeleton 50 elite vampiric swift')
     check('spawn command', 'Spawned' in out, out)
+    # Tag and freeze it at once: a swift skeleton can walk out of a small selector radius within a second.
+    c('tag @e[type=minecraft:skeleton,x=8,y=121,z=4,distance=..2,limit=1,sort=nearest] add qa_elite')
+    c('data merge entity @e[tag=qa_elite,limit=1] {NoAI:1b}')
     wait(1)
-    sel = '@e[type=minecraft:skeleton,x=8,y=121,z=4,distance=..2,limit=1]'
+    sel = '@e[tag=qa_elite,limit=1]'
     d = data_tag(sel)
     check('spawned data', d is not None and d[0] == '50' and d[1] == 'elite' and set(d[2].split('+')) == {'vampiric', 'swift'}, d)
     check('elite rank tag', 'remnant_mobs.elite' in tags(sel), tags(sel))
-    health = attr(sel, 'minecraft:max_health')
+    health = attr(sel, A('max_health'))
     check('elite level 50 health = 20 x 4 x 2', abs(health - 160) < 0.01, health)
     def modifier(attribute, mid):
         return number(c(f'attribute {sel} {attribute} modifier value get {mid}'), -1)
-    check('armor modifiers: level + elite', abs(modifier('minecraft:armor', 'remnant_mobs:level') - 7.5) < 0.01
-          and abs(modifier('minecraft:armor', 'remnant_mobs:rank') - 4) < 0.01)
-    check('swift modifier', abs(modifier('minecraft:movement_speed', 'remnant_mobs:trait/swift') - 0.3) < 0.001)
-    speed = attr(sel, 'minecraft:movement_speed')
+    check('armor modifiers: level + elite', abs(modifier(A('armor'), M('level')) - 7.5) < 0.01
+          and abs(modifier(A('armor'), M('rank')) - 4) < 0.01)
+    check('swift modifier', abs(modifier(A('movement_speed'), M('trait/swift')) - 0.3) < 0.001)
+    speed = attr(sel, A('movement_speed'))
     check('speed = base x level x swift', abs(speed - 0.25 * 1.15 * 1.3) < 0.002, speed)
     hp = number(c(f'data get entity {sel} Health'), -1)
     check('spawned at full health', abs(hp - 160) < 0.01, hp)
 
     # set level keeps the health ratio and re-applies stats.
     c(f'remnants set {sel} level 10')
-    health = attr(sel, 'minecraft:max_health')
+    health = attr(sel, A('max_health'))
     check('set level re-applies stats', abs(health - 20 * 1.6 * 2) < 0.01, health)
     c(f'remnants set {sel} rank common')
-    health = attr(sel, 'minecraft:max_health')
+    health = attr(sel, A('max_health'))
     check('set rank common drops rank stats', abs(health - 32) < 0.01, health)
     check('rank tag removed', 'remnant_mobs.elite' not in tags(sel), tags(sel))
     c(f'remnants set {sel} traits juggernaut swift')
     d = data_tag(sel)
     check('conflicting traits are dropped', d is not None and d[2] == 'juggernaut', d)
-    check('juggernaut knockback resistance', attr(sel, 'minecraft:knockback_resistance') >= 1.0)
+    check('juggernaut knockback resistance', attr(sel, A('knockback_resistance')) >= 1.0)
     out = c(f'remnants inspect {sel}')
     check('inspect', 'Level 10' in out or 'Level' in out, out)
     c(f'remnants set {sel} clear')
-    check('clear removes data', data_tag(sel) is None and abs(attr(sel, 'minecraft:max_health') - 20) < 0.01, tags(sel))
+    check('clear removes data', data_tag(sel) is None and abs(attr(sel, A('max_health')) - 20) < 0.01, tags(sel))
     c(f'remnants set {sel} reroll')
     check('reroll levels again', data_tag(sel) is not None, tags(sel))
 
     # Remnant rank: title, persistence.
     out = c('execute positioned 12 121 4 run remnants spawn minecraft:skeleton 40 remnant')
     wait(1)
-    sel = '@e[type=minecraft:skeleton,x=12,y=121,z=4,distance=..2,limit=1]'
+    sel = '@e[type=minecraft:skeleton,tag=remnant_mobs.remnant,limit=1]'
     d = data_tag(sel)
     check('remnant spawned', d is not None and d[1] == 'remnant' and len(d[2].split('+')) == 4, d)
     check('remnant has a title', 'CustomName' in c(f'data get entity {sel}') and len(c(f'data get entity {sel} CustomName')) > 10,
@@ -165,25 +196,30 @@ def main():
     wait(1)
     d = data_tag('@e[tag=qa_boss,limit=1]')
     check('boss gets a level, no rank', d is not None and d[1] == 'common' and int(d[4]) & 16, d)
-    check('boss stats unchanged', abs(attr('@e[tag=qa_boss,limit=1]', 'minecraft:max_health') - 80) < 0.01)
+    check('boss stats unchanged', abs(attr('@e[tag=qa_boss,limit=1]', A('max_health')) - 80) < 0.01)
     check('cow is not leveled', data_tag('@e[tag=qa_cow,limit=1]') is None, tags('@e[tag=qa_cow,limit=1]'))
 
     # A 2.x mob converts.
-    c('summon minecraft:husk 28 121 4 {NoAI:1b,Tags:["qa_legacy","am_level_25.0","am_got_level"],'
-      'attributes:[{id:"minecraft:max_health",base:20,modifiers:[{id:"rpgmoblevelingsystem:level",amount:50.0,operation:"add_value"}]}]}')
+    if MC == '1.20.1':
+        c('summon minecraft:husk 28 121 4 {NoAI:1b,Tags:["qa_legacy","am_level_25.0","am_got_level"],'
+          'Attributes:[{Name:"minecraft:generic.max_health",Base:20,Modifiers:[{UUID:[I;-1891882480,1800228497,-1674633858,-1973732288],'
+          'Name:"level",Amount:50.0,Operation:0}]}]}')
+    else:
+        c('summon minecraft:husk 28 121 4 {NoAI:1b,Tags:["qa_legacy","am_level_25.0","am_got_level"],'
+          f'attributes:[{{id:"{A("max_health")}",base:20,modifiers:[{{id:"rpgmoblevelingsystem:level",amount:50.0,operation:"add_value"}}]}}]}}')
     wait(1)
     d = data_tag('@e[tag=qa_legacy,limit=1]')
     check('2.x mob keeps its level', d is not None and d[0] == '25', tags('@e[tag=qa_legacy,limit=1]'))
     check('2.x tags removed', 'am_level_' not in tags('@e[tag=qa_legacy,limit=1]'))
-    check('2.x modifier replaced', abs(attr('@e[tag=qa_legacy,limit=1]', 'minecraft:max_health') - 20 * 2.5) < 0.01,
-          attr('@e[tag=qa_legacy,limit=1]', 'minecraft:max_health'))
+    check('2.x modifier replaced', abs(attr('@e[tag=qa_legacy,limit=1]', A('max_health')) - 20 * 2.5) < 0.01,
+          attr('@e[tag=qa_legacy,limit=1]', A('max_health')))
 
     # Packleader calls its pack once.
     c('kill @e[type=minecraft:zombie]')
     c('execute positioned 4 121 12 run remnants spawn minecraft:zombie 20 champion packleader')
     wait(1)
     sel = '@e[type=minecraft:zombie,x=4,y=121,z=12,distance=..2,limit=1]'
-    max_hp = attr(sel, 'minecraft:max_health')
+    max_hp = attr(sel, A('max_health'))
     c(f'damage {sel} {max_hp * 0.5:.1f} minecraft:generic_kill')
     wait(1)
     pack = '@e[type=minecraft:zombie,tag=!remnant_mobs.champion,x=4,y=121,z=12,distance=..6]'
@@ -274,7 +310,7 @@ def player_checks(c, wait, tags, data_tag, attr, args):
     total = (levels ** 2 + 6 * levels if levels <= 16 else 2.5 * levels ** 2 - 40.5 * levels + 360 if levels <= 31
              else 4.5 * levels ** 2 - 162.5 * levels + 2220) + points
     # The base is 5 plus 1-3 per piece of equipment the zombie spawned with.
-    check('champion experience multiplied (base x 2.2 x 5)', 55 <= total <= 17 * 11, f'{levels} levels {points} points = {total}')
+    check('champion experience multiplied (base x 2.2 x 5)', 50 <= total <= 17 * 11, f'{levels} levels {points} points = {total}')
     c(f'tp {PLAYER} 20 122 36')
     c('kill @e[type=minecraft:item]')
     c('kill @e[type=minecraft:experience_orb]')

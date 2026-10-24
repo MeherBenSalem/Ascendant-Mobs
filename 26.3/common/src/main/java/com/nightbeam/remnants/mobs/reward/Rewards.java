@@ -124,8 +124,7 @@ public final class Rewards {
             if (valor >= 0.5) {
                 RasBridge.addValor(killer, valor);
                 if (rewards.valorMessage) {
-                    Feedback.actionBar(killer, Component.translatable("message.remnant_mobs.valor",
-                            Component.translatable(data.rank().translationKey()).withStyle(style -> style.withColor(data.rank().color())),
+                    Feedback.actionBar(killer, Component.translatable("message.remnant_mobs.valor", slainName(mob, data),
                             Component.literal("+" + Math.round(valor)).withStyle(ChatFormatting.GOLD)));
                 }
             }
@@ -160,5 +159,12 @@ public final class Rewards {
         }
         Player last = victim.getLastHurtByPlayer();
         return last instanceof ServerPlayer player ? player : null;
+    }
+
+    /** "Elite Vindicator" in the rank's colour, or a named mob's own name (a Remnant's is its title). */
+    private static Component slainName(Mob mob, MobData data) {
+        Component name = mob.hasCustomName() ? mob.getCustomName()
+                : Component.translatable("plate.remnant_mobs.ranked_name", Component.translatable(data.rank().translationKey()), mob.getType().getDescription());
+        return name.copy().withStyle(style -> style.withColor(data.rank().color()));
     }
 }
