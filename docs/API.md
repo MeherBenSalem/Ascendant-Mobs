@@ -1,28 +1,74 @@
-# Public API (v2.0.0)
+# Remnants: RPG Mobs 3.0: API
 
-Package: `tn.nightbeam.rpgmoblevelingsystem.api`
+For other mods, datapacks and modpacks. Everything here is the same on every supported Minecraft version unless
+noted.
 
-## RmlApi
+## RemnantMobsApi
+
+`com.nightbeam.remnants.mobs.api.RemnantMobsApi`. Reads work on both sides (a client knows the mobs it can see);
+changes run on the server thread.
 
 ```java
-int getLevel(Entity entity);
-void recalculate(Entity entity);
-LevelDebugBreakdown getDebugBreakdown(Entity entity);
-Integer getDisplayLevel(Level world, Entity entity);
+int getLevel(Entity entity);                         // -1 when Remnants has not leveled it
+String getRank(Entity entity);                       // "common", "veteran", "elite", "champion", "remnant"; "" when not leveled
+Set<String> getTraits(Entity entity);                // trait keys such as "vampiric"
+boolean isBranded(Entity entity);                    // marked with a Brand of Challenge
+void setLevel(Mob mob, int level);                   // keeps rank and traits, re-applies stats (server)
+int getThreat(ServerLevel level, BlockPos pos);      // the level mobs would spawn at there, players included (server)
+boolean isHuntersMoon();                             // (server)
 ```
 
-All mutation calls must run server-side.
+Compile against the jar for your version, or call it through reflection to keep Remnants optional.
 
-## LevelDebugBreakdown
+## Keys
 
-Fields: `entityId`, `baseLevel`, `spawnDifference`, `playerContribution`, `structureMin`, `lockedLevel`, `beforeClamp`, `finalLevel`, `scaleType`, `playerScaleMode`, `rasLoaded`.
+- Ranks: `common`, `veteran`, `elite`, `champion`, `remnant`.
+- Traits: `vampiric`, `frostbite`, `infernal`, `venomous`, `withering`, `berserk`, `crushing`, `juggernaut`,
+  `thornskin`, `warded`, `regenerating`, `deflecting`, `swift`, `blinking`, `packleader`, `volatile`.
 
-## RPG Attribute System integration
+## Entity type tags
 
-When `rpg_attribute_system` 4.1+ is present, configure `scale_settings.json`:
+| Tag | Meaning |
+| --- | --- |
+| `#remnant_mobs:bosses` | Shown with a level but never ranked; stats only scale with `mobs.boss_stats`. Includes `#c:bosses` |
+| `#remnant_mobs:never_leveled` | Never leveled |
+| `#remnant_mobs:never_ranked` | Leveled but always Common (vexes, silverfish and endermites by default) |
 
-- `playerScaleMode`: `none`, `nearest`, `highest_nearby`, `average_nearby`
-- `playerScaleRadius`, `playerScaleFactor`
-- `playerBalanceEnabled`, `playerBalanceHealthRatio`, `playerBalanceDamageRatio`
+## Scoreboard tags
 
-Mob levels consume `tn.nightbeam.ras.api.RasApi` via reflection — no duplicated RAS formulas.
+Leveled mobs carry these entity tags (`/tag`, `@e[tag=...]`):
+
+| Tag | |
+| --- | --- |
+| `remnant_mobs.<rank>` | `remnant_mobs.veteran` ... `remnant_mobs.remnant` (none for Common) |
+| `remnant_mobs.trait.<trait>` | One per trait |
+| `remnant_mobs:data\|<level>\|<rank>\|<traits>\|<seed>\|<flags>` | The saved data. Read it through the API rather than parsing it |
+
+Removing these tags by hand does not remove the stats; use `/remnants set <targets> clear`.
+
+## Attribute modifiers
+
+Fixed ids, so any mod can find, read or remove them:
+
+| Id | Source |
+| --- | --- |
+| `remnant_mobs:level` | The level (one per scaled attribute) |
+| `remnant_mobs:rank` | The rank's health, damage and armor |
+| `remnant_mobs:trait/swift`, `remnant_mobs:trait/juggernaut`, `remnant_mobs:trait/warded` | Trait stats |
+| `remnant_mobs:trait/berserk` | Berserk while below half health (not saved) |
+
+On 1.20.1 modifiers have UUIDs: the name-based (version 3) UUID of the id above, `UUID.nameUUIDFromBytes("remnant_mobs:level".getBytes(UTF_8))`. Warded has no modifier on 1.20.1, which has no max absorption attribute.
+
+## RPG Attribute System
+
+Remnants reads RAS through reflection, with no compile dependency in either direction:
+
+- player level: `tn.nightbeam.ras.api.RasApi.getLevel(Player)`;
+- Valor: `tn.nightbeam.ras.procedures.LevelingService.addXp(Entity, double)`, falling back to the
+  `/ras xp <amount> <player>` command.
+
+## Network
+
+Two play payloads, both optional on the client: `remnant_mobs:mob_info` (a mob's level, rank, traits, flags,
+damage and armor, sent when a player starts tracking it or it changes) and `remnant_mobs:player_state` (your
+level, whether a Hunter's Moon is up and the Hunter's Lens readout).

@@ -2,10 +2,10 @@
 # Prefer committing loader jars to releases/ so CI does not rebuild.
 #
 # Publish ONLY Minecraft 26.3:
-#   gh workflow run publish.yml -f version=2.0.7 -f minecraft_version=26.3
+#   gh workflow run publish.yml -f version=3.0.0 -f minecraft_version=26.3
 #
 # All jars for a version:
-#   gh workflow run publish.yml -f version=2.0.7
+#   gh workflow run publish.yml -f version=3.0.0
 
 name: Publish
 
@@ -46,7 +46,7 @@ jobs:
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
           mkdir -p dist
-          mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "rpgmoblevelingsystem-*-${VERSION}.jar" \
+          mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "remnant_mobs-*-${VERSION}.jar" \
             ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
             ! -name "*-dev.jar" ! -name "*-dev-shadow.jar" \
             ! -name "*-common-*.jar" 2>/dev/null | sort)
@@ -57,7 +57,7 @@ jobs:
             printf '%s\n' "${JARS[@]}"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "No releases/rpgmoblevelingsystem-*-${VERSION}.jar — will try GitHub Release then Gradle"
+            echo "No releases/remnant_mobs-*-${VERSION}.jar — will try GitHub Release then Gradle"
           fi
 
       - name: Download GitHub release jars
@@ -70,9 +70,9 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           if gh release view "v${VERSION}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            gh release download "v${VERSION}" --repo "${{ github.repository }}" --dir dist --pattern 'rpgmoblevelingsystem-*.jar' || true
+            gh release download "v${VERSION}" --repo "${{ github.repository }}" --dir dist --pattern 'remnant_mobs-*.jar' || true
           fi
-          count=$(find dist -name 'rpgmoblevelingsystem-*.jar' | wc -l)
+          count=$(find dist -name 'remnant_mobs-*.jar' | wc -l)
           echo "github_count=${count}" >> "$GITHUB_OUTPUT"
           if [ "$count" -eq 0 ]; then
             echo "No GitHub Release jars for v${VERSION}"
@@ -97,7 +97,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ "$(find dist -name 'rpgmoblevelingsystem-*.jar' | wc -l)" -gt 0 ]; then
+          if [ "$(find dist -name 'remnant_mobs-*.jar' | wc -l)" -gt 0 ]; then
             echo "Skipping Gradle build; jars already in dist/"
             exit 0
           fi
@@ -106,7 +106,7 @@ jobs:
           if [ -n "$MC_FILTER" ]; then
             workspaces=("$MC_FILTER")
           else
-            workspaces=(1.20.1 1.21.1 26.3)
+            workspaces=(1.20.1 1.21.1 26.1.2 26.2 26.3)
           fi
           built=0
           for ws in "${workspaces[@]}"; do
@@ -116,7 +116,7 @@ jobs:
             fi
             echo "Building workspace $ws"
             case "$ws" in
-              26.3) java_home="${JAVA_HOME_25_X64:-${JAVA_HOME_25_ARM64:-$JAVA_HOME}}" ;;
+              26.*) java_home="${JAVA_HOME_25_X64:-${JAVA_HOME_25_ARM64:-$JAVA_HOME}}" ;;
               1.21.1) java_home="${JAVA_HOME_21_X64:-${JAVA_HOME_21_ARM64:-$JAVA_HOME}}" ;;
               *) java_home="${JAVA_HOME_17_X64:-${JAVA_HOME_17_ARM64:-$JAVA_HOME}}" ;;
             esac
@@ -139,22 +139,22 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
-          mapfile -t JARS < <(find dist -type f -name 'rpgmoblevelingsystem-*.jar' \
+          mapfile -t JARS < <(find dist -type f -name 'remnant_mobs-*.jar' \
             ! -name '*-sources.jar' ! -name '*-javadoc.jar' \
             ! -name '*-dev.jar' ! -name '*-common-*.jar' 2>/dev/null | sort)
           if [ ${#JARS[@]} -eq 0 ]; then
-            mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "rpgmoblevelingsystem-*-${VERSION}.jar" \
+            mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "remnant_mobs-*-${VERSION}.jar" \
               ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
               ! -name "*-common-*.jar" 2>/dev/null | sort)
           fi
           if [ ${#JARS[@]} -eq 0 ]; then
-            mapfile -t JARS < <(find . -type f -path "*/build/libs/rpgmoblevelingsystem-*-${VERSION}.jar" \
+            mapfile -t JARS < <(find . -type f -path "*/build/libs/remnant_mobs-*-${VERSION}.jar" \
               ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
               ! -name "*-dev.jar" ! -name "*-dev-shadow.jar" \
               ! -name "*-common-*.jar" | sort)
           fi
           if [ ${#JARS[@]} -eq 0 ]; then
-            echo "No rpgmoblevelingsystem jars found for version ${VERSION}" >&2
+            echo "No remnant_mobs jars found for version ${VERSION}" >&2
             exit 1
           fi
           MC_FILTER="${{ inputs.minecraft_version }}"
@@ -186,9 +186,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          notes="$(gh release view "v${VERSION}" --repo "${{ github.repository }}" --json body --jq .body)"
+          # This version's own notes (patchnotes/<version>.md) first, then the GitHub Release body.
+          if [ -f "patchnotes/${VERSION}.md" ]; then
+            notes="$(cat "patchnotes/${VERSION}.md")"
+          else
+            notes="$(gh release view "v${VERSION}" --repo "${{ github.repository }}" --json body --jq .body 2>/dev/null || true)"
+          fi
           if [ -z "${notes// }" ]; then
-            notes="## RPG Mob Leveling System ${VERSION}
+            notes="## Remnants: RPG Mobs ${VERSION}
 
           See https://github.com/${{ github.repository }}/releases/tag/v${VERSION}"
           fi
@@ -221,7 +226,7 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const version = process.env.VERSION;
-          const changelog = process.env.CHANGELOG || `## RPG Mob Leveling System ${version}\n\nSee GitHub release notes.`;
+          const changelog = process.env.CHANGELOG || `## Remnants: RPG Mobs ${version}\n\nSee GitHub release notes.`;
           const curseforgeOnly = process.env.CURSEFORGE_ONLY === 'true';
           const jars = process.env.JAR_LIST.split(/\n/).map(s => s.trim()).filter(Boolean);
 
@@ -231,7 +236,7 @@ jobs:
             if (/neoforge/i.test(n)) loader = 'neoforge';
             else if (/forge/i.test(n)) loader = 'forge';
             else if (/fabric/i.test(n)) loader = 'fabric';
-            const m = n.match(/^rpgmoblevelingsystem-(?:fabric|forge|neoforge)-(.+)-(\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?)\.jar$/i);
+            const m = n.match(/^remnant_mobs-(?:fabric|forge|neoforge)-(.+)-(\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?)\.jar$/i);
             const game = m ? m[1] : null;
             return { jar, name: n, loader, game };
           }
@@ -245,7 +250,7 @@ jobs:
             if (!curseforgeOnly) {
               for (const p of parsed) {
                 const body = {
-                  name: `RPG Mob Leveling System ${version}`,
+                  name: `Remnants: RPG Mobs ${version}`,
                   version_number: version,
                   changelog,
                   dependencies: [],

@@ -3,11 +3,11 @@
 #
 # Usage:
 #   .\upload_local.ps1
-#   .\upload_local.ps1 -Version 2.0.2
-#   .\upload_local.ps1 -Version 2.0.2 -CurseForgeOnly
+#   .\upload_local.ps1 -Version 3.0.0
+#   .\upload_local.ps1 -Version 3.0.0 -CurseForgeOnly
 
 param(
-    [string]$Version = "2.0.2",
+    [string]$Version = "3.0.0",
     [switch]$CurseForgeOnly,
     [switch]$DryRun
 )
@@ -16,9 +16,9 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 Set-Location $root
 
-$notes = Join-Path $root "Ascendant-Mobs-$Version-PatchNotes.md"
+$notes = Join-Path $root "patchnotes\$Version.md"
 if (-not (Test-Path $notes)) {
-    $notes = Join-Path $root "RPG-Mob-Leveling-System-$Version-PatchNotes.md"
+    $notes = Join-Path $root "Ascendant-Mobs-$Version-PatchNotes.md"
 }
 if (-not (Test-Path $notes)) {
     $notes = Join-Path $root "PATCH_NOTES.md"
@@ -28,7 +28,7 @@ $nodeArgs = @("scripts/upload_platforms.mjs", "--version", $Version, "--changelo
 if ($CurseForgeOnly) { $nodeArgs += "--curseforge-only" }
 if ($DryRun) { $nodeArgs += "--dry-run" }
 
-Write-Host "=== Local upload RPG Mob Leveling System v$Version ===" -ForegroundColor Green
+Write-Host "=== Local upload Remnants: RPG Mobs v$Version ===" -ForegroundColor Green
 node @nodeArgs
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

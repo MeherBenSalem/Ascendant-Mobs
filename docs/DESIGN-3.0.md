@@ -141,7 +141,7 @@ Access is through `RasApi` (reflection, no compile dependency) and the public `/
 | `inspect [target]` | all (look) / ops (target) | Level, rank, traits, stats of a mob |
 | `spawn <entity> <level> [rank] [traits…]` | ops | Spawn a leveled mob |
 | `set <targets> level|rank|trait …` | ops | Change existing mobs |
-| `moon start|stop|status` | ops / all | Hunter's Moon |
+| `moon [start|stop]` | all / ops | Hunter's Moon status, start, stop |
 | `reload` | ops | Reload configs |
 
 ## 10. Config (`config/remnant_mobs/`)
@@ -163,7 +163,7 @@ rules, banned mobs and namespaces, level locks, structure minimums, player scali
   modifiers have fixed ids (`remnant_mobs:level/<attribute>`, `remnant_mobs:rank/<attribute>`, `remnant_mobs:trait/<id>`).
 - 2.x mobs (`am_level_<n>` tags) keep their level and get a rank roll of Common.
 - Clients receive `remnant_mobs:mob_info` when they start tracking a mob or its data changes, and
-  `remnant_mobs:player_level` with their RAS level.
+  `remnant_mobs:player_state` with their level, the Hunter's Moon state and the Hunter's Lens readout.
 
 ## 12. Advancements
 

@@ -3,8 +3,8 @@
  * Tokens: env vars or NightBeam-Knowledge-Base/secrets/local.env
  *
  * Usage:
- *   node scripts/upload_platforms.mjs --version 2.0.2
- *   node scripts/upload_platforms.mjs --version 2.0.2 --curseforge-only
+ *   node scripts/upload_platforms.mjs --version 3.0.0
+ *   node scripts/upload_platforms.mjs --version 3.0.0 --curseforge-only
  */
 import fs from "fs";
 import path from "path";
@@ -16,7 +16,7 @@ const DIST = path.join(ROOT, "dist");
 
 const MODRINTH_ID = "4eSfhd3M";
 const CURSEFORGE_ID = "1088344";
-const MOD_TITLE = "RPG Mob Leveling System";
+const MOD_TITLE = "Remnants: RPG Mobs";
 
 async function loadEnv() {
   const candidates = [
@@ -61,7 +61,7 @@ function parseJar(jar) {
   if (/neoforge/i.test(n)) loader = "neoforge";
   else if (/forge/i.test(n)) loader = "forge";
   else if (/fabric/i.test(n)) loader = "fabric";
-  const m = n.match(/^rpgmoblevelingsystem-(?:fabric|forge|neoforge)-(.+)-(\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?)\.jar$/i);
+  const m = n.match(/^remnant_mobs-(?:fabric|forge|neoforge)-(.+)-(\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?)\.jar$/i);
   const game = m ? m[1] : null;
   return { jar, name: n, loader, game };
 }
@@ -77,10 +77,10 @@ async function main() {
 
   const jars = fs
     .readdirSync(DIST)
-    .filter((f) => f.startsWith("rpgmoblevelingsystem-") && f.endsWith(`-${version}.jar`))
+    .filter((f) => f.startsWith("remnant_mobs-") && f.endsWith(`-${version}.jar`))
     .map((f) => path.join(DIST, f))
     .sort();
-  if (!jars.length) throw new Error(`No rpgmoblevelingsystem-*-${version}.jar in dist/`);
+  if (!jars.length) throw new Error(`No remnant_mobs-*-${version}.jar in dist/`);
 
   const parsed = jars.map(parseJar);
   for (const p of parsed) {

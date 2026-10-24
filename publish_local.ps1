@@ -1,4 +1,4 @@
-# Local build + GitHub release for Ascendant-Mobs MultiLoader.
+# Local build + GitHub release for Remnants: RPG Mobs (MultiLoader, repository Ascendant-Mobs).
 # Modrinth/CurseForge (upload-only, no CI build):
 #   gh workflow run publish.yml --repo MeherBenSalem/Ascendant-Mobs -f version=X.Y.Z
 #
@@ -21,7 +21,7 @@ if (-not $Version) {
 }
 if (-not $Version) { throw "Could not resolve version from 1.21.1/gradle.properties" }
 
-Write-Host "=== Ascendant-Mobs local publish v$Version ===" -ForegroundColor Green
+Write-Host "=== Remnants: RPG Mobs local publish v$Version ===" -ForegroundColor Green
 
 $distDir = Join-Path $root "dist"
 if (-not $SkipBuild) {
@@ -39,7 +39,7 @@ if (-not $SkipBuild) {
     Set-Location (Join-Path $root "1.20.1")
     .\gradlew.bat clean build --no-daemon
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    Get-ChildItem "fabric\build\libs","forge\build\libs" -Filter "rpgmoblevelingsystem-*.jar" -ErrorAction SilentlyContinue |
+    Get-ChildItem "fabric\build\libs","forge\build\libs" -Filter "remnant_mobs-*.jar" -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
         ForEach-Object { Copy-Item $_.FullName $distDir -Force }
 
@@ -49,7 +49,7 @@ if (-not $SkipBuild) {
     Set-Location (Join-Path $root "1.21.1")
     .\gradlew.bat clean build --no-daemon
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    Get-ChildItem "fabric\build\libs","neoforge\build\libs" -Filter "rpgmoblevelingsystem-*.jar" -ErrorAction SilentlyContinue |
+    Get-ChildItem "fabric\build\libs","neoforge\build\libs" -Filter "remnant_mobs-*.jar" -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
         ForEach-Object { Copy-Item $_.FullName $distDir -Force }
 
@@ -61,27 +61,29 @@ if (-not $SkipBuild) {
         $null
     }
     if ($jdk25) {
-        Write-Host "Building 26.3 (NeoForge + Fabric)..." -ForegroundColor Cyan
-        $env:JAVA_HOME = $jdk25
-        $env:Path = "$jdk25\bin;" + $env:Path
-        Set-Location (Join-Path $root "26.3")
-        .\gradlew.bat clean build --no-daemon
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        Get-ChildItem "fabric\build\libs","neoforge\build\libs" -Filter "rpgmoblevelingsystem-*.jar" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
-            ForEach-Object { Copy-Item $_.FullName $distDir -Force }
+        foreach ($ws in @("26.1.2", "26.2", "26.3")) {
+            Write-Host "Building $ws (NeoForge + Fabric)..." -ForegroundColor Cyan
+            $env:JAVA_HOME = $jdk25
+            $env:Path = "$jdk25\bin;" + $env:Path
+            Set-Location (Join-Path $root $ws)
+            .\gradlew.bat clean build --no-daemon
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            Get-ChildItem "fabric\build\libs","neoforge\build\libs" -Filter "remnant_mobs-*.jar" -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -notmatch 'sources|javadoc|dev' } |
+                ForEach-Object { Copy-Item $_.FullName $distDir -Force }
+        }
     } else {
-        Write-Host "Skipping 26.3 build (JDK 25 not found). Copy jars from 26.3/*/build/libs or releases/." -ForegroundColor Yellow
+        Write-Host "Skipping 26.x builds (JDK 25 not found). Copy jars from 26.*/*/build/libs or releases/." -ForegroundColor Yellow
     }
 
     Set-Location $root
 }
 
 if (-not (Test-Path $distDir)) { throw "dist/ missing - run build first" }
-$jars = Get-ChildItem $distDir -Filter "rpgmoblevelingsystem-*.jar" | Where-Object { $_.Name -match "-$Version\.jar$" }
-if ($jars.Count -eq 0) { throw "No rpgmoblevelingsystem-*-$Version.jar in dist/" }
+$jars = Get-ChildItem $distDir -Filter "remnant_mobs-*.jar" | Where-Object { $_.Name -match "-$Version\.jar$" }
+if ($jars.Count -eq 0) { throw "No remnant_mobs-*-$Version.jar in dist/" }
 
-$patchNotes = Join-Path $root "Ascendant-Mobs-$Version-PatchNotes.md"
+$patchNotes = Join-Path $root "patchnotes\$Version.md"
 $notesFile = if (Test-Path $patchNotes) { $patchNotes } else { $null }
 
 $tag = "v$Version"
@@ -101,11 +103,11 @@ if ($releaseExists) {
 } else {
     $ghArgs = @("release", "create", $tag)
     foreach ($jar in $jars) { $ghArgs += $jar.FullName }
-    $ghArgs += @("--repo", "MeherBenSalem/Ascendant-Mobs", "--title", "Ascendant-Mobs $Version")
+    $ghArgs += @("--repo", "MeherBenSalem/Ascendant-Mobs", "--title", "Remnants: RPG Mobs $Version")
     if ($notesFile) {
         $ghArgs += @("--notes-file", $notesFile)
     } else {
-        $ghArgs += @("--notes", "Ascendant-Mobs $Version")
+        $ghArgs += @("--notes", "Remnants: RPG Mobs $Version")
     }
     & gh @ghArgs
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -1,4 +1,21 @@
-# RPG Mob Leveling System — Patch Notes
+# Remnants: RPG Mobs — Patch Notes
+
+Formerly RPG Mob Leveling System. Full notes for each major release are in [patchnotes/](patchnotes/).
+
+## 3.0.0: Blood and Valor
+
+**Supported platforms:** Minecraft 1.20.1 (Fabric, Forge) · 1.21.1, 26.1.2, 26.2, 26.3 (Fabric, NeoForge)
+
+A full rebuild, renamed **Remnants: RPG Mobs** (mod id `remnant_mobs`). See [patchnotes/3.0.0.md](patchnotes/3.0.0.md).
+
+* **Levels** from the threat of a place: distance, world age, depth, dimension bands and structure minimums, pulled toward nearby players' RPG Attribute System levels. New percent-based attribute rules with fixed modifier ids.
+* **Ranks**: Veteran, Elite, Champion and Remnant, with more health, damage, armor, experience, loot and Remnant Shards. Remnants get titles, boss bars, a horn and a server-wide message.
+* **16 traits**, from Vampiric and Frostbite to Blinking, Packleader and Volatile.
+* **Nameplates** with rank crest, level coloured against your own, health bar with damage trail, and traits.
+* **Rewards**: experience by level and rank, extra loot rolls, Remnant Shards, and bonus Valor with RAS.
+* **Items**: Remnant Shard, Hunter's Lens, Brand of Challenge. **Hunter's Moon** event. 10 advancements.
+* `/remnants` commands, five commented JSON configs with `/remnants reload`, `RemnantMobsApi`.
+* **Upgrading**: remove the 2.x jar. 2.x configs are carried over once, 2.x mobs keep their level. The Calendar item and the Neat and Jade hooks are removed.
 
 ## 2.0.7
 
