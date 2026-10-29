@@ -2,7 +2,8 @@
 
 Design for the 3.1 line: a world difficulty that rises with time, distance, depth and player power and drives the
 existing levels and ranks; event nights; player-side progression; and loot that scales with difficulty. Branch:
-`claude/difficulty-engine`. Status: **Phases 1–4 done: 1.20.1, 1.21.1, 26.1.2, 26.2 and 26.3, Fabric and NeoForge (Forge on 1.20.1)** (see [Status](#status) at the end).
+`claude/difficulty-engine`. Status: **Phases 1–5 done: 1.20.1 (Fabric, Forge), 1.21.1 (Fabric, NeoForge), 26.1.2, 26.2 and 26.3 (Fabric,
+NeoForge, Forge)** (see [Status](#status) at the end).
 
 The guiding rule: **extend what 3.0 already has instead of building a parallel system.** 3.0 already turns "how
 dangerous is this place" into a level (the *threat*), and level already drives rank odds. The difficulty engine
@@ -15,7 +16,7 @@ is a richer threat formula, not a second number fighting with the first.
 | | |
 | --- | --- |
 | Layout | One MultiLoader workspace per Minecraft version (`1.20.1/`, `1.21.1/`, `26.1.2/`, `26.2/`, `26.3/`), each with `common/` + two loader subprojects. No Architectury; code is copied between workspaces and adjusted per version (the `common/` trees differ by ~400 diff lines between 1.20.1 and 1.21.1). |
-| Loaders | 1.20.1: Fabric + Forge 47 (ModDevGradle legacyforge). 1.21.1, 26.x: Fabric + NeoForge. **There is no Forge 26.x workspace.** |
+| Loaders | 1.20.1: Fabric + Forge 47 (ModDevGradle legacyforge). 1.21.1, 26.x: Fabric + NeoForge. **There is no Forge 26.x workspace.** (Phase 5 added a `forge/` subproject to each 26.x workspace.) |
 | Java | 1.20.1 targets Java 17 (`java_version=17`, toolchain); 1.21.1 Java 21; 26.x Java 25. |
 | Mod id | `remnant_mobs` (3.0). 2.x was `rpgmoblevelingsystem`; 3.0 migrates its configs and leveled mobs and refuses to load next to it. |
 | Config | Own commented-JSON loader (`config/CommentedJson.java`): typed readers, comments regenerated, missing keys restored, `/remnants reload`. Files: `levels.json`, `ranks.json`, `traits.json`, `rewards.json`, `client.json` in `config/remnant_mobs/`. |
@@ -344,7 +345,7 @@ change to `remnant_mobs.json`; event state goes to a new file.
 | **2** | Vital Ember, healing items, difficulty payload + HUD gauge, elite readability (aura, bars, titles), overlap detection polish | same |
 | **3** | Loot scaling, Mob LootBags soft dep, loot beam | same |
 | **4** | Port to 26.1.2, 26.2, 26.3 (Fabric, NeoForge); 26.4 freezing hook (done) | 26.x |
-| **5** | Forge 26.x: needs a new workspace (none exists today) | — |
+| **5** | Forge 26.x: a `forge/` subproject in each 26.x workspace (ForgeGradle 7, Forge 64–66) (done) | 26.x |
 | later | KubeJS hooks, more boss tiers | — |
 
 ## 14. Open questions for the owner
@@ -486,14 +487,58 @@ Tested:
   `enabled: false`, `levels.json` byte-identical), **NeoForge 26.1.2**, **Fabric 26.1.2, 26.2 and 26.3** (fresh: all on).
 - Not tested in game: the 26.4 Freezing branch (no 26.4 yet), a real client on 26.1.2/26.2 or on Fabric 26.x.
 
+### Phase 5 (2026-10-29)
+
+| | 26.1.2 | 26.2 | 26.3 |
+| --- | --- | --- | --- |
+| `forge/` subproject (ForgeGradle 7.0.40): Forge 64.1.5 / 65.1.5 / 66.1.0, jar `remnant_mobs-forge-<mc>-<version>.jar` | ✅ | ✅ | ✅ |
+| Everything from Phases 1–4 (the common code is shared unchanged; the three Forge entry points are identical) | ✅ | ✅ | ✅ |
+
+No new workspace was needed: Forge sits next to Fabric and NeoForge in each 26.x workspace. What is Forge-specific:
+- **Events**: EventBus 7 (one static bus per event). **Bug found and fixed:** the death hook was first a monitor
+  listener, but EventBus 7 never calls monitors on a bus that has no ordinary listener, which is the case for deaths
+  unless another mod listens too. Volatile blasts, kill rewards and Remnant announcements silently did nothing. It is
+  now a lowest-priority listener, which still skips deaths another mod cancelled (same as NeoForge's `LOWEST`).
+- **Network**: the payload channel is `optional()`, so clients without the mod still join; payloads only go to
+  clients that have the channel.
+- **HUD gauge**: Forge draws the HUD through its own layers, so the HUD mixin (already optional, `require = 0`) never
+  runs there; the gauge is a Forge overlay layer instead.
+- **Fake players**: Forge 64–66 has no `FakePlayer` class; any `ServerPlayer` subclass counts as one.
+- **Mixins**: the jar lists them in its manifest (`MixinConfigs`); dev runs pass `--mixin.config`.
+- **Build**: ForgeGradle 7 needs Gradle 9.3+, so the **26.1.2 workspace moved from Gradle 9.2.0 to 9.5.0** (what
+  26.2 and the Forge MDKs use). `tools/qa/devrun.sh stop-server` also recognises Forge 26 dev servers.
+
+Tested:
+- `./gradlew build` passes in `26.1.2/`, `26.2/` and `26.3/` with all three loaders; **29 unit tests** each, all
+  passing.
+- `tools/qa/server_smoke.py` on dev servers: **Forge 26.1.2, 26.2 and 26.3: 0 failures** (the first 26.2 run had 3,
+  which is how the death-hook bug was found; 0 after the fix). **Fabric and NeoForge 26.1.2** again after the
+  Gradle bump: 0 failures. Forge fresh installs create all 10 config files; event list/start/status/stop works;
+  vanilla-summoned mobs get levels.
+- `tools/qa/client_checks.py` with the **real QA client on Forge 26.1.2 and 26.2: 0 failures** (rank nameplates,
+  damage trail, Hunter's Lens, Brand, shards, Remnant and Champion boss bars, Hunter's Moon), with the difficulty
+  gauge on screen ("8% +5" under the Hunter's Moon).
+- **Forge 26.3 with the real QA client**: a Vital Ember took extra hearts 2 → 3 (max health 26) and granted
+  *Kindled*; Frostbite applied Slowness II and 96 freeze ticks; during a Grim Vigil the Champion boss bar, the
+  nameplates and the gauge ("22% +8") were on screen, with no mixin errors. That session ran before the death-hook
+  fix, so the Volatile blast on Forge is covered by the smoke test only (the drop-sparing code is common code, tested
+  in game on Fabric 1.20.1 and NeoForge 26.3).
+- Not tested on Forge 26.x: Mob LootBags (it has no Forge 26.x build), RPG Attribute System, clients without the
+  mod (the mineflayer bots do not support 26.x), and the 3.0 upgrade path (same common code as the NeoForge 26.2
+  upgrade test).
+- Found, not caused by this branch: on **26.1.2 (every loader)** the level number on a nameplate a few blocks away
+  renders garbled (fine up close; 26.2 and 26.3 are clean). The plate code is unchanged from 3.0.
+
 ### Next
 
 1. **26.4**: when it ships, confirm the Freezing effect id, add the frost zombie to `event_hunters`, and add a 26.4
-   workspace (`tools/port_setup.py`).
-2. **Phase 5**: Forge 26.x needs a new workspace (none exists).
-3. Run the full `tools/qa/run_all.py` suite on every target with a real client, once with RAS.
-4. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose); the 3.0.1
-   hotfix could be cut from the "fix:" and "26.x: the two 3.0 fixes" commits.
+   workspace (`tools/port_setup.py`). The script copies `common/`, `fabric/` and `neoforge/` only: copy `26.3/forge/`
+   and its lines in `settings.gradle`, `build.gradle` and `gradle.properties` by hand.
+2. Run the full `tools/qa/run_all.py` suite on every target with a real client, once with RAS.
+3. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose); the 3.0.1
+   hotfix could be cut from the "fix:" and "26.x: the two 3.0 fixes" commits. The store pages in `marketing/`
+   still list Fabric and NeoForge only for 26.x; update them with the 3.1 release.
+4. Look into the garbled level number on 26.1.2 nameplates (above).
 
 ### Decisions for the owner
 
@@ -503,3 +548,6 @@ The questions in §14, most urgent first: **Q1** (mod id / which project 3.x shi
 1.20.1). Plus two fixes that change 3.0 behaviour on every install, not only with the new systems on: the
 **NeoForge crash with unmodded clients** and **Volatile destroying its own drops**. Both look like 3.0.1 hotfix
 material for every version, independent of 3.1.
+
+From Phase 5: whether the Forge 26.x jars ship with 3.1 or wait until Mob LootBags and RPG Attribute System are
+checked on Forge 26.x (both are optional; Remnants runs without them).
