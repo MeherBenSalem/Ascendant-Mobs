@@ -48,7 +48,7 @@ is a richer threat formula, not a second number fighting with the first.
 | 2. Player progression | — | Heart growth item, two healing items, always-on difficulty meter (HUD + command), meter in `player_state` |
 | 2. Mob health bars | Nameplates with health bars | Optional bar for unranked mobs at range; nothing else |
 | 3. Elites readable in 1 s | Rank colour on plate, Remnant boss bar + title | **Server-side** aura particles per rank, optional glow in rank colour, boss bars for Champion (configurable), event titles. All work for vanilla clients |
-| 4. Event nights | Hunter's Moon (buff-only) | **Event system** (`events.json`): triggers, announcement, effects, **hunters + mini-boss that track players**, rewards, boss-tier hook. The Hunter's Moon becomes one event of it with identical behaviour |
+| 4. Event nights | Hunter's Moon (buff-only) | **Event system** (`events.json`): triggers, announcement, effects, **hunters + mini-boss that track players**, rewards, boss-tier hook. The Hunter's Moon stays as it is, listed alongside and never overlapped by a rolled event |
 | 5. Loot scales with difficulty | Extra rolls per rank, shards | Extra rolls/shards scale with difficulty; optional Mob LootBags drops; loot beam |
 | 6. Pack-maker controls | Commented JSON, entity tags (`bosses`, `never_leveled`, `never_ranked`), id/tag/namespace filters | `difficulty.json`, `events.json`, new entity tags, dimension-type tags, overlap detection |
 | 7. Server-side first | Payloads optional | New features server-side; see §8 for the honest limit |
@@ -304,7 +304,7 @@ change to `remnant_mobs.json`; event state goes to a new file.
 
 | Phase | Scope | Targets |
 | --- | --- | --- |
-| **1** | Difficulty engine (factors, curves, dimensions, rank odds), `difficulty.json` + `events.json` with migration defaults, `/remnants difficulty`, `/remnants event …`, event system with `grim_vigil` + Hunter's Moon adapter, new tags, unit tests | 1.20.1 (Forge first, Fabric shares `common/`), then 1.21.1 (NeoForge, Fabric) |
+| **1** | Difficulty engine (factors, curves, dimensions, rank odds), `difficulty.json` + `events.json` with migration defaults, `/remnants difficulty`, `/remnants event …`, event system with `grim_vigil` (Hunter's Moon unchanged, listed alongside), new tags, unit tests | 1.20.1 (Forge first, Fabric shares `common/`), then 1.21.1 (NeoForge, Fabric) |
 | **2** | Vital Ember, healing items, difficulty payload + HUD gauge, elite readability (aura, bars, titles), overlap detection polish | same |
 | **3** | Loot scaling, Mob LootBags soft dep, loot beam | same |
 | **4** | Port to 26.1.2, 26.3 (Fabric, NeoForge), 26.2 if still shipped; 26.4 freezing hook | 26.x |
