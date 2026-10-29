@@ -9,6 +9,7 @@ import com.nightbeam.remnants.mobs.event.Scheduler;
 import com.nightbeam.remnants.mobs.mob.RemnantBars;
 import com.nightbeam.remnants.mobs.network.Network;
 import com.nightbeam.remnants.mobs.progression.Hearts;
+import com.nightbeam.remnants.mobs.reward.LootBeams;
 import com.nightbeam.remnants.mobs.reward.Rewards;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -38,12 +39,14 @@ public final class RemnantsEvents {
         HuntersMoon.unload();
         EventNights.unload();
         RemnantBars.clear();
+        LootBeams.clear();
         Scheduler.clear();
         Network.clear();
     }
 
     public static void onServerTick(MinecraftServer server) {
         Scheduler.tick();
+        LootBeams.tick(server, ticks);
         if (++ticks % 20 == 0) {
             HuntersMoon.tick(server);
             EventNights.tick(server);

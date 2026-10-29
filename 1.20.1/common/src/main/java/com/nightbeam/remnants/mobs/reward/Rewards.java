@@ -2,7 +2,9 @@ package com.nightbeam.remnants.mobs.reward;
 
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.compat.RasBridge;
+import com.nightbeam.remnants.mobs.compat.LootBagsBridge;
 import com.nightbeam.remnants.mobs.config.LevelsConfig;
+import com.nightbeam.remnants.mobs.config.LootConfig;
 import com.nightbeam.remnants.mobs.config.ProgressionConfig;
 import com.nightbeam.remnants.mobs.config.RanksConfig;
 import com.nightbeam.remnants.mobs.config.RemnantsConfig;
@@ -58,12 +60,23 @@ public final class Rewards {
     public static void dropLoot(ServerLevel level, Mob mob, DamageSource source, boolean playerKilled, LootRoller roller) {
         MobData data = RemnantMob.data(mob);
         RewardsConfig rewards = RemnantsConfig.rewards();
-        if (data == null || !data.ranked() || data.flag(MobData.MINION) || (rewards.requirePlayerKill && !playerKilled)) {
+        if (data == null || data.flag(MobData.MINION) || (rewards.requirePlayerKill && !playerKilled)) {
+            return;
+        }
+        LootConfig loot = RemnantsConfig.loot();
+        double fraction = fraction(level, data);
+        var random = mob.getRandom();
+        if (!data.ranked()) {
+            // Unranked monsters only get something from loot.json, and only at higher difficulty.
+            if (loot.enabled && rewards.extraLoot && !data.flag(MobData.BOSS) && random.nextDouble() < loot.commonExtraRoll * fraction) {
+                roller.roll();
+            }
             return;
         }
         RanksConfig.Stats stats = RemnantsConfig.ranks().stats(data.rank());
         if (rewards.extraLoot) {
-            int rolls = (int) Math.round(stats.lootRolls() * branded(data));
+            int rolls = loot.enabled ? chanceRound(loot.rolls(stats.lootRolls() * branded(data), fraction), random)
+                    : (int) Math.round(stats.lootRolls() * branded(data));
             for (int i = 0; i < rolls; i++) {
                 roller.roll();
             }
@@ -74,6 +87,9 @@ public final class Rewards {
                 count *= RemnantsConfig.levels().moonShardMultiplier;
             }
             count *= branded(data) * EventNights.shardMultiplier(mob);
+            if (loot.enabled) {
+                count = loot.shards(count, fraction);
+            }
             int shards = (int) Math.round(count) + EventNights.bossShards(mob);
             while (shards > 0) {
                 int stack = Math.min(shards, 64);
@@ -82,18 +98,43 @@ public final class Rewards {
             }
         }
         if (playerKilled) {
-            dropProgression(level, mob, data);
+            dropProgression(level, mob, data, fraction);
+            dropBag(level, mob, data, fraction, killer(mob, source));
+        }
+        LootBeams.watchDrops(level, mob);
+    }
+
+    /** Where the mob's level sits in its dimension's band: what drop chances and loot scale with. */
+    private static double fraction(ServerLevel level, MobData data) {
+        LevelsConfig.Band band = RemnantsConfig.levels().band(level.dimension().location().toString());
+        return Difficulty.fraction(data.level(), band.min(), band.max());
+    }
+
+    /** 2.4 becomes 2, or 3 with a 40% chance, so fractional bonuses still count. */
+    public static int chanceRound(double value, net.minecraft.util.RandomSource random) {
+        int whole = (int) Math.floor(Math.max(0, value));
+        return whole + (random.nextDouble() < value - whole ? 1 : 0);
+    }
+
+    /** A Mob LootBags bag on top of that mod's own drops (loot.json), better at higher difficulty. */
+    private static void dropBag(ServerLevel level, Mob mob, MobData data, double fraction, @Nullable ServerPlayer killer) {
+        LootConfig c = RemnantsConfig.loot();
+        if (!c.enabled || !c.bagsEnabled || !LootBagsBridge.present()) {
+            return;
+        }
+        String key = mob.getTags().contains(EventNights.BOSS_TAG) ? LootConfig.EVENT_BOSS : data.rank().key();
+        double chance = c.bagChance.getOrDefault(key, 0.0);
+        if (chance > 0 && mob.getRandom().nextDouble() < chance) {
+            LootBagsBridge.drop(level, mob, c.tier(key, fraction), killer);
         }
     }
 
     /** Vital Embers and healing items (progression.json), likelier the higher the mob sits in its dimension's band. */
-    private static void dropProgression(ServerLevel level, Mob mob, MobData data) {
+    private static void dropProgression(ServerLevel level, Mob mob, MobData data, double fraction) {
         ProgressionConfig c = RemnantsConfig.progression();
         if (!c.enabled) {
             return;
         }
-        LevelsConfig.Band band = RemnantsConfig.levels().band(level.dimension().location().toString());
-        double fraction = Difficulty.fraction(data.level(), band.min(), band.max());
         var random = mob.getRandom();
         double ember = mob.getTags().contains(EventNights.BOSS_TAG) ? c.emberEventBoss : c.emberChance.getOrDefault(data.rank(), 0.0);
         if (ember > 0 && random.nextDouble() < c.chance(ember, fraction)) {
