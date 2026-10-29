@@ -2,7 +2,7 @@
 
 Design for the 3.1 line: a world difficulty that rises with time, distance, depth and player power and drives the
 existing levels and ranks; event nights; player-side progression; and loot that scales with difficulty. Branch:
-`claude/difficulty-engine`. Status: **Phases 1 and 2 done on 1.20.1 and 1.21.1** (see [Status](#status) at the end).
+`claude/difficulty-engine`. Status: **Phases 1, 2 and 3 done on 1.20.1 and 1.21.1** (see [Status](#status) at the end).
 
 The guiding rule: **extend what 3.0 already has instead of building a parallel system.** 3.0 already turns "how
 dangerous is this place" into a level (the *threat*), and level already drives rank odds. The difficulty engine
@@ -224,13 +224,31 @@ so players without the mod see it too (verified with an unmodded client):
 - **Event glow**: monsters an event night sends glow until dawn (vanilla Glowing effect, white outline). The
   team-colour variant was dropped: scoreboard teams would collide with packs' own teams.
 
-## 7. Loot that scales (Phase 3)
+## 7. Loot that scales (Phase 3, done)
 
-- Extra loot rolls and shard counts × `1 + loot.difficulty_bonus × f`.
-- **Mob LootBags** (soft dependency, detected by mod id at runtime, no compile dependency): ranked kills may drop a
-  bag; rank → tier map in `rewards.json → loot_bags` (item ids, so no API coupling). Off when the mod is absent.
-- **Loot beam**: server-side particle column above dropped items whose rarity ≥ `rare` or that came from a
-  Champion+ / event kill, for up to 30 s. Cheap: one particle packet per item per 10 ticks, capped count.
+In **`loot.json`** (new file, same migration rule: off next to an existing config, so drops stay exactly as in
+3.0). Difficulty is the monster's level across its dimension's band, 0 to 1.
+
+- **Scaling**: ranked monsters roll their loot table `loot_rolls x (1 + extra_rolls_bonus x difficulty)` extra
+  times (default up to double; a fraction is the chance of one more roll) and drop
+  `shards x (1 + shards_bonus x difficulty)` Remnant Shards (up to +50%). Unranked monsters get
+  `common_extra_roll x difficulty` chance (up to 15%) of one more roll.
+- **Mob LootBags** (soft dependency): detected by mod id `mob_loot_bags`. Ranked monsters killed by a player may drop
+  a bag **on top of** that mod's own drops (which already scale with the monster's max health, so leveled mobs
+  already pay better there): Elite 10% Uncommon, Champion 30% Rare, Remnant 100% Epic, event mini-boss 100%
+  Legendary; from difficulty 0.66 one tier better. Bags are made and dropped through Mob LootBags' own
+  `DropEngine.createBag`/`spawnBag` (reflection, no compile dependency either way), so they get its dimension themes,
+  bag statistics, drop sound and particles, announcements and client loot beams. If that code is not there (Mob
+  LootBags 1.x), the bag is dropped by item id (`loot_bags.items`) instead. The ids were read from the Mob LootBags
+  repository (`BagType`: `commonlootbag` … `mythiclootbag`, identical on 1.20.1, 1.21.1 and 26.x and in 1.x).
+- **Loot beams**: a column of dust in the item's rarity colour (vanilla's: yellow, aqua, light purple; default
+  `min_rarity: rare`) over what a ranked monster drops, for 30 s or until picked up, within 48 blocks. Sent from the
+  server, so every player sees it; Mob LootBags bags are skipped because that mod draws its own beam. Cost: one
+  particle packet per beam per nearby player every 5 ticks, at most 128 beams.
+- **Bug fix found while testing (3.0)**: the Volatile trait's death blast destroyed the monster's own drops
+  (explosions kill item entities), so Volatile Remnants dropped nothing. Item entities in the blast's reach are now
+  invulnerable for the instant of the explosion; the blast still hurts players and pushes items. This fix applies
+  regardless of `loot.json` (see Decisions).
 
 ## 8. Server-side first: what testing showed
 
@@ -250,6 +268,8 @@ so players without the mod see it too (verified with an unmodded client):
   **metadata stays "both sides"** (`environment: "*"`, `side = "BOTH"`), and the client part is "recommended",
   not "required, or you cannot join". A fully vanilla-joinable "server edition" without registered items is open
   question Q3.
+- With **Mob LootBags** installed, unmodded clients cannot join a NeoForge server at all: that mod's network channels
+  are required (its README: "needed on both the server and the client"). Remnants' own parts stay optional.
 
 ## 9. jauml bundling
 
@@ -280,6 +300,7 @@ New files only — **no new keys are injected into the five 3.0 files**, so thei
 - `config/remnant_mobs/events.json`: `enabled`, `events.<id>` as in §4.2.
 - `config/remnant_mobs/progression.json` (Phase 2): `enabled`, `hearts`, `drops`, `healing`, `meter`.
 - `config/remnant_mobs/elites.json` (Phase 2): `enabled`, `aura`, `boss_bars`, `champion_titles`, `event_glow`.
+- `config/remnant_mobs/loot.json` (Phase 3): `enabled`, `scaling`, `loot_bags`, `beams`.
 
 ### Migration defaults (requirement 8)
 
@@ -298,8 +319,8 @@ change to `remnant_mobs.json`; event state goes to a new file.
 ### Migration note (for the changelog)
 
 > **Upgrading from 3.0 or 2.x?** Nothing changes until you opt in. Remnants finds your existing config and
-> creates `difficulty.json`, `events.json`, `progression.json` and `elites.json` with every new system switched
-> off. Set `enabled: true` in each to try them; `/remnants reload` applies it. Fresh installs start with them on. The Hunter's Moon, levels, ranks,
+> creates `difficulty.json`, `events.json`, `progression.json`, `elites.json` and `loot.json` with every new
+> system switched off. Set `enabled: true` in each to try them; `/remnants reload` applies it. Fresh installs start with them on. The Hunter's Moon, levels, ranks,
 > traits and rewards behave exactly as before either way.
 
 ## 12. Minecraft 26.4 overlap
@@ -340,7 +361,7 @@ change to `remnant_mobs.json`; event state goes to a new file.
 6. **Overlap detection.** The rules say not to name other mods anywhere, but detecting them needs their mod ids.
    The design keeps the two ids only as default values of `compat.overlap_mod_ids` (a config value, never shown in
    docs or descriptions). Accept, or ship the list empty and let pack makers fill it?
-7. **Mob LootBags item ids** per tier (needed for Phase 3; that repo is not in this session's scope).
+7. ~~Mob LootBags item ids~~: resolved in Phase 3 by reading that repository (§7).
 9. **Recipes for the new items.** Drops only for now (§5). Should the Salve and Draught be craftable, and should
    Vital Embers stay drop-only (they are the progression gate)?
 8. **Java for 1.20.1.** The workspace targets Java 17 (the task brief said 21). Keep 17 (wider compatibility)?
@@ -406,20 +427,48 @@ Tested:
 - Not tested in game: the HUD gauge itself (needs a modded client; the payload is only sent to clients that have the
   channel, so the unmodded bot never got it) and Fabric 1.21.1 (builds; shares all common code).
 
+### Phase 3 (2026-10-29)
+
+| | 1.20.1 (Forge, Fabric) | 1.21.1 (NeoForge, Fabric) |
+| --- | --- | --- |
+| `loot.json` with the migration rule | ✅ | ✅ |
+| Extra loot rolls and shards scale with difficulty; extra roll chance for unranked monsters | ✅ | ✅ |
+| Mob LootBags bags from ranked kills (its own bag code, item-id fallback), tier up at high difficulty | ✅ | ✅ |
+| Server-side loot beams over rare drops | ✅ | ✅ |
+| Fix: Volatile no longer destroys the drops of the monster that exploded | ✅ | ✅ |
+
+Tested:
+- `./gradlew build` passes in both workspaces; **29 unit tests** each, all passing (5 new in `LootTest`: defaults,
+  scaling maths, bag tier-up and bad values, fractional rolls as chances over 10,000 draws, migration rule).
+- **Fabric 1.20.1** + Mob LootBags 2.0.0, unmodded bot as the player: "Mob LootBags found" in the log; an Elite at
+  level 58 (difficulty 0.97) dropped a **Rare** bag (Uncommon + 1 tier); a Remnant dropped an **Epic** bag
+  through Mob LootBags' own code. Volatile Remnant on a closed platform: 5 drops before the blast, **0 after** on
+  the 3.0 code, **5 after** with the fix (Vampiric control: drops kept either way). Loot beam: 51 extra dust
+  packets reached the bot in 12 s over a Vital Ember, then stopped when the item was gone.
+- **Fabric 1.20.1** + Mob LootBags **1.11.2** (no `DropEngine`): the bridge logs that it falls back, and the Epic
+  bag still drops by item id.
+- **NeoForge 1.21.1** + Mob LootBags 2.0.0 with the **real QA client** (Xvfb, software rendering): a level-40
+  Remnant (difficulty 0.66) dropped a **Legendary** bag, a Vital Ember and shards despite being Volatile. Screenshot:
+  our aqua beam over the Ember next to Mob LootBags' gold beam over its bag, and the **difficulty gauge** (Phase 2)
+  at "0%" near spawn and "86% +3" (deep red) 6,000 blocks out during a Grim Vigil, plus the extra heart row.
+  0 server exceptions, no client exceptions besides the missing sound device.
+- Not tested in game: Forge 1.20.1 and Fabric 1.21.1 with Mob LootBags (same common code and bridge).
+
 ### Next
 
-1. Run `tools/qa/run_all.py` with a real QA client on 1.20.1 Forge and 1.21.1 NeoForge to see the gauge, the
-   plates and the new items in hand; take screenshots for the listing. Once with RAS installed.
-2. **Phase 3**: difficulty-scaled loot rolls and shards, Mob LootBags soft dependency, loot beam.
-3. **Phase 4**: port to 26.1.2/26.2/26.3 (Fabric, NeoForge) **including the NeoForge unmodded-client crash fix**;
-   Frostbite → vanilla Freezing on 26.4.
-4. **Phase 5**: Forge 26.x needs a new workspace.
-5. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose).
+1. Run the full `tools/qa/run_all.py` suite (nameplates, `server_smoke.py`, `client_checks.py`) on 1.20.1 Forge and
+   1.21.1 NeoForge, once with RAS. (`tools/qa/prepare_runs.sh` now writes an `options.txt` that skips the first-run
+   accessibility screen, which had stopped the QA client's auto-join.)
+2. **Phase 4**: port to 26.1.2/26.2/26.3 (Fabric, NeoForge) **including the NeoForge unmodded-client crash fix and the
+   Volatile fix**; Frostbite → vanilla Freezing on 26.4.
+3. **Phase 5**: Forge 26.x needs a new workspace.
+4. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose).
 
 ### Decisions for the owner
 
 The questions in §14, most urgent first: **Q1** (mod id / which project 3.x ships to; the 143 packs are on 2.x),
 **Q6** (overlap mod ids in config vs. no detection), **Q4** (Grim Vigil cadence), **Q5** (names), **Q9**
-(recipes for the new items), **Q3** (server edition), **Q2** (should difficulty ever go down), **Q7** (LootBags ids), **Q8** (Java 17 for 1.20.1). Plus:
-**the NeoForge crash fix touches 3.0 behaviour**: consider a 3.0.1 hotfix for 1.21.1 and 26.x NeoForge
-independent of 3.1.
+(recipes for the new items), **Q3** (server edition), **Q2** (should difficulty ever go down), **Q8** (Java 17 for
+1.20.1). Plus two fixes that change 3.0 behaviour on every install, not only with the new systems on: the
+**NeoForge crash with unmodded clients** and **Volatile destroying its own drops**. Both look like 3.0.1 hotfix
+material for every version, independent of 3.1.

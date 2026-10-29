@@ -193,6 +193,19 @@ With the mod on your client, a small **difficulty meter** sits bottom right: a s
 green to deep red, with "+N" when an event night or Hunter's Moon adds levels. Move it with `meter.anchor`, `x`
 and `y` in your own `progression.json`, or hide it with `meter.hud`.
 
+## Loot (3.1)
+
+`loot.json`. The harder the place (a monster's level across its dimension's band), the better the loot:
+
+- ranked monsters roll their loot table up to twice as many extra times and drop up to 50% more Remnant Shards;
+  unranked monsters get up to a 15% chance of one more roll;
+- with **Mob LootBags** installed, ranked monsters killed by a player may also drop a bag on top of that mod's own
+  drops: Elite 10% Uncommon, Champion 30% Rare, Remnant always Epic, an event night's mini-boss always Legendary,
+  one tier better from two thirds of the way up the band. The bags come from Mob LootBags itself, with its themes,
+  announcements and beams;
+- rare and epic items a ranked monster drops get a **loot beam** in their rarity colour for 30 seconds, visible
+  to everyone.
+
 ## Readable elites (3.1)
 
 `elites.json`, visible to every player, with or without the mod: an aura in the rank's colour around Elites and
@@ -237,7 +250,7 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 
 ## Configuration
 
-Nine commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
+Ten commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
 every key, and `/remnants reload` applies changes without a restart (new spawns use them; existing mobs keep their
 rolls until `/remnants set ... reroll`).
 
@@ -251,6 +264,7 @@ rolls until `/remnants set ... reroll`).
 | `events.json` | (3.1) Event nights: trigger, announcement, effects, hunter waves, mini-boss, rewards, dimensions |
 | `progression.json` | (3.1) Vital Embers and the heart cap, healing items, their drop chances, the difficulty meter |
 | `elites.json` | (3.1) Rank aura, Champion and event boss bars and colours, Champion titles, event glow |
+| `loot.json` | (3.1) Loot and shard scaling with difficulty, Mob LootBags bags per rank, loot beams |
 | `client.json` | Nameplates (distances, look-at-only, health numbers, scale, colours, name tag replacement, F1), lens HUD, moon icon |
 
 Mob lists (`mobs.exclude`, trait `exclude`) take entity ids (`minecraft:creeper`), entity type tags
@@ -258,8 +272,8 @@ Mob lists (`mobs.exclude`, trait `exclude`) take entity ids (`minecraft:creeper`
 
 ### Upgrading to 3.1
 
-Nothing changes until you opt in. When `difficulty.json`, `events.json`, `progression.json` and `elites.json` are
-created next to an existing 3.0 (or 2.x) config, every new system starts **off**, so worlds and modpacks behave exactly as
+Nothing changes until you opt in. When `difficulty.json`, `events.json`, `progression.json`, `elites.json` and
+`loot.json` are created next to an existing 3.0 (or 2.x) config, every new system starts **off**, so worlds and modpacks behave exactly as
 before; set `enabled: true` in either and run `/remnants reload`. Fresh installs start with all of them on. The five 3.0
 files are not changed and mob data in worlds keeps its format.
 
