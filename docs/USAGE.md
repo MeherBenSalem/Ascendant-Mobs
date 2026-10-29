@@ -178,6 +178,28 @@ Copy the `grim_vigil` entry under a new id to add your own night (frequency, moo
 announcement, effects, waves, boss rank and tier, rewards, dimensions). Only one event runs at a time and never
 during a Hunter's Moon.
 
+## Player progression (3.1)
+
+`progression.json`. Ranked monsters killed by a player may drop:
+
+- **Vital Ember** (Elite 2%, Champion 15%, Remnant 60%, an event night's mini-boss always): use it for one more
+  heart of max health, for good, up to ten extra hearts. They stay after death (`hearts.keep_on_death`).
+  `/remnants hearts` shows yours.
+- **Mending Salve** (Veteran and above, 6%): heals 3 hearts over 3 seconds.
+- **Hunter's Draught** (Elite and above, 8%): drink to heal 40% of your health, then Regeneration for 5 seconds.
+
+Every chance grows with difficulty (up to double at the top of the dimension's band, `drops.difficulty_bonus`).
+With the mod on your client, a small **difficulty meter** sits bottom right: a skull, the percentage and a bar from
+green to deep red, with "+N" when an event night or Hunter's Moon adds levels. Move it with `meter.anchor`, `x`
+and `y` in your own `progression.json`, or hide it with `meter.hud`.
+
+## Readable elites (3.1)
+
+`elites.json`, visible to every player, with or without the mod: an aura in the rank's colour around Elites and
+above (a turning ring for Champions and Remnants), boss bars for Champions as well as Remnants (purple, yellow, and
+red for an event night's mini-boss), monsters sent by an event night glow until dawn, and optional titles for
+Champions.
+
 ## RPG Attribute System
 
 RAS is optional and found at runtime; nothing needs configuring. With it:
@@ -206,6 +228,8 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 | `/remnants set <targets> clear` | operators | Remove everything Remnants added |
 | `/remnants moon [start\|stop]` | everyone / operators | Hunter's Moon status, start, stop |
 | `/remnants difficulty [player]` | everyone / operators | Difficulty where you (or a player) stand, factor by factor |
+| `/remnants hearts [player]` | everyone / operators | Extra hearts from Vital Embers |
+| `/remnants hearts <player> set <n>` | operators | Set them |
 | `/remnants event` | everyone | The running event night and its waves |
 | `/remnants event list` | everyone | Event nights, their schedule and the next day they may roll |
 | `/remnants event start <id>` / `stop` | operators | Start an event night now (until dawn) or end it |
@@ -213,7 +237,7 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 
 ## Configuration
 
-Seven commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
+Nine commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
 every key, and `/remnants reload` applies changes without a restart (new spawns use them; existing mobs keep their
 rolls until `/remnants set ... reroll`).
 
@@ -225,6 +249,8 @@ rolls until `/remnants set ... reroll`).
 | `rewards.json` | Experience per level, extra loot, shards, Valor per rank and level, challenge curve, shard value, Brand multiplier |
 | `difficulty.json` | (3.1) Difficulty engine: factors and curves, gear score weights, rank odds, per-dimension multipliers and overrides, excluded dimensions, overlap with other elite-mob mods |
 | `events.json` | (3.1) Event nights: trigger, announcement, effects, hunter waves, mini-boss, rewards, dimensions |
+| `progression.json` | (3.1) Vital Embers and the heart cap, healing items, their drop chances, the difficulty meter |
+| `elites.json` | (3.1) Rank aura, Champion and event boss bars and colours, Champion titles, event glow |
 | `client.json` | Nameplates (distances, look-at-only, health numbers, scale, colours, name tag replacement, F1), lens HUD, moon icon |
 
 Mob lists (`mobs.exclude`, trait `exclude`) take entity ids (`minecraft:creeper`), entity type tags
@@ -232,9 +258,9 @@ Mob lists (`mobs.exclude`, trait `exclude`) take entity ids (`minecraft:creeper`
 
 ### Upgrading to 3.1
 
-Nothing changes until you opt in. When `difficulty.json` and `events.json` are created next to an existing 3.0 (or
-2.x) config, the difficulty engine and event nights start **off**, so worlds and modpacks behave exactly as
-before; set `enabled: true` in either and run `/remnants reload`. Fresh installs start with both on. The five 3.0
+Nothing changes until you opt in. When `difficulty.json`, `events.json`, `progression.json` and `elites.json` are
+created next to an existing 3.0 (or 2.x) config, every new system starts **off**, so worlds and modpacks behave exactly as
+before; set `enabled: true` in either and run `/remnants reload`. Fresh installs start with all of them on. The five 3.0
 files are not changed and mob data in worlds keeps its format.
 
 ### Coming from 2.x

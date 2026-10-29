@@ -66,6 +66,7 @@ Fixed ids, so any mod can find, read or remove them:
 | `remnant_mobs:rank` | The rank's health, damage and armor |
 | `remnant_mobs:trait/swift`, `remnant_mobs:trait/juggernaut`, `remnant_mobs:trait/warded` | Trait stats |
 | `remnant_mobs:trait/berserk` | Berserk while below half health (not saved) |
+| `remnant_mobs:vital_growth` | (3.1) On players: extra max health from Vital Embers (2 per heart) |
 
 On 1.20.1 modifiers have UUIDs: the name-based (version 3) UUID of the id above, `UUID.nameUUIDFromBytes("remnant_mobs:level".getBytes(UTF_8))`. Warded has no modifier on 1.20.1, which has no max absorption attribute.
 
@@ -81,4 +82,5 @@ Remnants reads RAS through reflection, with no compile dependency in either dire
 
 Two play payloads, both optional on the client: `remnant_mobs:mob_info` (a mob's level, rank, traits, flags,
 damage and armor, sent when a player starts tracking it or it changes) and `remnant_mobs:player_state` (your
-level, whether a Hunter's Moon is up and the Hunter's Lens readout).
+level, whether a Hunter's Moon is up and the Hunter's Lens readout). 3.1 adds `remnant_mobs:difficulty` (the
+difficulty meter: percent of the band, level, tonight's bonus), also optional.
