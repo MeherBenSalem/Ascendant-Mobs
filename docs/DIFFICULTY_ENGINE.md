@@ -2,7 +2,7 @@
 
 Design for the 3.1 line: a world difficulty that rises with time, distance, depth and player power and drives the
 existing levels and ranks; event nights; player-side progression; and loot that scales with difficulty. Branch:
-`claude/difficulty-engine`. Status: **Phases 1, 2 and 3 done on 1.20.1 and 1.21.1** (see [Status](#status) at the end).
+`claude/difficulty-engine`. Status: **Phases 1–4 done: 1.20.1, 1.21.1, 26.1.2, 26.2 and 26.3, Fabric and NeoForge (Forge on 1.20.1)** (see [Status](#status) at the end).
 
 The guiding rule: **extend what 3.0 already has instead of building a parallel system.** 3.0 already turns "how
 dangerous is this place" into a level (the *threat*), and level already drives rank odds. The difficulty engine
@@ -325,13 +325,16 @@ change to `remnant_mobs.json`; event state goes to a new file.
 
 ## 12. Minecraft 26.4 overlap
 
-26.4 (Q4 2026) adds a Freezing effect and a frost zombie. Plan:
+26.4 (Q4 2026) adds a Freezing effect and a frost zombie.
 
 - No new frost mechanics anywhere in this engine.
-- The 26.x port of the **Frostbite** trait looks up `minecraft:freezing` at runtime; if present it applies the
-  vanilla effect instead of Slowness + freeze ticks; otherwise 3.0 behaviour.
-- The frost zombie joins `#remnant_mobs:event_hunters` in the 26.4 workspace (via an optional tag entry
-  `{"id": "...", "required": false}` so the same data works before 26.4).
+- **Done (Phase 4):** on 26.1.2, 26.2 and 26.3 the **Frostbite** trait looks up `minecraft:freezing` in the effect
+  registry (`compat/VanillaFrost`). If the game has it, Frostbite applies it (for `slowness_seconds` at
+  `slowness_level`) instead of Slowness + freeze ticks; if not, 3.0 behaviour, verified on 26.3 (Slowness II for 3 s
+  and 100 freeze ticks). The id is a single constant **to confirm against 26.4** (snapshots may name it otherwise).
+- **Not done:** the frost zombie's id is not known yet, so it is not in `#remnant_mobs:event_hunters`. When 26.4 is
+  out, add it to `tools/assets/data.py` as `{"id": "minecraft:<id>", "required": false}` so the same data still
+  loads on 26.1–26.3.
 
 ## 13. Phases
 
@@ -340,7 +343,7 @@ change to `remnant_mobs.json`; event state goes to a new file.
 | **1** | Difficulty engine (factors, curves, dimensions, rank odds), `difficulty.json` + `events.json` with migration defaults, `/remnants difficulty`, `/remnants event …`, event system with `grim_vigil` (Hunter's Moon unchanged, listed alongside), new tags, unit tests | 1.20.1 (Forge first, Fabric shares `common/`), then 1.21.1 (NeoForge, Fabric) |
 | **2** | Vital Ember, healing items, difficulty payload + HUD gauge, elite readability (aura, bars, titles), overlap detection polish | same |
 | **3** | Loot scaling, Mob LootBags soft dep, loot beam | same |
-| **4** | Port to 26.1.2, 26.3 (Fabric, NeoForge), 26.2 if still shipped; 26.4 freezing hook | 26.x |
+| **4** | Port to 26.1.2, 26.2, 26.3 (Fabric, NeoForge); 26.4 freezing hook (done) | 26.x |
 | **5** | Forge 26.x: needs a new workspace (none exists today) | — |
 | later | KubeJS hooks, more boss tiers | — |
 
@@ -454,15 +457,43 @@ Tested:
   0 server exceptions, no client exceptions besides the missing sound device.
 - Not tested in game: Forge 1.20.1 and Fabric 1.21.1 with Mob LootBags (same common code and bridge).
 
+### Phase 4 (2026-10-29)
+
+| | 26.1.2 | 26.2 | 26.3 |
+| --- | --- | --- | --- |
+| Phases 1–3 (all five new config files, engine, events, progression, elites, loot, commands, API) on Fabric and NeoForge | ✅ | ✅ | ✅ |
+| NeoForge unmodded-client crash fix, Volatile drops fix (own commit, for a 3.0.1 hotfix) | ✅ | ✅ | ✅ |
+| Frostbite uses vanilla Freezing when present (26.4), 3.0 behaviour before | ✅ | ✅ | ✅ |
+
+How: a three-way merge of this branch's 1.21.1 changes into each 26.x workspace (5 conflicts each, resolved by
+hand), then the 26.x API changes (`Identifier`, jspecify, `entityTags()`, `level()`, `snapTo`, `EntitySpawnReason`,
+`spawnAtLocation(level, stack)`, `DustParticleOptions(rgb, scale)`, two-flag `sendParticles`, `getTagOrEmpty`,
+`GuiGraphicsExtractor`, `InteractionResult`, Consumer tooltips, `ItemUseAnimation`, stack cooldowns,
+`sendOverlayMessage`; Fabric `CreativeModeTabEvents`/`clientboundPlay`; NeoForge client payload handlers). The
+versions differ from each other only where Minecraft does: `EntityTypes` exists from 26.2, and 26.3 renamed
+`setInvulnerable` to `setPermanentlyInvulnerable`.
+
+Tested:
+- `./gradlew build` passes in `26.1.2/`, `26.2/` and `26.3/` (common, Fabric, NeoForge); **29 unit tests** each, all
+  passing. **Building 26.x needs Gradle to run on Java 25** (Loom 1.18 refuses Java 21); a Temurin 25.0.5 was used.
+- **NeoForge 26.3 + Mob LootBags 2.0.0 with the real QA client** (Xvfb; the 26.3 client needs EGL, so the container
+  needed `libegl1`): a level-40 Volatile Remnant dropped a **Legendary** bag (bridge, tier up), a Vital Ember and
+  shards, all surviving the blast; Frostbite on the player: Slowness II 60 ticks + 100 freeze ticks (no Freezing
+  effect in 26.3); a real right-click on a Vital Ember: 2 → 3 extra hearts, max health 26; Grim Vigil: 3/3 waves,
+  7 event monsters, glowing hunters, the mini-boss, and the gauge reading "14% +3" on screen. 0 server exceptions.
+- Dev servers, console checks (event list/start/stop, ranked spawns, threat), 0 exceptions each:
+  **NeoForge 26.2 as an upgrade** (3.0 `levels.json` present: "Existing config found", all five new files
+  `enabled: false`, `levels.json` byte-identical), **NeoForge 26.1.2**, **Fabric 26.1.2, 26.2 and 26.3** (fresh: all on).
+- Not tested in game: the 26.4 Freezing branch (no 26.4 yet), a real client on 26.1.2/26.2 or on Fabric 26.x.
+
 ### Next
 
-1. Run the full `tools/qa/run_all.py` suite (nameplates, `server_smoke.py`, `client_checks.py`) on 1.20.1 Forge and
-   1.21.1 NeoForge, once with RAS. (`tools/qa/prepare_runs.sh` now writes an `options.txt` that skips the first-run
-   accessibility screen, which had stopped the QA client's auto-join.)
-2. **Phase 4**: port to 26.1.2/26.2/26.3 (Fabric, NeoForge) **including the NeoForge unmodded-client crash fix and the
-   Volatile fix**; Frostbite → vanilla Freezing on 26.4.
-3. **Phase 5**: Forge 26.x needs a new workspace.
-4. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose).
+1. **26.4**: when it ships, confirm the Freezing effect id, add the frost zombie to `event_hunters`, and add a 26.4
+   workspace (`tools/port_setup.py`).
+2. **Phase 5**: Forge 26.x needs a new workspace (none exists).
+3. Run the full `tools/qa/run_all.py` suite on every target with a real client, once with RAS.
+4. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose); the 3.0.1
+   hotfix could be cut from the "fix:" and "26.x: the two 3.0 fixes" commits.
 
 ### Decisions for the owner
 
