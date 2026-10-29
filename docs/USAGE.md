@@ -148,6 +148,36 @@ everyone; until dawn, mobs in dimensions with a day cycle spawn 5 levels higher,
 shards drop twice as often. A moon icon in the corner of the screen shows it is up. `/remnants moon` shows the
 time left; operators can `/remnants moon start` and `/remnants moon stop`.
 
+## Difficulty engine (3.1)
+
+`difficulty.json` turns the threat into a fuller difficulty. When `enabled`:
+
+- distance, days and depth follow **curves** (`linear`, `sqrt`, `log`, `power`, each with `per` and a cap). They
+  start from your `levels.json` numbers, so switching the engine on does not move existing levels;
+- **played**: hours the nearby players have played (vanilla statistic) add levels (`sqrt`, 1 level at 2 h, cap 10);
+- **gear**: the nearby players' gear score (armor, toughness, attack damage, extra max health, read from their
+  attributes, so modded gear counts) adds levels (1 per 6 points, cap 15);
+- each dimension can multiply and offset the result and override any factor;
+- the higher a place sits in its dimension's level band, the likelier ranks get (up to x2 at the top);
+- `exclude_dimensions` (ids or `#` dimension type tags, `#remnant_mobs:no_difficulty` by default) and the entity
+  tag `#remnant_mobs:ignores_difficulty` keep the 3.0 formula.
+
+`/remnants difficulty` shows where you stand as a percentage of the band, factor by factor.
+
+## Event nights (3.1)
+
+`events.json` holds event nights. The built-in **Grim Vigil** rolls at dusk every 10 nights from day 7 (50%):
+a title, a horn and a chat line, then until dawn new monsters spawn 3 levels higher with x1.5 rank odds, and
+three waves of named, ranked hunters (`#remnant_mobs:event_hunters`) are sent after every player in survival.
+The last wave brings a Remnant-rank mini-boss (`#remnant_mobs:event_mini_bosses`) with its boss bar. Players who
+see the dawn get experience (and Valor with RAS) and the *See the Dawn* advancement; the mini-boss drops extra
+shards. Event monsters carry the scoreboard tags `remnant_mobs.event`, `remnant_mobs.event.<id>` and, for the
+mini-boss, `remnant_mobs.event_boss`.
+
+Copy the `grim_vigil` entry under a new id to add your own night (frequency, moon phase, minimum difficulty,
+announcement, effects, waves, boss rank and tier, rewards, dimensions). Only one event runs at a time and never
+during a Hunter's Moon.
+
 ## RPG Attribute System
 
 RAS is optional and found at runtime; nothing needs configuring. With it:
@@ -175,11 +205,15 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 | `/remnants set <targets> reroll` | operators | Roll level, rank and traits again |
 | `/remnants set <targets> clear` | operators | Remove everything Remnants added |
 | `/remnants moon [start\|stop]` | everyone / operators | Hunter's Moon status, start, stop |
+| `/remnants difficulty [player]` | everyone / operators | Difficulty where you (or a player) stand, factor by factor |
+| `/remnants event` | everyone | The running event night and its waves |
+| `/remnants event list` | everyone | Event nights, their schedule and the next day they may roll |
+| `/remnants event start <id>` / `stop` | operators | Start an event night now (until dawn) or end it |
 | `/remnants reload` | operators | Reload the config files |
 
 ## Configuration
 
-Five commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
+Seven commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
 every key, and `/remnants reload` applies changes without a restart (new spawns use them; existing mobs keep their
 rolls until `/remnants set ... reroll`).
 
@@ -189,10 +223,19 @@ rolls until `/remnants set ... reroll`).
 | `ranks.json` | Rank chances, minimum levels, stat multipliers, trait counts, rewards; Remnant titles, boss bar, announcement and horn |
 | `traits.json` | Per trait: enabled, weight, minimum rank, excluded mobs and its numbers |
 | `rewards.json` | Experience per level, extra loot, shards, Valor per rank and level, challenge curve, shard value, Brand multiplier |
+| `difficulty.json` | (3.1) Difficulty engine: factors and curves, gear score weights, rank odds, per-dimension multipliers and overrides, excluded dimensions, overlap with other elite-mob mods |
+| `events.json` | (3.1) Event nights: trigger, announcement, effects, hunter waves, mini-boss, rewards, dimensions |
 | `client.json` | Nameplates (distances, look-at-only, health numbers, scale, colours, name tag replacement, F1), lens HUD, moon icon |
 
 Mob lists (`mobs.exclude`, trait `exclude`) take entity ids (`minecraft:creeper`), entity type tags
 (`#minecraft:skeletons`) and whole namespaces (`cobblemon:`).
+
+### Upgrading to 3.1
+
+Nothing changes until you opt in. When `difficulty.json` and `events.json` are created next to an existing 3.0 (or
+2.x) config, the difficulty engine and event nights start **off**, so worlds and modpacks behave exactly as
+before; set `enabled: true` in either and run `/remnants reload`. Fresh installs start with both on. The five 3.0
+files are not changed and mob data in worlds keeps its format.
 
 ### Coming from 2.x
 

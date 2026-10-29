@@ -16,6 +16,9 @@ boolean isBranded(Entity entity);                    // marked with a Brand of C
 void setLevel(Mob mob, int level);                   // keeps rank and traits, re-applies stats (server)
 int getThreat(ServerLevel level, BlockPos pos);      // the level mobs would spawn at there, players included (server)
 boolean isHuntersMoon();                             // (server)
+double getDifficulty(ServerLevel level, BlockPos pos); // 0-1, where the threat sits in the dimension's band (server, 3.1)
+String getActiveEvent();                             // id of the running event night, "" when none (server, 3.1)
+void registerBossTier(String id, BossTier tier);     // a boss tier events can name in mini_boss.tier (3.1)
 ```
 
 Compile against the jar for your version, or call it through reflection to keep Remnants optional.
@@ -33,6 +36,11 @@ Compile against the jar for your version, or call it through reflection to keep 
 | `#remnant_mobs:bosses` | Shown with a level but never ranked; stats only scale with `mobs.boss_stats`. Includes `#c:bosses` |
 | `#remnant_mobs:never_leveled` | Never leveled |
 | `#remnant_mobs:never_ranked` | Leveled but always Common (vexes, silverfish and endermites by default) |
+| `#remnant_mobs:ignores_difficulty` | (3.1) Keeps the `levels.json` formula when the difficulty engine is on |
+| `#remnant_mobs:event_hunters` | (3.1) Monsters event nights send after players |
+| `#remnant_mobs:event_mini_bosses` | (3.1) Mini-boss candidates for event nights |
+
+Dimension type tag `#remnant_mobs:no_difficulty` (3.1): dimensions of these types keep the `levels.json` formula.
 
 ## Scoreboard tags
 
@@ -42,6 +50,8 @@ Leveled mobs carry these entity tags (`/tag`, `@e[tag=...]`):
 | --- | --- |
 | `remnant_mobs.<rank>` | `remnant_mobs.veteran` ... `remnant_mobs.remnant` (none for Common) |
 | `remnant_mobs.trait.<trait>` | One per trait |
+| `remnant_mobs.event`, `remnant_mobs.event.<id>` | (3.1) Sent by an event night |
+| `remnant_mobs.event_boss` | (3.1) An event night's mini-boss |
 | `remnant_mobs:data\|<level>\|<rank>\|<traits>\|<seed>\|<flags>` | The saved data. Read it through the API rather than parsing it |
 
 Removing these tags by hand does not remove the stats; use `/remnants set <targets> clear`.
