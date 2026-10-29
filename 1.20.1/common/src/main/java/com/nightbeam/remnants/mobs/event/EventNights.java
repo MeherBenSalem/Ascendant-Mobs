@@ -76,6 +76,8 @@ public final class EventNights {
     private static long endTime;
     private static long rolledDay = Long.MIN_VALUE;
     private static int wavesSent;
+    /** Started by an operator: runs even while events.json has events switched off. */
+    private static boolean forced;
     private static final Set<UUID> participants = new HashSet<>();
     private static final Map<UUID, Hunter> hunters = new HashMap<>();
     private static @Nullable Path file;
@@ -159,6 +161,7 @@ public final class EventNights {
         active = null;
         rolledDay = Long.MIN_VALUE;
         wavesSent = 0;
+        forced = false;
         participants.clear();
         hunters.clear();
         file = server.getWorldPath(LevelResource.ROOT).resolve(RemnantMobs.MOD_ID + "_events.json");
@@ -170,6 +173,7 @@ public final class EventNights {
                 endTime = o.has("end") ? o.get("end").getAsLong() : 0;
                 rolledDay = o.has("rolled_day") ? o.get("rolled_day").getAsLong() : Long.MIN_VALUE;
                 wavesSent = o.has("waves_sent") ? o.get("waves_sent").getAsInt() : 0;
+                forced = o.has("forced") && o.get("forced").getAsBoolean();
                 if (o.get("participants") instanceof JsonArray list) {
                     for (JsonElement element : list) {
                         participants.add(UUID.fromString(element.getAsString()));
@@ -201,6 +205,7 @@ public final class EventNights {
         o.addProperty("end", endTime);
         o.addProperty("rolled_day", rolledDay);
         o.addProperty("waves_sent", wavesSent);
+        o.addProperty("forced", forced);
         JsonArray list = new JsonArray();
         participants.forEach(id -> list.add(id.toString()));
         o.add("participants", list);
@@ -217,7 +222,7 @@ public final class EventNights {
         long time = WorldTime.time(overworld);
         if (active != null) {
             EventsConfig.Event event = activeEvent();
-            if (event == null || !RemnantsConfig.events().enabled || !event.enabled()) {
+            if (event == null || (!forced && (!RemnantsConfig.events().enabled || !event.enabled()))) {
                 stop(server, false);
             } else if (time >= endTime) {
                 stop(server, true);
@@ -245,7 +250,7 @@ public final class EventNights {
         RandomSource random = overworld.getRandom();
         for (EventsConfig.Event event : config.events.values()) {
             if (eligible(server, event, day) && random.nextDouble() < event.trigger().chance()) {
-                start(server, event);
+                start(server, event, false);
                 return;
             }
         }
@@ -286,8 +291,12 @@ public final class EventNights {
         return rem == 0 ? today : today + (trigger.everyDays() - rem);
     }
 
-    /** Starts {@code event} now; it lasts until the next dawn. */
-    public static void start(MinecraftServer server, EventsConfig.Event event) {
+    /**
+     * Starts {@code event} now; it lasts until the next dawn.
+     *
+     * @param forced started by an operator: it runs even if events are switched off in events.json
+     */
+    public static void start(MinecraftServer server, EventsConfig.Event event, boolean forced) {
         ServerLevel overworld = server.overworld();
         if (active != null) {
             stop(server, false);
@@ -300,6 +309,7 @@ public final class EventNights {
         endTime = day * WorldTime.DAY + DAWN + (timeOfDay >= DAWN ? WorldTime.DAY : 0);
         rolledDay = day;
         wavesSent = 0;
+        EventNights.forced = forced;
         participants.clear();
         hunters.clear();
         save();
@@ -382,7 +392,8 @@ public final class EventNights {
         }
         steer(server);
         EventsConfig.Hunters h = event.hunters();
-        if (wavesSent >= h.waves() || seconds < h.firstWaveSeconds() + (long) wavesSent * h.waveSeconds()) {
+        // Waves wait for someone to hunt, so players who arrive later in the night still get the whole hunt.
+        if (targets.isEmpty() || wavesSent >= h.waves() || seconds < h.firstWaveSeconds() + (long) wavesSent * h.waveSeconds()) {
             return;
         }
         wavesSent++;

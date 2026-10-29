@@ -262,7 +262,7 @@ public final class RemnantsCommand {
         if (event == null) {
             throw UNKNOWN_EVENT.create(id);
         }
-        EventNights.start(c.getSource().getServer(), event);
+        EventNights.start(c.getSource().getServer(), event, true);
         c.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.remnant_mobs.event.started",
                 "%s begins and lasts until dawn", eventName(id)), true);
         return 1;
