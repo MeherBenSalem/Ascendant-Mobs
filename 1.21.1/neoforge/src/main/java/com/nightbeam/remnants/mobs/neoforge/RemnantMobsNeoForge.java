@@ -3,6 +3,7 @@ package com.nightbeam.remnants.mobs.neoforge;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.DifficultyPayload;
 import com.nightbeam.remnants.mobs.network.MobInfoPayload;
 import com.nightbeam.remnants.mobs.network.PlayerStatePayload;
 import com.nightbeam.remnants.mobs.platform.Platform;
@@ -63,6 +64,11 @@ public final class RemnantMobsNeoForge {
                 RemnantsEvents.onPlayerJoin(player);
             }
         });
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.Clone event) -> {
+            if (event.getOriginal() instanceof ServerPlayer from && event.getEntity() instanceof ServerPlayer to) {
+                RemnantsEvents.onPlayerClone(from, to, !event.isWasDeath());
+            }
+        });
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) {
                 RemnantsEvents.onPlayerLeave(player);
@@ -80,16 +86,21 @@ public final class RemnantMobsNeoForge {
         // NeoForge 21.1 takes the client handlers here; they only run on the client.
         event.registrar("3").optional()
                 .playToClient(MobInfoPayload.TYPE, MobInfoPayload.CODEC, (payload, context) -> ClientHandlers.mobInfo(payload))
-                .playToClient(PlayerStatePayload.TYPE, PlayerStatePayload.CODEC, (payload, context) -> ClientHandlers.playerState(payload));
+                .playToClient(PlayerStatePayload.TYPE, PlayerStatePayload.CODEC, (payload, context) -> ClientHandlers.playerState(payload))
+                .playToClient(DifficultyPayload.TYPE, DifficultyPayload.CODEC, (payload, context) -> ClientHandlers.difficulty(payload));
     }
 
     private void buildTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModContent.REMNANT_SHARD.get());
+            event.accept(ModContent.VITAL_EMBER.get());
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModContent.HUNTERS_LENS.get());
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModContent.BRAND_OF_CHALLENGE.get());
+        } else if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
+            event.accept(ModContent.MENDING_SALVE.get());
+            event.accept(ModContent.HUNTERS_DRAUGHT.get());
         }
     }
 

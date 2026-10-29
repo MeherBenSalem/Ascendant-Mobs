@@ -9,6 +9,7 @@ import com.nightbeam.remnants.mobs.event.Scheduler;
 import com.nightbeam.remnants.mobs.mob.MobData;
 import com.nightbeam.remnants.mobs.mob.MobLeveler;
 import com.nightbeam.remnants.mobs.mob.MobState;
+import com.nightbeam.remnants.mobs.elite.EliteVisuals;
 import com.nightbeam.remnants.mobs.mob.RemnantBars;
 import com.nightbeam.remnants.mobs.mob.RemnantMob;
 import com.nightbeam.remnants.mobs.mob.Stats;
@@ -205,9 +206,10 @@ public final class TraitEffects {
 
     /** Every tick for leveled mobs with traits or a Remnant bar. */
     public static void tick(ServerLevel level, Mob mob, MobData data) {
-        if (data.rank() == Rank.REMNANT) {
+        if (data.rank() == Rank.REMNANT || (data.rank() == Rank.CHAMPION && EliteVisuals.championBar(mob))) {
             RemnantBars.tick(level, mob);
         }
+        EliteVisuals.tick(level, mob, data);
         if (data.traits().isEmpty() || !mob.isAlive()) {
             return;
         }

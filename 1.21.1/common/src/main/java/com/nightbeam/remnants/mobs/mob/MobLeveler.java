@@ -213,6 +213,9 @@ public final class MobLeveler {
             if (RemnantsConfig.ranks().remnantTitles && !mob.hasCustomName()) {
                 mob.setCustomName(Component.literal(Titles.of(data.seed())));
             }
+        } else if (data.rank() == Rank.CHAMPION && RemnantsConfig.elites().enabled && RemnantsConfig.elites().championTitles
+                && !mob.hasCustomName()) {
+            mob.setCustomName(Component.literal(Titles.of(data.seed())));
         }
         Network.syncMob(mob);
     }

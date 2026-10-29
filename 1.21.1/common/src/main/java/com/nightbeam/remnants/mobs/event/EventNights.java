@@ -518,6 +518,11 @@ public final class EventNights {
             return null;
         }
         mob.setTarget(player);
+        if (RemnantsConfig.elites().enabled && RemnantsConfig.elites().eventGlow) {
+            int ticks = (int) Math.min(Integer.MAX_VALUE, Math.max(20, remaining(level.getServer())));
+            mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING, ticks, 0,
+                    false, false));
+        }
         hunters.put(mob.getUUID(), new Hunter(player.getUUID(), boss));
         return mob;
     }

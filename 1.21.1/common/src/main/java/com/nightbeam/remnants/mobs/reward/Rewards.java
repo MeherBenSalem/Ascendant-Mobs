@@ -2,11 +2,14 @@ package com.nightbeam.remnants.mobs.reward;
 
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.compat.RasBridge;
+import com.nightbeam.remnants.mobs.config.LevelsConfig;
+import com.nightbeam.remnants.mobs.config.ProgressionConfig;
 import com.nightbeam.remnants.mobs.config.RanksConfig;
 import com.nightbeam.remnants.mobs.config.RemnantsConfig;
 import com.nightbeam.remnants.mobs.config.RewardsConfig;
 import com.nightbeam.remnants.mobs.content.ModContent;
 import com.nightbeam.remnants.mobs.content.Rank;
+import com.nightbeam.remnants.mobs.difficulty.Difficulty;
 import com.nightbeam.remnants.mobs.event.EventNights;
 import com.nightbeam.remnants.mobs.event.Feedback;
 import com.nightbeam.remnants.mobs.event.HuntersMoon;
@@ -77,6 +80,30 @@ public final class Rewards {
                 mob.spawnAtLocation(new ItemStack(ModContent.REMNANT_SHARD.get(), stack));
                 shards -= stack;
             }
+        }
+        if (playerKilled) {
+            dropProgression(level, mob, data);
+        }
+    }
+
+    /** Vital Embers and healing items (progression.json), likelier the higher the mob sits in its dimension's band. */
+    private static void dropProgression(ServerLevel level, Mob mob, MobData data) {
+        ProgressionConfig c = RemnantsConfig.progression();
+        if (!c.enabled) {
+            return;
+        }
+        LevelsConfig.Band band = RemnantsConfig.levels().band(level.dimension().location().toString());
+        double fraction = Difficulty.fraction(data.level(), band.min(), band.max());
+        var random = mob.getRandom();
+        double ember = mob.getTags().contains(EventNights.BOSS_TAG) ? c.emberEventBoss : c.emberChance.getOrDefault(data.rank(), 0.0);
+        if (ember > 0 && random.nextDouble() < c.chance(ember, fraction)) {
+            mob.spawnAtLocation(new ItemStack(ModContent.VITAL_EMBER.get()));
+        }
+        if (data.rank().atLeast(Rank.VETERAN) && c.salveChance > 0 && random.nextDouble() < c.chance(c.salveChance, fraction)) {
+            mob.spawnAtLocation(new ItemStack(ModContent.MENDING_SALVE.get()));
+        }
+        if (data.rank().atLeast(Rank.ELITE) && c.draughtChance > 0 && random.nextDouble() < c.chance(c.draughtChance, fraction)) {
+            mob.spawnAtLocation(new ItemStack(ModContent.HUNTERS_DRAUGHT.get()));
         }
     }
 

@@ -24,6 +24,7 @@ import com.nightbeam.remnants.mobs.mob.RemnantMob;
 import com.nightbeam.remnants.mobs.mob.Threat;
 import com.nightbeam.remnants.mobs.mob.Titles;
 import com.nightbeam.remnants.mobs.network.Network;
+import com.nightbeam.remnants.mobs.progression.Hearts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -130,6 +131,16 @@ public final class RemnantsCommand {
                         .executes(c -> difficulty(c, c.getSource().getPlayerOrException()))
                         .then(Commands.argument("player", EntityArgument.player()).requires(op)
                                 .executes(c -> difficulty(c, EntityArgument.getPlayer(c, "player")))))
+                .then(Commands.literal("hearts")
+                        .executes(c -> hearts(c, c.getSource().getPlayerOrException()))
+                        .then(Commands.argument("player", EntityArgument.player()).requires(op)
+                                .executes(c -> hearts(c, EntityArgument.getPlayer(c, "player")))
+                                .then(Commands.literal("set").then(Commands.argument("hearts", IntegerArgumentType.integer(0, 100))
+                                        .executes(c -> {
+                                            ServerPlayer player = EntityArgument.getPlayer(c, "player");
+                                            Hearts.set(player, IntegerArgumentType.getInteger(c, "hearts"));
+                                            return hearts(c, player);
+                                        })))))
                 .then(Commands.literal("event")
                         .executes(RemnantsCommand::eventStatus)
                         .then(Commands.literal("list").executes(RemnantsCommand::eventList))
@@ -219,6 +230,14 @@ public final class RemnantsCommand {
                     Math.round(t.weight() * 100)).withStyle(ChatFormatting.GRAY), false);
         }
         return percent;
+    }
+
+    private static int hearts(CommandContext<CommandSourceStack> c, ServerPlayer player) {
+        int hearts = Hearts.get(player);
+        int max = RemnantsConfig.progression().maxBonusHearts;
+        c.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.remnant_mobs.hearts",
+                "%s has %s of %s extra hearts from Vital Embers", player.getDisplayName(), hearts, max), false);
+        return hearts;
     }
 
     private static int eventStatus(CommandContext<CommandSourceStack> c) {

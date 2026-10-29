@@ -21,6 +21,8 @@ public final class RemnantsConfig {
     private static ClientConfig client = ClientConfig.from(new JsonObject());
     private static DifficultyConfig difficulty = DifficultyConfig.from(new JsonObject());
     private static EventsConfig events = EventsConfig.from(new JsonObject());
+    private static ProgressionConfig progression = ProgressionConfig.from(new JsonObject());
+    private static ElitesConfig elites = ElitesConfig.from(new JsonObject());
     private static Path dir = Path.of("config", RemnantMobs.MOD_ID);
 
     private RemnantsConfig() {
@@ -54,6 +56,14 @@ public final class RemnantsConfig {
         return events;
     }
 
+    public static ProgressionConfig progression() {
+        return progression;
+    }
+
+    public static ElitesConfig elites() {
+        return elites;
+    }
+
     public static Path dir() {
         return dir;
     }
@@ -75,12 +85,17 @@ public final class RemnantsConfig {
         client = ClientConfig.from(ClientConfig.spec().load(dir.resolve("client.json")));
         Path difficultyFile = dir.resolve("difficulty.json");
         Path eventsFile = dir.resolve("events.json");
-        if (!fresh && (!Files.exists(difficultyFile) || !Files.exists(eventsFile))) {
-            RemnantMobs.LOG.info("Existing config found: the difficulty engine and event nights start switched off (see {} and {})",
-                    difficultyFile.getFileName(), eventsFile.getFileName());
+        Path progressionFile = dir.resolve("progression.json");
+        Path elitesFile = dir.resolve("elites.json");
+        if (!fresh && (!Files.exists(difficultyFile) || !Files.exists(eventsFile) || !Files.exists(progressionFile)
+                || !Files.exists(elitesFile))) {
+            RemnantMobs.LOG.info("Existing config found: systems new in 3.1 start switched off (see difficulty.json, events.json, "
+                    + "progression.json and elites.json)");
         }
         difficulty = DifficultyConfig.from(DifficultyConfig.spec(fresh, levels).load(difficultyFile));
         events = EventsConfig.from(EventsConfig.spec(fresh).load(eventsFile));
+        progression = ProgressionConfig.from(ProgressionConfig.spec(fresh).load(progressionFile));
+        elites = ElitesConfig.from(ElitesConfig.spec(fresh).load(elitesFile));
         RemnantMobs.LOG.info("Loaded config from {}", dir);
     }
 
