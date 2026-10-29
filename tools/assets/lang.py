@@ -33,6 +33,7 @@ ADVANCEMENTS = {
     'accept_the_challenge': ('Accept the Challenge', 'Mark a monster with a Brand of Challenge'),
     'nothing_left_to_hide': ('Nothing Left to Hide', 'Slay a monster with four traits'),
     'see_the_dawn': ('See the Dawn', 'Survive an event night until sunrise'),
+    'kindled': ('Kindled', 'Grow your heart with a Vital Ember'),
 }
 
 EN_US = {
@@ -45,6 +46,14 @@ EN_US = {
     'item.remnant_mobs.brand_of_challenge': 'Brand of Challenge',
     'item.remnant_mobs.brand_of_challenge.tooltip': 'Use on a leveled monster: one rank higher, five levels stronger, one more trait',
     'item.remnant_mobs.brand_of_challenge.tooltip.reward': 'Its rewards are doubled',
+    'item.remnant_mobs.vital_ember': 'Vital Ember',
+    'item.remnant_mobs.vital_ember.tooltip': 'Use to grow your heart: one more heart of max health, for good',
+    'item.remnant_mobs.mending_salve': 'Mending Salve',
+    'item.remnant_mobs.mending_salve.tooltip': 'Use to heal a little over a few seconds',
+    'item.remnant_mobs.hunters_draught': "Hunter's Draught",
+    'item.remnant_mobs.hunters_draught.tooltip': 'Drink to heal a large part of your health, then regenerate',
+    'message.remnant_mobs.ember.used': 'Your heart burns brighter: %s extra hearts',
+    'message.remnant_mobs.ember.full': 'Your heart can hold no more embers (%s extra hearts)',
 
     'rank.remnant_mobs.common': 'Common',
     'rank.remnant_mobs.veteran': 'Veteran',
@@ -118,6 +127,7 @@ EN_US = {
     'commands.remnant_mobs.moon.inactive': "No Hunter's Moon tonight",
     'commands.remnant_mobs.moon.disabled': "The Hunter's Moon is turned off in levels.json",
     'commands.remnant_mobs.reload': 'Reloaded Remnants: RPG Mobs config',
+    'commands.remnant_mobs.hearts': '%s has %s of %s extra hearts from Vital Embers',
     'commands.remnant_mobs.difficulty.header': 'Difficulty for %s: %s  (level %s of %s-%s, %s)',
     'commands.remnant_mobs.difficulty.parts': '  base %s + distance %s + days %s + depth %s + played %s + gear %s',
     'commands.remnant_mobs.difficulty.dimension': '  x %s %s this dimension',

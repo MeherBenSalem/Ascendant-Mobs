@@ -38,7 +38,7 @@ PROFILES = {
     '1.20.1': Profile('object', False, True, 'item', _BG_OLD, {'pack_format': 15, 'description': DESCRIPTION}),
 }
 
-ITEMS = ['remnant_shard', 'hunters_lens', 'brand_of_challenge']
+ITEMS = ['remnant_shard', 'hunters_lens', 'brand_of_challenge', 'vital_ember', 'mending_salve', 'hunters_draught']
 
 
 def _ing(value, profile):
@@ -97,6 +97,7 @@ _ADVANCEMENTS = [
     ('under_the_hunters_moon', 'proven_hunter', 'clock', 'goal', False, 'minecraft:impossible'),
     ('accept_the_challenge', 'taste_of_valor', 'brand_of_challenge', 'goal', False, 'minecraft:impossible'),
     ('see_the_dawn', 'proven_hunter', 'bell', 'goal', False, 'minecraft:impossible'),
+    ('kindled', 'root', 'vital_ember', 'task', False, 'minecraft:impossible'),
 ]
 
 
