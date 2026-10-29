@@ -8,6 +8,7 @@ import com.nightbeam.remnants.mobs.event.HuntersMoon;
 import com.nightbeam.remnants.mobs.event.Scheduler;
 import com.nightbeam.remnants.mobs.mob.RemnantBars;
 import com.nightbeam.remnants.mobs.network.Network;
+import com.nightbeam.remnants.mobs.progression.Hearts;
 import com.nightbeam.remnants.mobs.reward.Rewards;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -54,6 +55,11 @@ public final class RemnantsEvents {
     public static void onPlayerJoin(ServerPlayer player) {
         Network.forget(player);
         Network.syncPlayer(player);
+    }
+
+    /** A player was re-created on respawn or on leaving the End; {@code alive} is false after a death. */
+    public static void onPlayerClone(ServerPlayer from, ServerPlayer to, boolean alive) {
+        Hearts.copy(from, to, alive);
     }
 
     public static void onPlayerLeave(ServerPlayer player) {
