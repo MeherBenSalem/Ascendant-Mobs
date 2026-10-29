@@ -2,7 +2,7 @@
 
 Design for the 3.1 line: a world difficulty that rises with time, distance, depth and player power and drives the
 existing levels and ranks; event nights; player-side progression; and loot that scales with difficulty. Branch:
-`claude/difficulty-engine`. Status: **design + Phase 1 in progress** (see [Status](#status) at the end).
+`claude/difficulty-engine`. Status: **Phase 1 done on 1.20.1 and 1.21.1** (see [Status](#status) at the end).
 
 The guiding rule: **extend what 3.0 already has instead of building a parallel system.** 3.0 already turns "how
 dangerous is this place" into a level (the *threat*), and level already drives rank odds. The difficulty engine
@@ -136,12 +136,14 @@ mini-boss, no rewards beyond more shards, nothing schedulable other than "full m
 
 ### 4.2 The event system
 
-`events.json` holds a list of **event definitions**. The scheduler checks once a second; at most one event runs
-at a time. Built-in definitions:
+`events.json` holds a map of **event definitions**. The scheduler checks once a second; at most one event runs
+at a time.
 
-- `hunters_moon`: **is** the 3.0 Hunter's Moon. Its numbers stay in `levels.json → hunters_moon` (so existing
-  configs keep working), the existing `HuntersMoon` class keeps its state file and logic. The event system only
-  reports it (`/remnants event list`) and keeps other events from overlapping it.
+- The **Hunter's Moon** stays the 3.0 system, unchanged: its numbers stay in `levels.json → hunters_moon` (so
+  existing configs keep working) and the `HuntersMoon` class keeps its state file and logic. It is **not** an
+  entry of `events.json`; the event system lists it (`/remnants event list`) and a rolled event never starts while
+  it is up. (An operator's `/remnants event start` can still overlap it on purpose.) Folding it into
+  `events.json` later is possible but would move keys out of `levels.json`, so it waits for a major version.
 - `grim_vigil` (new, original): every `every_days` nights (default 10, from day 7, chance 50%), a night where
   named elites and one mini-boss hunt each player.
 
@@ -149,28 +151,31 @@ at a time. Built-in definitions:
 "grim_vigil": {
   "enabled": true,
   "trigger": { "every_days": 10, "first_day": 7, "chance": 0.5, "min_difficulty": 0.0, "moon": "any" },
-  "announce": { "title": true, "chat": true, "sound": true, "warn_seconds": 30 },
+  "announce": { "title": true, "chat": true, "sound": true },
   "effects": { "level_bonus": 3, "rank_multiplier": 1.5, "shard_multiplier": 1.5 },
-  "hunters": { "waves": 3, "per_wave": 3, "wave_seconds": 90, "min_rank": "veteran", "named": true,
-               "distance_min": 24, "distance_max": 40, "max_alive": 6 },
-  "mini_boss": { "enabled": true, "wave": 3, "rank": "remnant", "level_bonus": 5, "tier": "mini" },
-  "rewards": { "survive_experience": 50, "boss_shards": 8, "advancement": true },
+  "hunters": { "waves": 3, "per_wave": 3, "wave_seconds": 90, "first_wave_seconds": 20, "min_rank": "veteran",
+               "named": true, "distance_min": 20, "distance_max": 32, "max_alive": 6 },
+  "mini_boss": { "enabled": true, "per_player": false, "rank": "remnant", "level_bonus": 5, "tier": "mini" },
+  "rewards": { "survive_experience": 50, "survive_valor": 40, "boss_shards": 8 },
   "dimensions": ["minecraft:overworld"]
 }
 ```
 
-- **Hunters** are picked from `#remnant_mobs:event_hunters`, placed on valid spawn spots 24–40 blocks from the
-  player (vanilla spawn placement rules, never in view, never in protected spawn radius), given the event's
-  minimum rank and a generated title (the existing `Titles` generator), set to target and path to the player,
-  and tagged `remnant_mobs.event` (scoreboard tag, so datapacks can react).
-- The **mini-boss** arrives on the last wave with a Remnant-rank roll → it gets the existing boss bar, horn and
-  broadcast for free.
+- **Hunters** are picked from `#remnant_mobs:event_hunters`, placed on valid spawn spots 20–32 blocks from the
+  player (vanilla spawn placement rules and collision, inside the world border, surface or cave depending on where
+  the player is), given at least the event's minimum rank and a generated title (the existing `Titles`
+  generator), and re-aimed at their player every second (monsters normally drop targets beyond follow range).
+  They carry the scoreboard tags `remnant_mobs.event` and `remnant_mobs.event.<id>`, so datapacks can react.
+  Players in creative or spectator are not hunted. Waves wait until someone is online to hunt.
+- The **mini-boss** arrives with the last wave, after one random hunted player (or each, with `per_player`), at
+  the event's boss rank (Remnant by default), so it gets the existing boss bar, horn and kill broadcast for free.
 - **Rewards**: surviving to dawn grants XP (and Valor through the existing RAS bridge if present); the mini-boss
   drops `boss_shards` extra shards. Event mobs multiply shards by `shard_multiplier`.
 - **Boss-tier hook**: `mini_boss.tier` names an entry in a `BossTiers` registry (`api/BossTier`). Phase 1 ships
   `mini` (a ranked vanilla mob). Remnant Bosses or a later phase can register `major`, `raid` etc. through
   `RemnantMobsApi.registerBossTier(id, spawner)` without changing the event format.
-- Commands: `/remnants event` (status), `/remnants event list`, `/remnants event start <id>` (op),
+- Commands: `/remnants event` (status), `/remnants event list`, `/remnants event start <id>` (op; runs even
+  while `events.json` has events switched off, so pack makers can try a night before enabling the schedule),
   `/remnants event stop` (op). `/remnants moon …` is unchanged.
 - State persists in `<world>/remnant_mobs_events.json` (separate from the Hunter's Moon file so 3.0 worlds
   load untouched).
@@ -216,17 +221,24 @@ Server-side, so it reaches vanilla clients:
 - **Loot beam**: server-side particle column above dropped items whose rarity ≥ `rare` or that came from a
   Champion+ / event kill, for up to 30 s. Cheap: one particle packet per item per 10 ticks, capped count.
 
-## 8. Server-side first: the honest limit
+## 8. Server-side first: what testing showed
 
-- Everything Phase 1 adds (difficulty, events, commands, hunters, titles, boss bars, particles) is server-side
-  and uses vanilla packets.
-- **But 3.0 already registers items (Remnant Shard, Hunter's Lens, Brand of Challenge) and sounds.** On Forge and
-  NeoForge, registry sync means a vanilla client cannot join a server with registered items; on Fabric the
-  client would get unknown item ids. So today the mod is a both-sides mod and the metadata says so correctly
-  (`environment: "*"`, Forge `side = "BOTH"`, NeoForge `side = "BOTH"`).
-- A truly vanilla-joinable build would need a **"server edition"** jar without registered content (shards become
-  tagged vanilla items, sounds become vanilla sounds). That is a product decision → open question Q3. The new
-  code is written so that every Phase 1 feature works with no new registry entries and no required payloads.
+- Everything Phase 1 adds (difficulty, events, commands, hunters, titles, boss bars) is server-side, adds **no
+  registry entries and no payloads**, and uses vanilla packets. New messages use `translatableWithFallback`, so
+  unmodded clients read English instead of raw keys; the generated advancements and the Remnant boss bar level
+  now carry fallbacks too.
+- Smoke tests with an **unmodded client** (a mineflayer bot, see Status) on dev servers with the mod installed:
+  - **Forge 1.20.1** and **Fabric 1.20.1**: the client joins and plays through a full event night.
+  - **NeoForge 1.21.1**: in 3.0 the **server crashed** as soon as a leveled mob near an unmodded client got its
+    data (`sendToPlayersTrackingEntity` throws for clients without the channel). Fixed on this branch; the client
+    then plays through a full event night with no server exception. **The same call is in the 26.1.2, 26.2 and 26.3
+    NeoForge workspaces and needs the same fix** (Phase 4).
+- What unmodded clients still cannot get: the nameplates, the Hunter's Lens HUD and textures/names of the three
+  3.0 items (Remnant Shard, Hunter's Lens, Brand of Challenge). Item handling for unmodded clients was not tested
+  (the bot never held one); on NeoForge, registered items normally require the mod on the client, so the
+  **metadata stays "both sides"** (`environment: "*"`, `side = "BOTH"`), and the client part is "recommended",
+  not "required, or you cannot join". A fully vanilla-joinable "server edition" without registered items is open
+  question Q3.
 
 ## 9. jauml bundling
 
@@ -307,7 +319,8 @@ change to `remnant_mobs.json`; event state goes to a new file.
    does; 3.0's 2.x config/mob migration covers worlds, but pack scripts referencing `rpgmoblevelingsystem` will not.
 2. **Clock for difficulty.** Default: world days (as 3.0) **plus** each player's own play time at a smaller
    weight. Should difficulty ever go **down** (on death, with an item)? Not in the design today.
-3. **Server edition.** Do you want a vanilla-client-joinable jar without registered items (§8)?
+3. **Server edition.** Unmodded clients already join Forge/Fabric 1.20.1 and (after this branch's fix) NeoForge
+   1.21.1. Do you also want a jar without registered items so nothing on the server can trip them up (§8)?
 4. **Event cadence.** `grim_vigil` every 10 nights, 50% chance, from day 7: too much or too little for packs?
    Should it refuse to start while a player is in a bed / AFK?
 5. **Names.** Proposed original names: *Grim Vigil* (event), *Vital Ember*, *Mending Salve*, *Hunter's Draught*.
@@ -320,4 +333,57 @@ change to `remnant_mobs.json`; event state goes to a new file.
 
 ## Status
 
-_Filled in as work lands; see the bottom of this file._
+_As of 2026-10-29, branch `claude/difficulty-engine`. Nothing has been published, tagged or merged._
+
+### Done
+
+| | 1.20.1 (Forge, Fabric) | 1.21.1 (NeoForge, Fabric) |
+| --- | --- | --- |
+| Difficulty engine: curved factors (days, played, distance, depth, gear), per-dimension multiplier/offset/overrides, exclusions by id or `dimension_type` tag, `#remnant_mobs:ignores_difficulty`, rank odds from difficulty | ✅ | ✅ |
+| `difficulty.json` and `events.json` with the migration rule (off next to a 3.0 or 2.x config, on for fresh installs); the five 3.0 files untouched | ✅ | ✅ |
+| Event nights: scheduler, Grim Vigil, waves of named ranked hunters, mini-boss through the `BossTier` hook, dawn rewards, *See the Dawn* advancement, state in `remnant_mobs_events.json`; Hunter's Moon unchanged | ✅ | ✅ |
+| `/remnants difficulty [player]`, `/remnants event [list\|start <id>\|stop]` | ✅ | ✅ |
+| Trait suppression next to listed overlapping mods (`compat`) | ✅ | ✅ |
+| API: `getDifficulty`, `getActiveEvent`, `registerBossTier`; tags; English fallbacks | ✅ | ✅ |
+| Fix: NeoForge server crash with unmodded clients online | n/a | ✅ |
+| Docs: this file, `USAGE.md`, `API.md`, `patchnotes/3.1.0.md` (draft with the migration note) | ✅ | ✅ |
+
+### Tested
+
+- `./gradlew build` passes in `1.20.1/` (common, Fabric, Forge) and `1.21.1/` (common, Fabric, NeoForge). It was
+  built with JDK 21; Gradle provisioned the Java 17 toolchain for 1.20.1.
+- Unit tests: 19 per workspace, all passing (10 existing + 9 new in `DifficultyTest`: curves, overrides, defaults
+  mirroring `levels.json`, gear score, rank odds, event schedule, fresh install on, 3.0 upgrade off with files
+  byte-identical, 2.x upgrade off). The first run caught a real bug (rank-odds curve read as disabled).
+- Dev dedicated servers, driven over RCON (`tools/qa/rcon.py`), with a mineflayer bot as an unmodded player:
+  - **Forge 1.20.1**: commands; fresh-install configs on; **upgrade**: with the 3.0 files kept and the new files
+    deleted, the restart logs "Existing config found…", creates both new files with `enabled: false`, leaves the
+    five 3.0 files byte-identical (md5) and threat unchanged; full Grim Vigil (3 waves, named Veteran+ hunters,
+    Remnant mini-boss with boss bar, cap on hunters alive); dawn reward (+50 XP, advancement, message); event state
+    survives a restart; operator start works with events off.
+  - **NeoForge 1.21.1**: found and fixed the unmodded-client crash, then a full Grim Vigil with 0 exceptions.
+  - **Fabric 1.20.1**: full Grim Vigil, boss bar reads "Lv. 14" on the unmodded client, 0 exceptions.
+  - Not run: Fabric 1.21.1 in game (it builds), the QA client with nameplates (no change to client code), the
+    existing `server_smoke.py` suite, RAS present.
+- Smoke tests found and fixed two event bugs: an operator start ended at once while events were off, and waves
+  were used up while nobody was online.
+
+### Next
+
+1. **Phase 2** on the same targets: Vital Ember (heart growth), healing items, `remnant_mobs:difficulty` payload +
+   HUD gauge, elite readability (aura particles, Champion bars, event glow), overlap-detection polish.
+2. Run `tools/qa/run_all.py` (nameplates + `server_smoke.py`) on 1.20.1 Forge and 1.21.1 NeoForge with a real QA
+   client, and once with RAS installed.
+3. **Phase 3**: difficulty-scaled loot, Mob LootBags soft dependency, loot beam.
+4. **Phase 4**: port to 26.1.2/26.2/26.3 (Fabric, NeoForge) **including the NeoForge unmodded-client crash fix**;
+   Frostbite → vanilla Freezing on 26.4.
+5. **Phase 5**: Forge 26.x needs a new workspace.
+6. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose).
+
+### Decisions for the owner
+
+The questions in §14, most urgent first: **Q1** (mod id / which project 3.x ships to; the 143 packs are on 2.x),
+**Q6** (overlap mod ids in config vs. no detection), **Q4** (Grim Vigil cadence), **Q5** (names), **Q3** (server
+edition), **Q2** (should difficulty ever go down), **Q7** (LootBags ids), **Q8** (Java 17 for 1.20.1). Plus:
+**the NeoForge crash fix touches 3.0 behaviour**: consider a 3.0.1 hotfix for 1.21.1 and 26.x NeoForge
+independent of 3.1.
