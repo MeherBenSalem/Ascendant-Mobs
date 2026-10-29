@@ -526,8 +526,14 @@ Tested:
 - Not tested on Forge 26.x: Mob LootBags (it has no Forge 26.x build), RPG Attribute System, clients without the
   mod (the mineflayer bots do not support 26.x), and the 3.0 upgrade path (same common code as the NeoForge 26.2
   upgrade test).
-- Found, not caused by this branch: on **26.1.2 (every loader)** the level number on a nameplate a few blocks away
-  renders garbled (fine up close; 26.2 and 26.3 are clean). The plate code is unchanged from 3.0.
+- Found and fixed (a 3.0 bug, not caused by this branch): on **26.1.2 (every loader)** nameplate text seen at an
+  angle broke up into dark blocks, worst on the bold level number, also on the rank crest. 26.1.2 draws a text
+  outline at the depth of the text and its depth buffer cannot tell them apart from a few blocks away (26.2 moved to
+  a reverse depth buffer, so 26.2 and 26.3 are clean). Plates now draw each outline on its own first, then the text
+  just in front of it, by about eight depth steps at that distance. Checked with the real QA client from both
+  diagonals and head-on at 6–28 blocks (plates at scale 2 to keep the text resolvable), at the screen edge and in the
+  Hunter's Moon scene where it showed first: all clean, `client_checks.py` 0 failures. 1.21.1 under the same sweep
+  was already clean (its bold glyphs do not sit in front of their outline), so nothing changes there.
 
 ### Next
 
@@ -538,7 +544,6 @@ Tested:
 3. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose); the 3.0.1
    hotfix could be cut from the "fix:" and "26.x: the two 3.0 fixes" commits. The store pages in `marketing/`
    still list Fabric and NeoForge only for 26.x; update them with the 3.1 release.
-4. Look into the garbled level number on 26.1.2 nameplates (above).
 
 ### Decisions for the owner
 
@@ -547,7 +552,7 @@ The questions in §14, most urgent first: **Q1** (mod id / which project 3.x shi
 (recipes for the new items), **Q3** (server edition), **Q2** (should difficulty ever go down), **Q8** (Java 17 for
 1.20.1). Plus two fixes that change 3.0 behaviour on every install, not only with the new systems on: the
 **NeoForge crash with unmodded clients** and **Volatile destroying its own drops**. Both look like 3.0.1 hotfix
-material for every version, independent of 3.1.
+material for every version, independent of 3.1, and so is the 26.1.2 nameplate fix (its own commit).
 
 From Phase 5: whether the Forge 26.x jars ship with 3.1 or wait until Mob LootBags and RPG Attribute System are
 checked on Forge 26.x (both are optional; Remnants runs without them).
