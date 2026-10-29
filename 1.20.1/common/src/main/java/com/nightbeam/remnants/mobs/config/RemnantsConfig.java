@@ -12,13 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Loads and holds the five files under {@code config/remnant_mobs/}. */
+/** Loads and holds the files under {@code config/remnant_mobs/}. */
 public final class RemnantsConfig {
     private static LevelsConfig levels = LevelsConfig.from(new JsonObject());
     private static RanksConfig ranks = RanksConfig.from(new JsonObject());
     private static TraitsConfig traits = TraitsConfig.from(new JsonObject());
     private static RewardsConfig rewards = RewardsConfig.from(new JsonObject());
     private static ClientConfig client = ClientConfig.from(new JsonObject());
+    private static DifficultyConfig difficulty = DifficultyConfig.from(new JsonObject());
+    private static EventsConfig events = EventsConfig.from(new JsonObject());
     private static Path dir = Path.of("config", RemnantMobs.MOD_ID);
 
     private RemnantsConfig() {
@@ -44,6 +46,14 @@ public final class RemnantsConfig {
         return client;
     }
 
+    public static DifficultyConfig difficulty() {
+        return difficulty;
+    }
+
+    public static EventsConfig events() {
+        return events;
+    }
+
     public static Path dir() {
         return dir;
     }
@@ -52,6 +62,8 @@ public final class RemnantsConfig {
     public static synchronized void load(Path configRoot) {
         dir = configRoot.resolve(RemnantMobs.MOD_ID);
         Path legacy = configRoot.resolve("rpgmoblevelingsystem");
+        // Decided before anything is written: files new in 3.1 start with their systems off next to an older config.
+        boolean fresh = isFreshInstall(dir, legacy);
         CommentedJson levelsSpec = LevelsConfig.spec();
         if (!Files.exists(dir) && Files.isDirectory(legacy)) {
             LegacyMigration.migrate(legacy, dir, levelsSpec);
@@ -61,7 +73,20 @@ public final class RemnantsConfig {
         traits = TraitsConfig.from(TraitsConfig.spec().load(dir.resolve("traits.json")));
         rewards = RewardsConfig.from(RewardsConfig.spec().load(dir.resolve("rewards.json")));
         client = ClientConfig.from(ClientConfig.spec().load(dir.resolve("client.json")));
+        Path difficultyFile = dir.resolve("difficulty.json");
+        Path eventsFile = dir.resolve("events.json");
+        if (!fresh && (!Files.exists(difficultyFile) || !Files.exists(eventsFile))) {
+            RemnantMobs.LOG.info("Existing config found: the difficulty engine and event nights start switched off (see {} and {})",
+                    difficultyFile.getFileName(), eventsFile.getFileName());
+        }
+        difficulty = DifficultyConfig.from(DifficultyConfig.spec(fresh, levels).load(difficultyFile));
+        events = EventsConfig.from(EventsConfig.spec(fresh).load(eventsFile));
         RemnantMobs.LOG.info("Loaded config from {}", dir);
+    }
+
+    /** No 3.x config and no 2.x config: a new install, where the 3.1 systems start on. */
+    static boolean isFreshInstall(Path dir, Path legacy) {
+        return !Files.exists(dir.resolve("levels.json")) && !Files.isDirectory(legacy);
     }
 
     /** Carries customised 2.x settings ({@code config/rpgmoblevelingsystem/}) into {@code levels.json}, once. */

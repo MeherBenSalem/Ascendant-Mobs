@@ -32,6 +32,7 @@ ADVANCEMENTS = {
     'know_thy_enemy': ('Know Thy Enemy', "Look through a Hunter's Lens"),
     'accept_the_challenge': ('Accept the Challenge', 'Mark a monster with a Brand of Challenge'),
     'nothing_left_to_hide': ('Nothing Left to Hide', 'Slay a monster with four traits'),
+    'see_the_dawn': ('See the Dawn', 'Survive an event night until sunrise'),
 }
 
 EN_US = {
@@ -69,6 +70,14 @@ EN_US = {
     'event.remnant_mobs.hunters_moon.subtitle': 'Monsters grow stronger until dawn',
     'event.remnant_mobs.hunters_moon.chat': "A Hunter's Moon rises. Until dawn, monsters spawn stronger, ranks come more often and shards drop more.",
     'event.remnant_mobs.hunters_moon.end': "The Hunter's Moon sets.",
+
+    'event.remnant_mobs.grim_vigil.title': 'The Grim Vigil',
+    'event.remnant_mobs.grim_vigil.subtitle': 'Something hunts you until dawn',
+    'event.remnant_mobs.grim_vigil.chat': 'The Grim Vigil falls. Until dawn, named hunters track every survivor, and something worse follows them.',
+    'event.remnant_mobs.end': 'Dawn breaks. The hunt is over.',
+    'event.remnant_mobs.wave': 'The hunters close in (%s/%s)',
+    'event.remnant_mobs.boss': '%s has found your trail',
+    'event.remnant_mobs.survived': 'You saw the dawn. +%s experience',
 
     'hud.remnant_mobs.hunters_moon': "Hunter's Moon",
     'hud.remnant_mobs.threat': 'Threat',
@@ -109,6 +118,20 @@ EN_US = {
     'commands.remnant_mobs.moon.inactive': "No Hunter's Moon tonight",
     'commands.remnant_mobs.moon.disabled': "The Hunter's Moon is turned off in levels.json",
     'commands.remnant_mobs.reload': 'Reloaded Remnants: RPG Mobs config',
+    'commands.remnant_mobs.difficulty.header': 'Difficulty for %s: %s  (level %s of %s-%s, %s)',
+    'commands.remnant_mobs.difficulty.parts': '  base %s + distance %s + days %s + depth %s + played %s + gear %s',
+    'commands.remnant_mobs.difficulty.dimension': '  x %s %s this dimension',
+    'commands.remnant_mobs.difficulty.ranks': '  rank odds x%s',
+    'commands.remnant_mobs.difficulty.off': '  (the difficulty engine is off here: see difficulty.json)',
+    'commands.remnant_mobs.difficulty.night': '  tonight: +%s levels',
+    'commands.remnant_mobs.event.unknown': 'Unknown event: %s',
+    'commands.remnant_mobs.event.active': '%s is running: wave %s/%s, %s min %s s until dawn',
+    'commands.remnant_mobs.event.none': 'No event night is running',
+    'commands.remnant_mobs.event.disabled': 'Event nights are turned off in events.json',
+    'commands.remnant_mobs.event.stopped': 'The event night is over',
+    'commands.remnant_mobs.event.started': '%s begins and lasts until dawn',
+    'commands.remnant_mobs.event.list_moon': " ◆ Hunter's Moon (levels.json): %s, %s%% on full moons",
+    'commands.remnant_mobs.event.list_entry': ' ◆ %s (%s): %s, %s%% every %s nights from day %s; next chance on day %s',
 
     'subtitles.remnant_mobs.item.shard.absorb': 'Remnant Shard absorbed',
     'subtitles.remnant_mobs.item.brand.apply': 'Brand burns',

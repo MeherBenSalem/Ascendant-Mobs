@@ -24,7 +24,7 @@ class Profile:
     def dir(self, kind):
         if self.plural_dirs:
             return {'recipe': 'recipes', 'advancement': 'advancements', 'tags/item': 'tags/items',
-                    'tags/entity_type': 'tags/entity_types'}[kind]
+                    'tags/entity_type': 'tags/entity_types'}.get(kind, kind)
         return kind
 
 
@@ -73,6 +73,14 @@ def tags(profile):
         ('tags/entity_type', 'never_leveled'): {'replace': False, 'values': []},
         ('tags/entity_type', 'never_ranked'): {'replace': False, 'values': [
             'minecraft:vex', 'minecraft:silverfish', 'minecraft:endermite']},
+        # Difficulty engine and event nights (3.1).
+        ('tags/entity_type', 'ignores_difficulty'): {'replace': False, 'values': []},
+        ('tags/entity_type', 'event_hunters'): {'replace': False, 'values': [
+            'minecraft:zombie', 'minecraft:husk', 'minecraft:skeleton', 'minecraft:stray', 'minecraft:spider',
+            'minecraft:vindicator', 'minecraft:pillager', 'minecraft:witch']},
+        ('tags/entity_type', 'event_mini_bosses'): {'replace': False, 'values': [
+            'minecraft:vindicator', 'minecraft:wither_skeleton', 'minecraft:evoker', 'minecraft:ravager']},
+        ('tags/dimension_type', 'no_difficulty'): {'replace': False, 'values': []},
     }
 
 
@@ -88,6 +96,7 @@ _ADVANCEMENTS = [
     ('nothing_left_to_hide', 'champions_bane', 'ender_eye', 'challenge', True, 'minecraft:impossible'),
     ('under_the_hunters_moon', 'proven_hunter', 'clock', 'goal', False, 'minecraft:impossible'),
     ('accept_the_challenge', 'taste_of_valor', 'brand_of_challenge', 'goal', False, 'minecraft:impossible'),
+    ('see_the_dawn', 'proven_hunter', 'bell', 'goal', False, 'minecraft:impossible'),
 ]
 
 

@@ -7,6 +7,7 @@ import com.nightbeam.remnants.mobs.config.RemnantsConfig;
 import com.nightbeam.remnants.mobs.config.RewardsConfig;
 import com.nightbeam.remnants.mobs.content.ModContent;
 import com.nightbeam.remnants.mobs.content.Rank;
+import com.nightbeam.remnants.mobs.event.EventNights;
 import com.nightbeam.remnants.mobs.event.Feedback;
 import com.nightbeam.remnants.mobs.event.HuntersMoon;
 import com.nightbeam.remnants.mobs.mob.MobData;
@@ -69,8 +70,8 @@ public final class Rewards {
             if (data.flag(MobData.MOONLIT) || HuntersMoon.affects(level)) {
                 count *= RemnantsConfig.levels().moonShardMultiplier;
             }
-            count *= branded(data);
-            int shards = (int) Math.round(count);
+            count *= branded(data) * EventNights.shardMultiplier(mob);
+            int shards = (int) Math.round(count) + EventNights.bossShards(mob);
             while (shards > 0) {
                 int stack = Math.min(shards, 64);
                 mob.spawnAtLocation(new ItemStack(ModContent.REMNANT_SHARD.get(), stack));
