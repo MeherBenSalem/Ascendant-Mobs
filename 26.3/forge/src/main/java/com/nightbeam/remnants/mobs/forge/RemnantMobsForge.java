@@ -30,6 +30,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -60,12 +61,9 @@ public final class RemnantMobsForge {
         channel = buildChannel();
 
         BuildCreativeModeTabContentsEvent.BUS.addListener(RemnantMobsForge::buildTabs);
-        // A monitor: runs last and is told whether another mod cancelled the death.
-        LivingDeathEvent.BUS.addListener((event, cancelled) -> {
-            if (!cancelled) {
-                RemnantsEvents.onLivingDeath(event.getEntity(), event.getSource());
-            }
-        });
+        // Last, and skipped when another mod cancels the death. Not a monitor: EventBus 7 never calls monitors on a
+        // bus without ordinary listeners, which is the case for this event unless another mod listens too.
+        LivingDeathEvent.BUS.addListener(Priority.LOWEST, (LivingDeathEvent event) -> RemnantsEvents.onLivingDeath(event.getEntity(), event.getSource()));
         ServerStartedEvent.BUS.addListener(event -> RemnantsEvents.onServerStarted(event.getServer()));
         ServerStoppingEvent.BUS.addListener(event -> RemnantsEvents.onServerStopping(event.getServer()));
         TickEvent.ServerTickEvent.Post.BUS.addListener(event -> RemnantsEvents.onServerTick(event.server()));
