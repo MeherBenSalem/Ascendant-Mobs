@@ -16,6 +16,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -119,7 +120,18 @@ public final class RemnantMobsNeoForge {
 
         @Override
         public void sendToTracking(Entity entity, CustomPacketPayload payload) {
-            PacketDistributor.sendToPlayersTrackingEntity(entity, payload);
+            // PacketDistributor.sendToPlayersTrackingEntity throws for clients without the channel (unmodded
+            // clients), which crashed the server. Send to the players in tracking range that have it instead; players
+            // who start tracking later get the mob's info from Network.onStartTracking.
+            if (!(entity.level() instanceof ServerLevel level)) {
+                return;
+            }
+            double range = entity.getType().clientTrackingRange() * 16.0;
+            for (ServerPlayer player : level.players()) {
+                if (player.distanceToSqr(entity) <= range * range) {
+                    sendToPlayer(player, payload);
+                }
+            }
         }
 
         @Override
