@@ -23,6 +23,7 @@ public final class RemnantsConfig {
     private static EventsConfig events = EventsConfig.from(new JsonObject());
     private static ProgressionConfig progression = ProgressionConfig.from(new JsonObject());
     private static ElitesConfig elites = ElitesConfig.from(new JsonObject());
+    private static LootConfig loot = LootConfig.from(new JsonObject());
     private static Path dir = Path.of("config", RemnantMobs.MOD_ID);
 
     private RemnantsConfig() {
@@ -64,6 +65,10 @@ public final class RemnantsConfig {
         return elites;
     }
 
+    public static LootConfig loot() {
+        return loot;
+    }
+
     public static Path dir() {
         return dir;
     }
@@ -87,15 +92,17 @@ public final class RemnantsConfig {
         Path eventsFile = dir.resolve("events.json");
         Path progressionFile = dir.resolve("progression.json");
         Path elitesFile = dir.resolve("elites.json");
+        Path lootFile = dir.resolve("loot.json");
         if (!fresh && (!Files.exists(difficultyFile) || !Files.exists(eventsFile) || !Files.exists(progressionFile)
-                || !Files.exists(elitesFile))) {
+                || !Files.exists(elitesFile) || !Files.exists(lootFile))) {
             RemnantMobs.LOG.info("Existing config found: systems new in 3.1 start switched off (see difficulty.json, events.json, "
-                    + "progression.json and elites.json)");
+                    + "progression.json, elites.json and loot.json)");
         }
         difficulty = DifficultyConfig.from(DifficultyConfig.spec(fresh, levels).load(difficultyFile));
         events = EventsConfig.from(EventsConfig.spec(fresh).load(eventsFile));
         progression = ProgressionConfig.from(ProgressionConfig.spec(fresh).load(progressionFile));
         elites = ElitesConfig.from(ElitesConfig.spec(fresh).load(elitesFile));
+        loot = LootConfig.from(LootConfig.spec(fresh).load(lootFile));
         RemnantMobs.LOG.info("Loaded config from {}", dir);
     }
 
