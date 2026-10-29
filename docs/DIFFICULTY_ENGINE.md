@@ -372,7 +372,8 @@ change to `remnant_mobs.json`; event state goes to a new file.
 
 ## Status
 
-_As of 2026-10-29, branch `claude/difficulty-engine`. Nothing has been published, tagged or merged._
+_As of 2026-10-29, branch `claude/difficulty-engine`. **3.1.0 is published** on Modrinth and CurseForge (13 files,
+the `Publish` workflow run on this branch, jars in `releases/`). Nothing has been tagged or merged into `main`._
 
 ### Done
 
@@ -541,9 +542,13 @@ Tested:
    workspace (`tools/port_setup.py`). The script copies `common/`, `fabric/` and `neoforge/` only: copy `26.3/forge/`
    and its lines in `settings.gradle`, `build.gradle` and `gradle.properties` by hand.
 2. Run the full `tools/qa/run_all.py` suite on every target with a real client, once with RAS.
-3. Before release: bump `version` to 3.1.0 in each `gradle.properties` (left at 3.0.0 on purpose); the 3.0.1
-   hotfix could be cut from the "fix:" and "26.x: the two 3.0 fixes" commits. The store pages in `marketing/`
-   still list Fabric and NeoForge only for 26.x; update them with the 3.1 release.
+3. After the 3.1.0 release: merge this branch into `main` (the released code and jars are only here so far), and
+   update the store pages: the description in `marketing/` still describes 3.0 and lists Fabric and NeoForge only
+   for 26.x, and the workflow uploads files, not page text.
+
+Release gate for 3.1.0 (2026-10-29): `./gradlew clean build` in all five workspaces (29 tests each), each jar's
+mappings checked against its 3.0.0 counterpart, then a fresh dev server and `server_smoke.py` for all 13 shipped
+version/loader pairs: 0 failures.
 
 ### Decisions for the owner
 
