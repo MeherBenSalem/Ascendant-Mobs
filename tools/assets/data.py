@@ -106,8 +106,9 @@ def advancements(profile):
         icon_id = icon if ':' in icon else (f'{NS}:{icon}' if icon in ITEMS else f'minecraft:{icon}')
         display = {
             'icon': {profile.icon_key: icon_id},
-            'title': {'translate': f'advancements.{NS}.{adv_id}.title'},
-            'description': {'translate': f'advancements.{NS}.{adv_id}.description'},
+            # The fallback is what clients without the mod's language file read.
+            'title': {'translate': f'advancements.{NS}.{adv_id}.title', 'fallback': ADVANCEMENTS[adv_id][0]},
+            'description': {'translate': f'advancements.{NS}.{adv_id}.description', 'fallback': ADVANCEMENTS[adv_id][1]},
             'frame': frame,
             'show_toast': parent is not None,
             'announce_to_chat': parent is not None,

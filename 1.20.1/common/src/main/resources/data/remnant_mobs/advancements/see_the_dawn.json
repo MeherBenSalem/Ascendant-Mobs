@@ -4,10 +4,12 @@
       "item": "minecraft:bell"
     },
     "title": {
-      "translate": "advancements.remnant_mobs.see_the_dawn.title"
+      "translate": "advancements.remnant_mobs.see_the_dawn.title",
+      "fallback": "See the Dawn"
     },
     "description": {
-      "translate": "advancements.remnant_mobs.see_the_dawn.description"
+      "translate": "advancements.remnant_mobs.see_the_dawn.description",
+      "fallback": "Survive an event night until sunrise"
     },
     "frame": "goal",
     "show_toast": true,

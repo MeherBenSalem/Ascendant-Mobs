@@ -36,7 +36,7 @@ public final class RemnantBars {
             Component name = Component.empty()
                     .append(mob.getDisplayName().copy().withStyle(style -> style.withColor(Rank.REMNANT.color())))
                     .append(Component.literal("  ·  ").withStyle(ChatFormatting.DARK_GRAY))
-                    .append(Component.translatable("plate.remnant_mobs.level", data.level()).withStyle(ChatFormatting.GOLD));
+                    .append(Component.translatableWithFallback("plate.remnant_mobs.level", "Lv. %s", data.level()).withStyle(ChatFormatting.GOLD));
             bar = new ServerBossEvent(name, BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.NOTCHED_10);
             bar.setDarkenScreen(false);
             BARS.put(mob, bar);
