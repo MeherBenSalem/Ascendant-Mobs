@@ -2,6 +2,8 @@ package com.nightbeam.remnants.mobs;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.nightbeam.remnants.mobs.command.RemnantsCommand;
+import com.nightbeam.remnants.mobs.difficulty.Difficulty;
+import com.nightbeam.remnants.mobs.event.EventNights;
 import com.nightbeam.remnants.mobs.event.HuntersMoon;
 import com.nightbeam.remnants.mobs.event.Scheduler;
 import com.nightbeam.remnants.mobs.mob.RemnantBars;
@@ -25,10 +27,15 @@ public final class RemnantsEvents {
 
     public static void onServerStarted(MinecraftServer server) {
         HuntersMoon.load(server);
+        EventNights.load(server);
+        if (Difficulty.traitsSuppressed()) {
+            RemnantMobs.LOG.info("A mod listed in difficulty.json compat.overlap_mod_ids is installed: Remnants rolls no traits");
+        }
     }
 
     public static void onServerStopping(MinecraftServer server) {
         HuntersMoon.unload();
+        EventNights.unload();
         RemnantBars.clear();
         Scheduler.clear();
         Network.clear();
@@ -38,6 +45,7 @@ public final class RemnantsEvents {
         Scheduler.tick();
         if (++ticks % 20 == 0) {
             HuntersMoon.tick(server);
+            EventNights.tick(server);
             RemnantBars.cleanup();
             Network.syncPlayers(server);
         }
