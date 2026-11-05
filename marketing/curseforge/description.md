@@ -1,5 +1,9 @@
 ![Remnants: RPG Mobs 3.0: Blood and Valor](https://raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/banner.png)
 
+**[Discord](https://discord.gg/TJc3CxR4jK) · [The modpack](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy) · [Support NightBeam](https://nightbeam.dev/support) · [NightBeam Pro](https://nightbeam.dev/memberships) · [All projects](https://nightbeam.dev/projects)**
+
+> **Play it in [Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**, NightBeam's story-driven soulslike RPG modpack. It builds RPG Mobs into one rule set with the rest of the Remnants series.
+
 ## Every monster has a level. Some have a rank. A few have a name.
 
 **Remnants: RPG Mobs** turns Minecraft's monsters into RPG enemies. The farther you travel, the deeper you dig and the longer your world lives, the stronger they get. Some rise as **Veterans**, **Elites** and **Champions** with traits like *Vampiric*, *Blinking* or *Packleader*, and once in a few thousand spawns a **Remnant** walks out of the dark with a name, a title and a boss bar. Every kill pays more the harder it was: experience, extra loot, **Remnant Shards**, and **Valor** when you play with [RPG Attribute System](https://www.curseforge.com/minecraft/mc-mods/rpg-attribute-system).
@@ -90,7 +94,7 @@ The Warded shield shatters and regrows with a sound you will learn to dread, Bli
 - **Health bar** in the rank colour (classic red for Common mobs), with a pale trail that drains away as you land hits, and the current health beside it.
 - **Traits** appear when you come within 12 blocks or look at the mob.
 - Common mobs show their plate within 12 blocks and ranked mobs within 24. Named mobs show their name on the plate. Plates hide with the HUD (F1).
-- Distances, scale, look-at-only mode and colours are client settings.
+- Distances, scale, look-at mode and colours are client settings.
 
 ![Rewards](https://raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/header-rewards.png)
 
@@ -178,7 +182,7 @@ Mob lists take entity ids (`minecraft:creeper`), tags (`#minecraft:skeletons`) o
 ![Coming from 2.x](https://raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/header-upgrading.png)
 
 - The mod id is now `remnant_mobs`. Remove the old RPG Mob Leveling System jar; the two cannot be installed together.
-- Your settings in `config/rpgmoblevelingsystem/` are carried over on first start: dimension levels, distance factor, player scaling, attribute rules, banned mobs and namespaces, level locks and structure minimums.
+- Your settings in `config/rpgmoblevelingsystem/` are carried over when the new version starts: dimension levels, distance factor, player scaling, attribute rules, banned mobs and namespaces, level locks and structure minimums.
 - Mobs leveled by 2.x keep their level. Ascendant elites become Elites.
 - The Calendar item and the Neat and Jade hooks are gone. Levels show on the new nameplates.
 
@@ -200,7 +204,7 @@ Mob lists take entity ids (`minecraft:creeper`), tags (`#minecraft:skeletons`) o
 ![Questions](https://raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/header-faq.png)
 
 **Will this make the early game too hard?**
-No. Near spawn on day one, mobs are level 1 to 3, and below level 8 the only rank that can appear is Veteran, with a single trait. The world gets more dangerous as you explore and as time passes, and with RAS it grows with you.
+No. Near spawn on day one, mobs are level 1 to 3, and below level 8 Veteran is the one rank that can appear, with a single trait. The world gets more dangerous as you explore and as time passes, and with RAS it grows with you.
 
 **Do I need RPG Attribute System?**
 No, but it is the intended pairing. Without it, levels follow distance, days and depth, plates use neutral colours (or your experience level, if the server sets `players.source` to `vanilla`), and shards give experience.
@@ -215,7 +219,7 @@ Everything is a number in the config: the level bands, how fast levels grow, wha
 Remnants must be installed on the client to draw plates. Named mobs show their name on the plate; set `replace_name_tag` to `false` in `client.json` to keep vanilla name tags as well.
 
 **Does it slow my server down?**
-A mob is leveled once, the first time it ticks, and its data is saved as entity tags. Trait effects only run on the mobs that have them.
+A mob is leveled once, on its opening tick, and its data is saved as entity tags. Trait effects run just on the mobs that have them.
 
 **Where are the docs?**
 [Usage guide](https://github.com/MeherBenSalem/Ascendant-Mobs/blob/main/docs/USAGE.md) · [API](https://github.com/MeherBenSalem/Ascendant-Mobs/blob/main/docs/API.md) · [Release notes](https://github.com/MeherBenSalem/Ascendant-Mobs/blob/main/patchnotes/3.0.0.md) · [Issues](https://github.com/MeherBenSalem/Ascendant-Mobs/issues)
@@ -245,3 +249,15 @@ A mob is leveled once, the first time it ticks, and its data is saved as entity 
 ---
 
 Remnants: RPG Mobs is licensed under Apache-2.0. The Cinzel and EB Garamond fonts used in this artwork are licensed under the SIL Open Font License 1.1.
+
+---
+
+### More from NightBeam Studio
+
+- **[Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**: the story-driven soulslike RPG modpack built on NightBeam's mods
+- **[Premium server plugins](https://nightbeam.dev/store)**: anti-cheat, ranked PvP, SMP setups and more on BuiltByBit
+- **[NightBeam Pro](https://nightbeam.dev/memberships)**: the model library and NightBeam Forge credits, from $5 a month
+- **[Discord](https://discord.gg/TJc3CxR4jK)**: support, bug reports, suggestions and early looks
+- **[Support NightBeam](https://nightbeam.dev/support)**: help keep every mod free
+
+**Follow:** [YouTube](https://www.youtube.com/@nightbeamstudio) · [Instagram](https://www.instagram.com/nightbeamstudio/) · [X](https://x.com/NightBeamLLC) · [Facebook](https://www.facebook.com/profile.php?id=61574823331471) · [Source and issues](https://github.com/MeherBenSalem/Ascendant-Mobs)
