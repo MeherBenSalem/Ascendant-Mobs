@@ -1,6 +1,6 @@
 ![Remnants: RPG Mobs 3.0: Blood and Valor](https://raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/banner.png)
 
-**[Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/Ascendant-Mobs)**
+**[Docs](https://nightbeam.dev/docs/remnants-rpg-mobs) · [Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/Ascendant-Mobs)**
 
 ## Every monster has a level. Some have a rank. A few have a name.
 
