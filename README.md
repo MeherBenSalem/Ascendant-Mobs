@@ -46,6 +46,9 @@ the server does the leveling and the client draws the plates.
 ## Documentation
 
 - [docs/USAGE.md](docs/USAGE.md): how levels, ranks, traits and rewards work, every config file and command
+- [docs/CONFIG.md](docs/CONFIG.md): every config option with its default, range and effect; how difficulty and the
+  difficulty meter work; which keys control how strong mobs get; recipes (slower or faster scaling, level caps, hiding
+  the meter, an easier early game)
 - [docs/API.md](docs/API.md): `RemnantMobsApi`, entity tags and modifier ids for other mods and datapacks
 - [PATCH_NOTES.md](PATCH_NOTES.md) and [patchnotes/3.0.0.md](patchnotes/3.0.0.md): what changed
 - [marketing/](marketing/): CurseForge and Modrinth page, summary and images
