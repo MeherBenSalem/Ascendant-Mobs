@@ -191,7 +191,8 @@ during a Hunter's Moon.
 Every chance grows with difficulty (up to double at the top of the dimension's band, `drops.difficulty_bonus`).
 With the mod on your client, a small **difficulty meter** sits bottom right: a skull, the percentage and a bar from
 green to deep red, with "+N" when an event night or Hunter's Moon adds levels. Move it with `meter.anchor`, `x`
-and `y` in your own `progression.json`, or hide it with `meter.hud`.
+and `y` in your own `progression.json`, or hide it with `meter.hud` (see
+[Hide the difficulty meter](CONFIG.md#hide-the-difficulty-meter)).
 
 ## Loot (3.1)
 
@@ -253,6 +254,9 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 Ten commented JSON files in `config/remnant_mobs/`. Missing keys come back with their defaults, comments explain
 every key, and `/remnants reload` applies changes without a restart (new spawns use them; existing mobs keep their
 rolls until `/remnants set ... reroll`).
+
+**[CONFIG.md](CONFIG.md) documents every option** of every file: type, default, accepted values and what it does,
+plus which keys control how strong mobs get and recipes for common changes.
 
 | File | Contents |
 | --- | --- |

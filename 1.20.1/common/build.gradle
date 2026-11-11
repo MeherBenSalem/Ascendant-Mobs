@@ -55,4 +55,6 @@ sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+    // ConfigDocsTest checks docs/CONFIG.md against the config files: re-run it when the docs change.
+    inputs.files(rootProject.file('../docs/CONFIG.md')).withPropertyName('configDocs')
 }
