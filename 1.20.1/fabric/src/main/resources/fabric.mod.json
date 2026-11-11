@@ -21,6 +21,9 @@
         ],
         "client": [
             "com.nightbeam.remnants.mobs.fabric.RemnantMobsFabricClient"
+        ],
+        "modmenu": [
+            "com.nightbeam.remnants.mobs.fabric.RemnantMobsModMenu"
         ]
     },
     "mixins": [

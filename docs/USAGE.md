@@ -248,6 +248,7 @@ Without RAS, levels follow distance, days and depth only, and shards give experi
 | `/remnants event list` | everyone | Event nights, their schedule and the next day they may roll |
 | `/remnants event start <id>` / `stop` | operators | Start an event night now (until dawn) or end it |
 | `/remnants reload` | operators | Reload the config files |
+| `/remnants config` | everyone | Open the settings screen (needs the mod on your client; server settings stay read-only unless you are an operator) |
 
 ## Configuration
 
@@ -257,6 +258,10 @@ rolls until `/remnants set ... reroll`).
 
 **[CONFIG.md](CONFIG.md) documents every option** of every file: type, default, accepted values and what it does,
 plus which keys control how strong mobs get and recipes for common changes.
+
+The difficulty and scaling settings can also be changed in game, in the **settings screen** (3.2): Mod Menu's config
+button on Fabric, the Config button in the Mods list on NeoForge and Forge, or `/remnants config` in a world. See
+[The settings screen](CONFIG.md#the-settings-screen).
 
 | File | Contents |
 | --- | --- |

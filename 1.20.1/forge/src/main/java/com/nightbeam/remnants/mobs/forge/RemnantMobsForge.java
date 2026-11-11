@@ -3,6 +3,10 @@ package com.nightbeam.remnants.mobs.forge;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.ConfigRequestPayload;
+import com.nightbeam.remnants.mobs.network.ConfigSync;
+import com.nightbeam.remnants.mobs.network.ConfigUpdatePayload;
+import com.nightbeam.remnants.mobs.network.ConfigValuesPayload;
 import com.nightbeam.remnants.mobs.network.DifficultyPayload;
 import com.nightbeam.remnants.mobs.network.MobInfoPayload;
 import com.nightbeam.remnants.mobs.network.Payload;
@@ -136,6 +140,38 @@ public final class RemnantMobsForge {
                 .consumerMainThread((payload, context) ->
                         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandlers.difficulty(payload)))
                 .add();
+        // The settings screen: its own optional channels, so clients and servers without them still connect.
+        channel(ConfigValuesPayload.ID).messageBuilder(ConfigValuesPayload.class, 0, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ConfigValuesPayload::write)
+                .decoder(ConfigValuesPayload::read)
+                .consumerMainThread((payload, context) ->
+                        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandlers.configValues(payload)))
+                .add();
+        channel(ConfigRequestPayload.ID).messageBuilder(ConfigRequestPayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ConfigRequestPayload::write)
+                .decoder(ConfigRequestPayload::read)
+                .consumerMainThread((payload, context) -> {
+                    ServerPlayer sender = context.get().getSender();
+                    if (sender != null) {
+                        ConfigSync.onRequest(sender);
+                    }
+                })
+                .add();
+        channel(ConfigUpdatePayload.ID).messageBuilder(ConfigUpdatePayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ConfigUpdatePayload::write)
+                .decoder(ConfigUpdatePayload::read)
+                .consumerMainThread((payload, context) -> {
+                    ServerPlayer sender = context.get().getSender();
+                    if (sender != null) {
+                        ConfigSync.onUpdate(sender, payload);
+                    }
+                })
+                .add();
+    }
+
+    /** The channel of a message, or null for an unknown one. */
+    static SimpleChannel existing(ResourceLocation id) {
+        return CHANNELS.get(id);
     }
 
     private static SimpleChannel channel(ResourceLocation id) {
@@ -170,6 +206,12 @@ public final class RemnantMobsForge {
             if (channel.isRemotePresent(player.connection.connection)) {
                 channel.send(PacketDistributor.PLAYER.with(() -> player), payload);
             }
+        }
+
+        @Override
+        public boolean hasChannel(ServerPlayer player, ResourceLocation id) {
+            SimpleChannel channel = CHANNELS.get(id);
+            return channel != null && channel.isRemotePresent(player.connection.connection);
         }
 
         @Override

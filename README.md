@@ -28,7 +28,8 @@ configs and leveled mobs carry over.
   Challenge (raise a mob's rank for double rewards).
 - **RAS integration**: levels follow RAS levels, plate colours compare with yours, and kills and shards grant
   Valor. Everything works without RAS too.
-- 10 advancements, `/remnants` commands, commented JSON configs with `/remnants reload`, and a small API.
+- 10 advancements, `/remnants` commands, commented JSON configs with `/remnants reload`, an in-game settings screen
+  (Mod Menu, the Mods list or `/remnants config`) and a small API.
 
 ## Requirements
 

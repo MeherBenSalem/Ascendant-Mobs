@@ -13,6 +13,7 @@ here no longer exists, or when a single default listed here no longer matches th
 - [Which keys control how strong mobs get](#which-keys-control-how-strong-mobs-get)
 - [Common recipes](#common-recipes)
 - [How the files work](#how-the-files-work)
+- [The settings screen](#the-settings-screen)
 - [Reference](#reference)
   - [`levels.json`](#levelsjson): levels, bands, distance/time/depth, player scaling, what a level does, Hunter's Moon
   - [`ranks.json`](#ranksjson): rank chances and rank stats
@@ -183,8 +184,10 @@ Raise `ranks.json → ranks.<rank>.chance` or lower `level_chance_divisor` (50) 
 
 ### Hide the difficulty meter
 
-- **Just for you:** set `meter.hud` to `false` in **your own** `config/remnant_mobs/progression.json`, on the computer you
-  play on (also when you play on a server), then restart the game. In single player `/remnants reload` applies it too.
+- **Just for you:** in the settings screen, **Meter, nameplates and HUD → Show the meter (client)**, then Save; it applies
+  at once, on any server. Without the screen: set `meter.hud` to `false` in **your own**
+  `config/remnant_mobs/progression.json`, on the computer you play on (also when you play on a server), then restart the
+  game. In single player `/remnants reload` applies it too.
   The meter's place is in the same section: `anchor` (`top_left`, `top_right`, `bottom_left`, `bottom_right`), `x`, `y`.
 - **For every player on a server:** set `meter.send_to_players` to `false` in the server's `progression.json` and run
   `/remnants reload`. Turning `progression.json → enabled` off also stops it, but it stops the item drops too.
@@ -224,7 +227,8 @@ Raise `ranks.json → ranks.<rank>.chance` or lower `level_chance_divisor` (50) 
 - **Bad values.** A value of the wrong type (text where a number belongs) falls back to the default. A number outside
   the range listed below is clamped when it is read; the file keeps what you wrote. Whole numbers are rounded
   (`2.6` reads as 3).
-- **Applying changes.** `/remnants reload` (permission level 2) reloads every file on the server. New mobs use the new
+- **Applying changes.** `/remnants reload` (permission level 2) reloads every file on the server; saving in the
+  [settings screen](#the-settings-screen) does the same. New mobs use the new
   numbers; mobs that already spawned keep their level, rank and traits until `/remnants set <targets> reroll`.
 - **Server or client.** Everything except the client keys below is read by the server (the integrated server in single
   player), so on a multiplayer server only the server's files count. `client.json` and the `meter.hud`, `meter.anchor`,
@@ -241,6 +245,36 @@ Raise `ranks.json → ranks.<rank>.chance` or lower `level_chance_divisor` (50) 
 - **Ranks** are written `veteran`, `elite`, `champion`, `remnant` (and `common` where it is allowed).
 - **Placeholders.** In the tables below, `<dimension>`, `<structure>`, `<rank>`, `<trait>`, `<factor>` and `<event>`
   stand for any one entry of that map.
+
+## The settings screen
+
+Since 3.2 the difficulty and scaling settings can be changed in game. Open it with:
+
+- **Fabric:** Mod Menu's config button for Remnants (Mod Menu is optional; without it, use the command);
+- **NeoForge and Forge:** the **Config** button of Remnants in the Mods list (title screen or pause menu);
+- **any loader, in a world:** `/remnants config`.
+
+Eight sections: difficulty engine, levels and bands, health and damage per level, ranks, traits, rewards, Hunter's Moon
+and event nights, and the meter, nameplates and HUD. Each option shows its name and its description from this page,
+whose setting it is, its default, its range and the file and key it writes; it has a reset button. Numbers with a range
+at both ends get a slider, other numbers a field, switches and choices a button.
+
+The JSON files stay the only source of truth. The screen reads them and writes them through the same code the mod
+loads them with: comments and keys it does not show are kept, and a value is only written as the mod would read it
+(clamped to the ranges below; a file that is not valid JSON is never overwritten). Saving reloads like
+`/remnants reload`.
+
+| Where you are | Server settings | Your own settings (meter, nameplates, HUD) |
+| --- | --- | --- |
+| Title screen (no world) | this computer's files, which single-player worlds use | this computer's files |
+| Single player, or a LAN world you host | editable: the world's server writes them and reloads | editable |
+| A server, as an operator (permission level 2, like `/remnants reload`) | editable: the server checks your permission and every value again, writes, reloads and updates every player | editable, saved on your computer |
+| A server, not an operator | read-only (the server refuses changes even if a modified client sends them) | editable, saved on your computer |
+| A server without Remnants 3.2 | not shown | editable, saved on your computer |
+
+Not in the screen (edit the files for those): lists (excluded mobs, dimensions, mod ids), `elites.json`, loot bags and
+loot beams, boss bar colours, healing items and hearts, and the rest of an event night's settings (announcements,
+hunter spawn distances, mini-boss, rewards).
 
 ## Reference
 
