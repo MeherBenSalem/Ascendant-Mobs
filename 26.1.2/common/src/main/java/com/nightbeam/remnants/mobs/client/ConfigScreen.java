@@ -134,6 +134,10 @@ public final class ConfigScreen extends Screen {
             case ConfigSync.DENIED -> say(Component.translatable("config.remnant_mobs.denied"), RED);
             case ConfigSync.FAILED -> say(Component.translatable("config.remnant_mobs.failed", payload.detail()), RED);
             default -> {
+                if (payload.open()) {
+                    // Opened again with /remnants config: the last save's message is old news.
+                    say(Component.empty(), MUTED);
+                }
             }
         }
         rebuildEdit();

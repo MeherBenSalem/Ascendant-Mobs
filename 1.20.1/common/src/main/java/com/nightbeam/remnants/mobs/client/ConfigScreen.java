@@ -134,6 +134,10 @@ public final class ConfigScreen extends Screen {
             case ConfigSync.DENIED -> say(Component.translatable("config.remnant_mobs.denied"), RED);
             case ConfigSync.FAILED -> say(Component.translatable("config.remnant_mobs.failed", payload.detail()), RED);
             default -> {
+                if (payload.open()) {
+                    // Opened again with /remnants config: the last save's message is old news.
+                    say(Component.empty(), MUTED);
+                }
             }
         }
         rebuildEdit();
@@ -458,6 +462,14 @@ public final class ConfigScreen extends Screen {
         OptionList(Minecraft minecraft, int width, int height, int y) {
             super(minecraft, width, y + height, y, y + height, ROW_HEIGHT);
             this.centerListVertically = false;
+            // 1.20.1 paints dirt above and below a list, which would hide the section buttons.
+            setRenderTopAndBottom(false);
+        }
+
+        /** 1.20.1 puts the scrollbar at a fixed place and ignores clicks right of it: keep it right of the wider rows. */
+        @Override
+        protected int getScrollbarPosition() {
+            return this.width / 2 + getRowWidth() / 2 + 6;
         }
 
         void add(Row row) {
