@@ -244,7 +244,7 @@ class ConfigDocsTest {
     }
 
     /** docs/CONFIG.md at the repository root, found from the workspace the tests run in. */
-    private static Path findDocs() {
+    static Path findDocs() {
         for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
             Path docs = dir.resolve("docs").resolve("CONFIG.md");
             if (Files.isRegularFile(docs)) {

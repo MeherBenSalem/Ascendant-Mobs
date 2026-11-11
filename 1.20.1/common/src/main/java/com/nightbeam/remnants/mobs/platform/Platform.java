@@ -2,6 +2,7 @@ package com.nightbeam.remnants.mobs.platform;
 
 import com.nightbeam.remnants.mobs.network.Payload;
 import java.nio.file.Path;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -12,6 +13,9 @@ public interface Platform {
     boolean isModLoaded(String modId);
 
     void sendToPlayer(ServerPlayer player, Payload payload);
+
+    /** True when the player's client listens on {@code channel} (it has the mod, in a version that knows the message). */
+    boolean hasChannel(ServerPlayer player, ResourceLocation channel);
 
     /** Sends to every player that currently tracks (sees) {@code entity}. */
     void sendToTracking(Entity entity, Payload payload);

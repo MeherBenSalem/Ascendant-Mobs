@@ -13,6 +13,9 @@ public interface Platform {
 
     void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
 
+    /** True when the player's client can receive {@code type} (it has the mod, in a version that knows the payload). */
+    boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type);
+
     /** Sends to every player that currently tracks (sees) {@code entity}. */
     void sendToTracking(Entity entity, CustomPacketPayload payload);
 

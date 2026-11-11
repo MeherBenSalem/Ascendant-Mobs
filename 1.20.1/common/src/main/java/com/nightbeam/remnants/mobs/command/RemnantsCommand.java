@@ -155,7 +155,8 @@ public final class RemnantsCommand {
                                     : Component.translatableWithFallback("commands.remnant_mobs.event.none", "No event night is running"), true);
                             return running ? 1 : 0;
                         })))
-                .then(Commands.literal("reload").requires(op).executes(RemnantsCommand::reload));
+                .then(Commands.literal("reload").requires(op).executes(RemnantsCommand::reload))
+                .then(Commands.literal("config").executes(RemnantsCommand::config));
         dispatcher.register(root);
         dispatcher.register(Commands.literal("rml").redirect(dispatcher.getRoot().getChild("remnants")));
     }
@@ -498,6 +499,17 @@ public final class RemnantsCommand {
                     ? "commands.remnant_mobs.moon.inactive" : "commands.remnant_mobs.moon.disabled"), false);
         }
         return HuntersMoon.active() ? 1 : 0;
+    }
+
+    /** Opens the settings screen on the player's client (read-only for server settings unless they may change them). */
+    private static int config(CommandContext<CommandSourceStack> c) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        if (!com.nightbeam.remnants.mobs.network.ConfigSync.open(c.getSource().getPlayerOrException())) {
+            // Sent to players without the mod, so it carries its English text.
+            c.getSource().sendFailure(Component.translatableWithFallback("commands.remnant_mobs.config.no_client",
+                    "The settings screen needs Remnants: RPG Mobs on your client. The files are in config/remnant_mobs/ on the server"));
+            return 0;
+        }
+        return 1;
     }
 
     private static int reload(CommandContext<CommandSourceStack> c) {

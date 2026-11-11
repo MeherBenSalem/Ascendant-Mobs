@@ -3,6 +3,9 @@ package com.nightbeam.remnants.mobs.fabric;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.ConfigRequestPayload;
+import com.nightbeam.remnants.mobs.network.ConfigSync;
+import com.nightbeam.remnants.mobs.network.ConfigUpdatePayload;
 import com.nightbeam.remnants.mobs.network.Payload;
 import com.nightbeam.remnants.mobs.platform.Platform;
 import com.nightbeam.remnants.mobs.platform.Registrar;
@@ -58,6 +61,11 @@ public final class RemnantMobsFabric implements ModInitializer {
         ServerPlayerEvents.COPY_FROM.register(RemnantsEvents::onPlayerClone);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RemnantsEvents.onPlayerLeave(handler.getPlayer()));
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> RemnantsEvents.registerCommands(dispatcher, context));
+        // The settings screen: clients without it (or without the mod) never send these.
+        ServerPlayNetworking.registerGlobalReceiver(ConfigRequestPayload.ID, (server, player, handler, buf, responseSender) ->
+                ConfigSync.onRequest(player));
+        ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePayload.ID, (server, player, handler, buf, responseSender) ->
+                ConfigSync.onUpdate(player, ConfigUpdatePayload.read(buf)));
     }
 
     private static final class FabricRegistrar implements Registrar {
@@ -90,6 +98,11 @@ public final class RemnantMobsFabric implements ModInitializer {
                 payload.write(buf);
                 ServerPlayNetworking.send(player, payload.id(), buf);
             }
+        }
+
+        @Override
+        public boolean hasChannel(ServerPlayer player, ResourceLocation channel) {
+            return ServerPlayNetworking.canSend(player, channel);
         }
 
         @Override

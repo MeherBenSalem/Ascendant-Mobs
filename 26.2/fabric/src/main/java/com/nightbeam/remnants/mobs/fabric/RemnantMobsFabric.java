@@ -3,6 +3,10 @@ package com.nightbeam.remnants.mobs.fabric;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.ConfigRequestPayload;
+import com.nightbeam.remnants.mobs.network.ConfigSync;
+import com.nightbeam.remnants.mobs.network.ConfigUpdatePayload;
+import com.nightbeam.remnants.mobs.network.ConfigValuesPayload;
 import com.nightbeam.remnants.mobs.network.DifficultyPayload;
 import com.nightbeam.remnants.mobs.network.MobInfoPayload;
 import com.nightbeam.remnants.mobs.network.PlayerStatePayload;
@@ -43,6 +47,12 @@ public final class RemnantMobsFabric implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(MobInfoPayload.TYPE, MobInfoPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(PlayerStatePayload.TYPE, PlayerStatePayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(DifficultyPayload.TYPE, DifficultyPayload.CODEC);
+        // The settings screen: optional like the rest, so clients and servers without it still connect.
+        PayloadTypeRegistry.clientboundPlay().register(ConfigValuesPayload.TYPE, ConfigValuesPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ConfigRequestPayload.TYPE, ConfigRequestPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ConfigUpdatePayload.TYPE, ConfigUpdatePayload.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(ConfigRequestPayload.TYPE, (payload, context) -> ConfigSync.onRequest(context.player()));
+        ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePayload.TYPE, (payload, context) -> ConfigSync.onUpdate(context.player(), payload));
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS)
                 .register(output -> {
@@ -97,6 +107,11 @@ public final class RemnantMobsFabric implements ModInitializer {
             if (ServerPlayNetworking.canSend(player, payload.type())) {
                 ServerPlayNetworking.send(player, payload);
             }
+        }
+
+        @Override
+        public boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+            return ServerPlayNetworking.canSend(player, type);
         }
 
         @Override

@@ -2,6 +2,11 @@
 
 Formerly RPG Mob Leveling System. Full notes for each major release are in [patchnotes/](patchnotes/).
 
+## 3.2.0
+
+* **In-game settings screen** for difficulty and scaling: Mod Menu (Fabric), the Mods list (NeoForge, Forge) or `/remnants config`. On servers only operators can change server settings; your own meter, nameplate and HUD settings are always yours. See [patchnotes/3.2.0.md](patchnotes/3.2.0.md).
+* **Every config option documented** in [docs/CONFIG.md](docs/CONFIG.md), with recipes. The difficulty meter can be hidden from the screen (or with `meter.hud`).
+
 ## 3.1.2
 
 * **Ice and Fire dragons, sea serpents and hydras** are now leveled and ranked; new tag `#remnant_mobs:hostile` for any modded mob that should count as hostile. See [patchnotes/3.1.2.md](patchnotes/3.1.2.md).

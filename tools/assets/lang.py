@@ -162,3 +162,104 @@ for key, (name, desc) in TRAITS.items():
 for key, (title, desc) in ADVANCEMENTS.items():
     EN_US[f'advancements.{NS}.{key}.title'] = title
     EN_US[f'advancements.{NS}.{key}.description'] = desc
+
+# The config screen (config/edit, client/ConfigScreen).
+EN_US.update({
+    'config.remnant_mobs.title': 'Remnants: RPG Mobs settings',
+    'config.remnant_mobs.section': 'Section: %s',
+    'config.remnant_mobs.save': 'Save',
+    'config.remnant_mobs.reset': 'Reset to the default (%s)',
+    'config.remnant_mobs.reset.none': 'No default: this entry was added to the file',
+    'config.remnant_mobs.default': 'Default: %s',
+    'config.remnant_mobs.range': 'Range: %s to %s',
+    'config.remnant_mobs.range.min': 'At least %s',
+    'config.remnant_mobs.range.max': 'At most %s',
+    'config.remnant_mobs.choices': 'Values: %s',
+    'config.remnant_mobs.where': '%s → %s',
+    'config.remnant_mobs.side.client': 'Your own setting: only changes what you see',
+    'config.remnant_mobs.side.server': 'Server setting',
+    'config.remnant_mobs.read_only': 'Read-only',
+    'config.remnant_mobs.on': 'On',
+    'config.remnant_mobs.off': 'Off',
+    'config.remnant_mobs.invalid': 'Not a valid value',
+    'config.remnant_mobs.unsaved': '%s unsaved change(s)',
+    'config.remnant_mobs.status.local': "Editing this computer's files (used by single-player worlds)",
+    'config.remnant_mobs.status.host': "Editing this world's settings: you are the host",
+    'config.remnant_mobs.status.operator': "Editing the server's settings as an operator",
+    'config.remnant_mobs.status.read_only': 'Server settings are read-only: only operators can change them',
+    'config.remnant_mobs.status.loading': "Loading the server's settings...",
+    'config.remnant_mobs.status.unavailable': 'This server does not share its settings (it needs Remnants 3.2+)',
+    'config.remnant_mobs.saved': 'Saved %s change(s)',
+    'config.remnant_mobs.refused': '%s change(s) were refused: %s',
+    'config.remnant_mobs.denied': 'Only operators can change server settings',
+    'config.remnant_mobs.failed': 'Could not save: %s',
+    'config.remnant_mobs.too_many': 'Too many changes at once: save fewer at a time',
+    'commands.remnant_mobs.config.no_client': 'The settings screen needs Remnants: RPG Mobs on your client. The files are in config/remnant_mobs/ on the server',
+    'commands.remnant_mobs.config.changed': '%s changed %s Remnants setting(s)',
+    'config.remnant_mobs.group.difficulty': 'Difficulty engine',
+    'config.remnant_mobs.group.levels': 'Levels and bands',
+    'config.remnant_mobs.group.scaling': 'Health and damage per level',
+    'config.remnant_mobs.group.ranks': 'Ranks',
+    'config.remnant_mobs.group.traits': 'Traits',
+    'config.remnant_mobs.group.rewards': 'Rewards',
+    'config.remnant_mobs.group.nights': "Hunter's Moon and event nights",
+    'config.remnant_mobs.group.display': 'Meter, nameplates and HUD',
+    'config.remnant_mobs.factor.days': 'Days',
+    'config.remnant_mobs.factor.played': 'Play time',
+    'config.remnant_mobs.factor.distance': 'Distance',
+    'config.remnant_mobs.factor.depth': 'Depth',
+    'config.remnant_mobs.factor.gear': 'Gear',
+    'config.remnant_mobs.file.levels': 'Levels (levels.json)',
+    'config.remnant_mobs.file.ranks': 'Ranks (ranks.json)',
+    'config.remnant_mobs.file.traits': 'Traits (traits.json)',
+    'config.remnant_mobs.file.rewards': 'Rewards (rewards.json)',
+    'config.remnant_mobs.file.client': 'Nameplates and HUD (client.json)',
+    'config.remnant_mobs.file.difficulty': 'Difficulty engine (difficulty.json)',
+    'config.remnant_mobs.file.events': 'Event nights (events.json)',
+    'config.remnant_mobs.file.progression': 'Progression and the difficulty meter (progression.json)',
+    'config.remnant_mobs.file.elites': 'Readable elites (elites.json)',
+    'config.remnant_mobs.file.loot': 'Loot (loot.json)',
+})
+
+
+def _config_docs():
+    """Names and tooltips of every config option, from the reference tables of docs/CONFIG.md.
+
+    Each row's description starts with its name in bold: "**Blocks per level.** One level per ...". The config screen
+    shows the name and uses the rest as the tooltip, so the screen says exactly what the documentation says.
+    """
+    import re
+    from pathlib import Path
+
+    docs = Path(__file__).resolve().parents[2] / 'docs' / 'CONFIG.md'
+    entries = {}
+    current, header = None, None
+    for line in docs.read_text(encoding='utf-8').splitlines():
+        line = line.strip()
+        if line.startswith('#'):
+            match = re.search(r'`([a-z_]+)\.json`', line)
+            current, header = (match.group(1) if match else None), None
+            continue
+        if not line.startswith('|'):
+            header = None
+            continue
+        cells = [c.strip().replace('\\|', '|') for c in re.split(r'(?<!\\)\|', line.strip('|'))]
+        if cells[0] == 'Key':
+            header = cells if current else None
+            continue
+        if header is None or cells[0].startswith('---'):
+            continue
+        description = cells[header.index('Description')]
+        match = re.match(r'\*\*(.+?)\*\*\s*(.*)', description)
+        if not match:
+            raise ValueError(f'docs/CONFIG.md: no **Name.** in the row of {cells[0]}')
+        name = match.group(1).rstrip('.')
+        tooltip = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', match.group(2))
+        tooltip = tooltip.replace('`', '').replace('**', '')
+        for key in re.findall(r'`([^`]+)`', cells[0]):
+            entries[f'config.{NS}.{current}.{key}'] = name
+            entries[f'config.{NS}.{current}.{key}.tooltip'] = tooltip or name
+    return entries
+
+
+EN_US.update(_config_docs())

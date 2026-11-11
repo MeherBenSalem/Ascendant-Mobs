@@ -3,6 +3,10 @@ package com.nightbeam.remnants.mobs.neoforge;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.ConfigRequestPayload;
+import com.nightbeam.remnants.mobs.network.ConfigSync;
+import com.nightbeam.remnants.mobs.network.ConfigUpdatePayload;
+import com.nightbeam.remnants.mobs.network.ConfigValuesPayload;
 import com.nightbeam.remnants.mobs.network.DifficultyPayload;
 import com.nightbeam.remnants.mobs.network.MobInfoPayload;
 import com.nightbeam.remnants.mobs.network.PlayerStatePayload;
@@ -88,6 +92,19 @@ public final class RemnantMobsNeoForge {
                 .playToClient(MobInfoPayload.TYPE, MobInfoPayload.CODEC, (payload, context) -> ClientHandlers.mobInfo(payload))
                 .playToClient(PlayerStatePayload.TYPE, PlayerStatePayload.CODEC, (payload, context) -> ClientHandlers.playerState(payload))
                 .playToClient(DifficultyPayload.TYPE, DifficultyPayload.CODEC, (payload, context) -> ClientHandlers.difficulty(payload));
+        // The settings screen: its own optional payloads, so clients and servers without them still connect.
+        event.registrar("1").optional()
+                .playToClient(ConfigValuesPayload.TYPE, ConfigValuesPayload.CODEC, (payload, context) -> ClientHandlers.configValues(payload))
+                .playToServer(ConfigRequestPayload.TYPE, ConfigRequestPayload.CODEC, (payload, context) -> {
+                    if (context.player() instanceof ServerPlayer player) {
+                        ConfigSync.onRequest(player);
+                    }
+                })
+                .playToServer(ConfigUpdatePayload.TYPE, ConfigUpdatePayload.CODEC, (payload, context) -> {
+                    if (context.player() instanceof ServerPlayer player) {
+                        ConfigSync.onUpdate(player, payload);
+                    }
+                });
     }
 
     private void buildTabs(BuildCreativeModeTabContentsEvent event) {
@@ -127,6 +144,11 @@ public final class RemnantMobsNeoForge {
             if (player.connection.hasChannel(payload.type())) {
                 PacketDistributor.sendToPlayer(player, payload);
             }
+        }
+
+        @Override
+        public boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+            return player.connection.hasChannel(type);
         }
 
         @Override

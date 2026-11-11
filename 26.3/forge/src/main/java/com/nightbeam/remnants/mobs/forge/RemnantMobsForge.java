@@ -3,6 +3,10 @@ package com.nightbeam.remnants.mobs.forge;
 import com.nightbeam.remnants.mobs.RemnantMobs;
 import com.nightbeam.remnants.mobs.RemnantsEvents;
 import com.nightbeam.remnants.mobs.content.ModContent;
+import com.nightbeam.remnants.mobs.network.ConfigRequestPayload;
+import com.nightbeam.remnants.mobs.network.ConfigSync;
+import com.nightbeam.remnants.mobs.network.ConfigUpdatePayload;
+import com.nightbeam.remnants.mobs.network.ConfigValuesPayload;
 import com.nightbeam.remnants.mobs.network.DifficultyPayload;
 import com.nightbeam.remnants.mobs.network.MobInfoPayload;
 import com.nightbeam.remnants.mobs.network.PlayerStatePayload;
@@ -47,6 +51,8 @@ public final class RemnantMobsForge {
     /** Bumped when a payload changes shape; clients with another version, or without the mod, still join. */
     private static final int PROTOCOL = 3;
     private static Channel<CustomPacketPayload> channel;
+    /** The settings screen's own optional channel, so clients and servers without it still get the main one. */
+    private static Channel<CustomPacketPayload> configChannel;
 
     private final Map<ResourceKey<?>, DeferredRegister<?>> registers = new HashMap<>();
 
@@ -59,6 +65,7 @@ public final class RemnantMobsForge {
         RemnantMobs.init(new ForgePlatform(), new ForgeRegistrar());
         registers.values().forEach(deferred -> deferred.register(modBus));
         channel = buildChannel();
+        configChannel = buildConfigChannel();
 
         BuildCreativeModeTabContentsEvent.BUS.addListener(RemnantMobsForge::buildTabs);
         // Last, and skipped when another mod cancels the death. Not a monitor: EventBus 7 never calls monitors on a
@@ -84,7 +91,7 @@ public final class RemnantMobsForge {
         });
         RegisterCommandsEvent.BUS.addListener(event -> RemnantsEvents.registerCommands(event.getDispatcher(), event.getBuildContext()));
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            RemnantMobsForgeClient.init();
+            RemnantMobsForgeClient.init(context);
         }
     }
 
@@ -105,6 +112,36 @@ public final class RemnantMobsForge {
     @SuppressWarnings("unchecked")
     private <R> DeferredRegister<R> register(ResourceKey<? extends Registry<R>> registry) {
         return (DeferredRegister<R>) registers.computeIfAbsent(registry, key -> DeferredRegister.create(registry, RemnantMobs.MOD_ID));
+    }
+
+    private static Channel<CustomPacketPayload> buildConfigChannel() {
+        return ChannelBuilder.named(RemnantMobs.id("config"))
+                .networkProtocolVersion(1)
+                .optional()
+                .payloadChannel()
+                .play()
+                .clientbound()
+                .addMain(ConfigValuesPayload.TYPE, ConfigValuesPayload.CODEC.cast(), (payload, context) -> ClientHandlers.configValues(payload))
+                .serverbound()
+                .addMain(ConfigRequestPayload.TYPE, ConfigRequestPayload.CODEC.cast(), (payload, context) -> {
+                    if (context.getSender() != null) {
+                        ConfigSync.onRequest(context.getSender());
+                    }
+                })
+                .addMain(ConfigUpdatePayload.TYPE, ConfigUpdatePayload.CODEC.cast(), (payload, context) -> {
+                    if (context.getSender() != null) {
+                        ConfigSync.onUpdate(context.getSender(), payload);
+                    }
+                })
+                .build();
+    }
+
+    static Channel<CustomPacketPayload> configChannel() {
+        return configChannel;
+    }
+
+    private static Channel<CustomPacketPayload> channelFor(CustomPacketPayload.Type<?> type) {
+        return type == ConfigValuesPayload.TYPE || type == ConfigRequestPayload.TYPE || type == ConfigUpdatePayload.TYPE ? configChannel : channel;
     }
 
     private static void buildTabs(BuildCreativeModeTabContentsEvent event) {
@@ -142,9 +179,16 @@ public final class RemnantMobsForge {
 
         @Override
         public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
-            if (channel != null && channel.isRemotePresent(player.connection.getConnection())) {
-                channel.send(payload, PacketDistributor.PLAYER.with(player));
+            Channel<CustomPacketPayload> target = channelFor(payload.type());
+            if (target != null && target.isRemotePresent(player.connection.getConnection())) {
+                target.send(payload, PacketDistributor.PLAYER.with(player));
             }
+        }
+
+        @Override
+        public boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+            Channel<CustomPacketPayload> target = channelFor(type);
+            return target != null && target.isRemotePresent(player.connection.getConnection());
         }
 
         @Override

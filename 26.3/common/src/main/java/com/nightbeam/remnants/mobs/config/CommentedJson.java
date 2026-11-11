@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import com.nightbeam.remnants.mobs.RemnantMobs;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JSON config files with {@code //} comments. Files are read leniently, merged over the defaults (user values win,
@@ -71,6 +72,28 @@ public final class CommentedJson {
             return defaults.deepCopy();
         }
         return merged;
+    }
+
+    /**
+     * The file's values merged over the defaults, like {@link #load} but without writing anything: the defaults when
+     * the file is missing or cannot be read.
+     */
+    public JsonObject read(Path file) {
+        JsonObject values = readStrict(file);
+        return values != null ? values : defaults.deepCopy();
+    }
+
+    /** Like {@link #read}, but null when the file exists and is not a valid JSON object (so it is not overwritten). */
+    public @Nullable JsonObject readStrict(Path file) {
+        if (!Files.exists(file)) {
+            return defaults.deepCopy();
+        }
+        try {
+            JsonElement parsed = parse(Files.readString(file, StandardCharsets.UTF_8));
+            return parsed != null && parsed.isJsonObject() ? mergeOver(defaults.deepCopy(), parsed.getAsJsonObject()) : null;
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
     }
 
     public static JsonElement parse(String text) {
