@@ -2,6 +2,10 @@
 
 Formerly RPG Mob Leveling System. Full notes for each major release are in [patchnotes/](patchnotes/).
 
+## 3.2.1
+
+* **Fixed:** health bars, levels and ranks now show on mobs animated by Epic Fight in every modpack (Forge 1.20.1, NeoForge 1.21.1); the 3.1.1 fix depended on mod loading order. See [patchnotes/3.2.1.md](patchnotes/3.2.1.md).
+
 ## 3.2.0
 
 * **In-game settings screen** for difficulty and scaling: Mod Menu (Fabric), the Mods list (NeoForge, Forge) or `/remnants config`. On servers only operators can change server settings; your own meter, nameplate and HUD settings are always yours. See [patchnotes/3.2.0.md](patchnotes/3.2.0.md).

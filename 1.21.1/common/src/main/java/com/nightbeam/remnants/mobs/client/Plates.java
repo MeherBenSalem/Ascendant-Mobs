@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import java.util.ArrayDeque;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -27,38 +28,64 @@ public final class Plates {
     private Plates() {
     }
 
-    /** The mob whose plate {@link #renderFallback} drew for the render in progress, if any. */
-    private static @Nullable Entity fallbackDrawn;
+    /** One entity in {@code EntityRenderDispatcher#render}: its plate, built once per render, and whether it was drawn. */
+    private static final class Frame {
+        final Entity entity;
+        final @Nullable Plate plate;
+        boolean drawn;
+
+        Frame(Entity entity, @Nullable Plate plate) {
+            this.entity = entity;
+            this.plate = plate;
+        }
+    }
+
+    /** Entity renders in progress. Usually one; more when a renderer draws another entity inside its own render. */
+    private static final ArrayDeque<Frame> FRAMES = new ArrayDeque<>();
 
     /**
-     * Draws a plate for a mob whose vanilla render another mod cancelled (Epic Fight replaces the renderer of the mobs it
-     * animates), so {@code EntityRenderer#render}, where plates are normally drawn, never runs for it. The loader calls
-     * this from the cancelled {@code RenderLivingEvent.Pre}, whose pose is the same one {@code EntityRenderer#render} gets.
+     * Start of {@code EntityRenderDispatcher#render}: builds the plate for this render. It is normally drawn from
+     * {@code EntityRenderer#render} ({@link #take}). When another mod replaces or cancels that render, {@link #end} draws
+     * it instead. Epic Fight does both: it cancels {@code RenderLivingEvent.Pre} for the mobs it animates (at the same
+     * LOWEST priority the 3.1.1 fallback listened at, so which ran first depended on mod loading order), and its own
+     * mobs use a renderer that never reaches {@code EntityRenderer#render}.
      */
-    public static void renderFallback(Mob mob, PoseStack pose, MultiBufferSource buffers, float partialTick) {
-        var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        Plate plate = Plate.build(mob, partialTick, dispatcher.distanceToSqr(mob));
-        if (plate == null) {
-            fallbackDrawn = null;
-            return;
+    public static void begin(Entity entity, float partialTick, double distanceSq) {
+        if (FRAMES.size() > 8) {
+            // A render that threw never reached end().
+            FRAMES.clear();
         }
-        render(plate, pose, buffers, dispatcher.cameraOrientation(), false);
-        fallbackDrawn = mob;
+        Plate plate = entity instanceof Mob mob ? Plate.build(mob, partialTick, distanceSq) : null;
+        FRAMES.push(new Frame(entity, plate));
     }
 
-    /** A living render went through normally: the next {@code EntityRenderer#render} draws its own plate. */
-    public static void clearFallback() {
-        fallbackDrawn = null;
+    /** The plate {@code EntityRenderer#render} should draw now for {@code entity}, or null. Marks it drawn. */
+    public static @Nullable Plate take(Entity entity) {
+        Frame frame = FRAMES.peek();
+        if (frame == null || frame.entity != entity || frame.plate == null || frame.drawn) {
+            return null;
+        }
+        frame.drawn = true;
+        return frame.plate;
     }
 
-    /** Whether {@link #renderFallback} already drew {@code entity}'s plate, so the renderer must not draw a second. */
-    public static boolean drewFallback(Entity entity) {
-        return entity == fallbackDrawn;
+    /**
+     * End of {@code EntityRenderDispatcher#render}: the plate still to draw because the entity's renderer never reached
+     * {@code EntityRenderer#render}, or null.
+     */
+    public static @Nullable Plate end(Entity entity) {
+        Frame frame = FRAMES.peek();
+        if (frame == null || frame.entity != entity) {
+            return null;
+        }
+        FRAMES.pop();
+        return frame.plate != null && !frame.drawn ? frame.plate : null;
     }
 
-    /** Whether the vanilla name tag of {@code entity} should give way to the fallback plate. */
+    /** Whether the vanilla name tag of {@code entity} gives way to its plate ({@code hide_vanilla_name}). */
     public static boolean hidesNameTag(Entity entity) {
-        return entity == fallbackDrawn && RemnantsConfig.client().hideVanillaName;
+        Frame frame = FRAMES.peek();
+        return frame != null && frame.entity == entity && frame.plate != null && RemnantsConfig.client().hideVanillaName;
     }
 
     public static void render(@Nullable Plate plate, PoseStack pose, MultiBufferSource buffers, Quaternionf camera, boolean nameTagShown) {

@@ -9,11 +9,9 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,33 +22,23 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Final
     protected EntityRenderDispatcher entityRenderDispatcher;
 
-    @Unique
-    private Entity remnants$plated;
-
     @Shadow
     protected abstract boolean shouldShowName(T entity);
 
     @Inject(method = "render", at = @At("HEAD"))
     private void remnants$plate(T entity, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, CallbackInfo ci) {
-        remnants$plated = null;
-        if (!(entity instanceof Mob mob) || Plates.drewFallback(entity)) {
-            return;
+        // Built once per render in EntityRenderDispatcherMixin; drawn there instead when this render never runs.
+        Plate plate = Plates.take(entity);
+        if (plate != null) {
+            boolean replace = RemnantsConfig.client().hideVanillaName;
+            Plates.render(plate, pose, buffers, entityRenderDispatcher.cameraOrientation(), !replace && shouldShowName(entity));
         }
-        Plate plate = Plate.build(mob, partialTick, entityRenderDispatcher.distanceToSqr(entity));
-        if (plate == null) {
-            return;
-        }
-        boolean replace = RemnantsConfig.client().hideVanillaName;
-        if (replace) {
-            remnants$plated = entity;
-        }
-        Plates.render(plate, pose, buffers, entityRenderDispatcher.cameraOrientation(), !replace && shouldShowName(entity));
     }
 
     @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
     private void remnants$hideNameTag(T entity, Component name, PoseStack pose, MultiBufferSource buffers, int light, float partialTick,
                                       CallbackInfo ci) {
-        if (entity == remnants$plated || Plates.hidesNameTag(entity)) {
+        if (Plates.hidesNameTag(entity)) {
             ci.cancel();
         }
     }

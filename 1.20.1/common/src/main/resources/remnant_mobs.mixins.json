@@ -12,6 +12,7 @@
     "ServerEntityMixin"
   ],
   "client": [
+    "client.EntityRenderDispatcherMixin",
     "client.EntityRendererMixin"
   ],
   "injectors": {
