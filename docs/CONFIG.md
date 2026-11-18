@@ -182,6 +182,30 @@ Raise `ranks.json → ranks.<rank>.chance` or lower `level_chance_divisor` (50) 
 - Cap what levels do: each rule in `levels.json → attributes` has a `max` (+600% health, +300% damage...).
 - Fix a mob type's level: `"mobs": { "level_locks": { "minecraft:warden": 40 } }`.
 
+### Every mob is level 60
+
+Level 60 is the top of the Overworld band, so mobs sit there when the threat adds up past it. Run `/remnants threat`
+where it happens: it prints every part. The usual causes:
+
+- **A high RPG Attribute System level.** With `players.source` set to `"ras"` (the default), the threat moves
+  `players.weight` (35%) of the way toward the nearby players' RAS level, and RAS levels go far past 60 (up to 500 by
+  default). A level 150 player pulls a threat of 20 up to 65, which the band cuts to 60. Lower `players.weight` (for
+  example `0.1`), set `players.source` to `"none"`, or raise the band's `max` so it fits your RAS levels.
+- **An older world with the difficulty engine on.** Days (up to 15 levels), play time (10), gear (15) and depth (8) can
+  add 48 levels on top of the band minimum, and distance has no cap (7.8 levels per 1,000 blocks). Cap or slow them as
+  in [Cap levels](#cap-levels) and [Make mobs scale slower](#make-mobs-scale-slower).
+- **Big modded mobs at a high level.** At level 60 the default rules add 360% health (6% a level), so an Ice and Fire
+  dragon, leveled since 3.1.2, can pass 1,000 health. Fix their level with `mobs.level_locks`
+  (`"iceandfire:fire_dragon": 20`), leave them out with `mobs.exclude` (`"iceandfire:"`), or add them to the
+  `#remnant_mobs:bosses` tag: bosses show a level but keep their own stats unless `mobs.boss_stats` is `true`.
+
+### With Runeborn
+
+Runeborn gives monsters zone levels and elites of its own, and both mods apply to the same mob, so their health and
+damage bonuses multiply. Keep one of them: set `mobLevelsEnabled` to `false` in `config/runeborn-server.json` to let
+RPG Mobs do the levels (this also turns off Runeborn's elites), or turn RPG Mobs' levels off with `levels.json →
+enabled`.
+
 ### Hide the difficulty meter
 
 - **Just for you:** in the settings screen, **Meter, nameplates and HUD → Show the meter (client)**, then Save; it applies
