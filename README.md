@@ -33,13 +33,15 @@ configs and leveled mobs carry over.
 
 ## Requirements
 
-| Workspace | Minecraft | Loaders | Java |
+| Minecraft | Loaders | Java | Folder |
 | --- | --- | --- | --- |
-| `1.20.1/` | 1.20.1 | Fabric, Forge | 17 |
-| `1.21.1/` | 1.21.1 | Fabric, NeoForge | 21 |
-| `26.1.2/` | 26.1.2 | Fabric, NeoForge, Forge | 25 |
-| `26.2/` | 26.2 | Fabric, NeoForge, Forge | 25 |
-| `26.3/` | 26.3 | Fabric, NeoForge, Forge | 25 |
+| 1.20.1 | Forge, Fabric | 17 bytecode (build on 21) | `1.20.1/{common,forge,fabric}` |
+| 1.21.1 | NeoForge, Fabric | 21 | `1.21.1/{common,neoforge,fabric}` |
+| 26.2 | NeoForge, Fabric | 25 | `26.2/{common,neoforge,fabric}` |
+| 26.3 | NeoForge, Fabric | 25 | `26.3/{common,neoforge,fabric}` |
+
+That is 8 jars per release, all with the same version. Other Minecraft versions and loaders (26.1.2, Forge on 26.x)
+are no longer built or supported.
 
 Fabric needs Fabric API. RPG Attribute System is optional. Install the mod on both the server and the client:
 the server does the leveling and the client draws the plates.
@@ -57,12 +59,25 @@ the server does the leveling and the client draws the plates.
 ## Building
 
 ```bash
-cd 1.20.1 && ./gradlew build   # Java 17
+./gradlew buildAll             # every workspace, then the 8 loader jars into releases/
+cd 1.20.1 && ./gradlew build   # Gradle on Java 21 (Java 17 toolchain)
 cd 1.21.1 && ./gradlew build   # Java 21
-cd 26.3 && ./gradlew build     # Java 25 (the same for 26.1.2 and 26.2)
+cd 26.3 && ./gradlew build     # Java 25 (the same for 26.2)
 ```
 
-Jars land in `<workspace>/<loader>/build/libs/remnant_mobs-<loader>-<minecraft>-<version>.jar`.
+The root build hands the 26.x workspaces `JAVA_HOME_25_X64` (or `-Pjava25Home=<jdk>`) and the others
+`JAVA_HOME_21_X64` (or `-Pjava21Home=<jdk>`); without them each workspace uses the current `JAVA_HOME`.
+Jars land in `<workspace>/<loader>/build/libs/remnant_mobs-<loader>-<minecraft>-<version>.jar`. Every workspace's
+`gradle.properties` carries the same `version=` (`./gradlew checkVersions`; set it with
+`./gradlew syncVersion -PmodVersion=x.y.z`).
+
+## Releasing
+
+CI (`.github/workflows/ci.yml`) builds all 8 jars on every push to `main`. Publishing to Modrinth and CurseForge is
+`.github/workflows/publish.yml`, run by hand (`version`, `dry_run`) or by a `v*.*.*` tag; it never runs on a plain
+push. It refuses a second release of the mod on the same day (Africa/Tunis), and fails unless exactly the 8 jars
+are found. It needs the secrets `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`, `CURSEFORGE_API_KEY` and the variables
+`MODRINTH_ID`, `CURSEFORGE_ID`.
 
 ## Tools
 

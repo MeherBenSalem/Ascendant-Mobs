@@ -7,7 +7,9 @@ Listing copy and artwork for CurseForge and Modrinth. Nothing here ships in the 
 | File | Use |
 | --- | --- |
 | [`curseforge/description.md`](curseforge/description.md) | Full project description (Markdown; also works on Modrinth) |
-| [`curseforge/summary.txt`](curseforge/summary.txt) | Short project summary (231 characters) |
+| [`curseforge/summary.txt`](curseforge/summary.txt) | Short project summary (143 characters) |
+| [`modrinth/description.md`](modrinth/description.md) | Modrinth description, made from the CurseForge copy by `python3 tools/make_modrinth_md.py .` (screenshots go in the Gallery tab) |
+| [`modrinth/summary.txt`](modrinth/summary.txt) | Modrinth summary (same text) |
 | [`../patchnotes/3.0.0.md`](../patchnotes/3.0.0.md) | File changelog for 3.0.0 |
 
 Image links in the description point at `raw.githubusercontent.com/MeherBenSalem/Ascendant-Mobs/main/marketing/images/...`, so they work once this folder is on `main`. To host on CurseForge instead, upload the images to the project gallery and replace each URL.
@@ -21,7 +23,10 @@ The project is still listed as RPG Mob Leveling System. Rename it to **Remnants:
 The supported versions are listed in exactly two places:
 
 1. `VERSIONS` at the top of [`source/render.cjs`](source/render.cjs). Add one line, for example `{ minecraft: '26.4', loaders: ['Fabric', 'NeoForge'] },`. The banner's loader pills and version line are built from it. Then rerun the script for `banner`.
-2. The table under **Downloads & Compatibility** in `curseforge/description.md`. Add one row.
+2. The table under **Downloads & Compatibility** in `curseforge/description.md`. Add one row, then run
+   `python3 tools/make_modrinth_md.py .` to refresh `modrinth/description.md`.
+
+Only the NightBeam convention's targets are listed: 1.20.1 (Fabric, Forge) and 1.21.1, 26.2, 26.3 (Fabric, NeoForge).
 
 No other copy or artwork names a Minecraft version. A new release name or number goes in `RELEASE` in `render.cjs` and in the first lines of the description.
 

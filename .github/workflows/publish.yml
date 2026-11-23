@@ -1,66 +1,119 @@
-# Upload Modrinth + CurseForge from prebuilt jars (releases/), a GitHub Release, or a Gradle build.
-# Prefer committing loader jars to releases/ so CI does not rebuild.
+# Publish Remnants: RPG Mobs to Modrinth + CurseForge (NightBeam convention).
 #
-# Publish ONLY Minecraft 26.3:
-#   gh workflow run publish.yml -f version=3.0.0 -f minecraft_version=26.3
+# Runs only by hand (workflow_dispatch) or on a v*.*.* tag; a push to main never releases anything.
+# Uses exactly the 8 convention jars for the version, in this order of sources:
+#   1. releases/remnant_mobs-<loader>-<minecraft>-<version>.jar committed to the repo,
+#   2. the jars attached to the GitHub Release v<version>,
+#   3. a build from source: ./gradlew buildAll (the workspaces must be at <version>).
+# The run fails unless all 8 are found: 1.20.1 Fabric + Forge; 1.21.1, 26.2 and 26.3 Fabric + NeoForge.
 #
-# All jars for a version:
-#   gh workflow run publish.yml -f version=3.0.0
+# Same-day guard (NightBeam convention): scripts/same_day_guard.mjs stops the run if this mod already had a
+# release today (Africa/Tunis day), on Modrinth, CurseForge or an earlier Publish run. A dry run only reports it.
+# It runs before building and again right before the upload, whatever the inputs below say.
+#
+# Repo secrets: MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY
+# Repo variables: MODRINTH_ID, CURSEFORGE_ID
+#
+# Prove it first:  gh workflow run publish.yml -f version=3.2.1 -f dry_run=true
+# Release:         gh workflow run publish.yml -f version=3.2.1   (or: git tag v3.2.1 && git push origin v3.2.1)
 
 name: Publish
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
       version:
-        description: Version (without v) matching jar names / GitHub Release
-        required: true
+        description: Version (without v) when not tagging; matches jar names / GitHub Release
+        required: false
       dry_run:
         description: Skip uploads if true
         required: false
         default: "false"
       curseforge_only:
-        description: Skip Modrinth (re-upload CurseForge only)
+        description: Skip Modrinth (re-upload CurseForge only; the same-day guard still applies)
         required: false
         default: "false"
       minecraft_version:
-        description: "Optional MC version filter (e.g. 26.3) — only upload matching jars"
+        description: "Optional: upload only this Minecraft version's jars (1.20.1, 1.21.1, 26.2 or 26.3); the same-day guard still applies"
         required: false
+
+# One Publish at a time per repo, so two runs can't both pass the same-day guard.
+concurrency:
+  group: publish-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
     steps:
       - uses: actions/checkout@v4
 
       - name: Resolve version
         id: ver
         shell: bash
-        run: echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          elif [[ -n "$VERSION_INPUT" ]]; then
+            echo "version=${VERSION_INPUT#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Provide a v*.*.* tag or workflow_dispatch version" >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test publisher scripts
+        run: node --test scripts/*.test.mjs
+
+      - name: Same-day guard
+        env:
+          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLISH_WORKFLOW: publish.yml
+          UPLOAD_STEP: Upload Modrinth + CurseForge
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/same_day_guard.mjs
 
       - name: Find prebuilt release jars
         id: prebuilt
         shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
+          set -euo pipefail
           mkdir -p dist
-          mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "remnant_mobs-*-${VERSION}.jar" \
-            ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
-            ! -name "*-dev.jar" ! -name "*-dev-shadow.jar" \
-            ! -name "*-common-*.jar" 2>/dev/null | sort)
-          if [ ${#JARS[@]} -gt 0 ]; then
+          # Only the 8 convention names are ever picked up; anything else for this version is ignored.
+          mapfile -t NAMES < <(python3 -c 'import sys; sys.path.insert(0, "scripts"); import check_targets as c; print("\n".join(sorted(c.expected_names(sys.argv[1]))))' "$VERSION")
+          found=0
+          for name in "${NAMES[@]}"; do
+            if [ -f "releases/$name" ]; then
+              cp -f "releases/$name" dist/
+              found=$((found + 1))
+            fi
+          done
+          if [ "$found" -gt 0 ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
-            cp -f "${JARS[@]}" dist/
-            printf 'Using prebuilt jars from releases/:\n'
-            printf '%s\n' "${JARS[@]}"
+            echo "Using $found prebuilt jar(s) from releases/"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "No releases/remnant_mobs-*-${VERSION}.jar — will try GitHub Release then Gradle"
+            echo "No convention jars for ${VERSION} in releases/; will try the GitHub Release, then build from source"
           fi
 
       - name: Download GitHub release jars
+        id: ghrelease
         if: steps.prebuilt.outputs.found != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,114 +122,88 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
+          patterns=()
+          while IFS= read -r name; do patterns+=(--pattern "$name"); done < <(python3 -c 'import sys; sys.path.insert(0, "scripts"); import check_targets as c; print("\n".join(sorted(c.expected_names(sys.argv[1]))))' "$VERSION")
           if gh release view "v${VERSION}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            gh release download "v${VERSION}" --repo "${{ github.repository }}" --dir dist --pattern 'remnant_mobs-*.jar' || true
+            gh release download "v${VERSION}" --repo "${{ github.repository }}" --dir dist --clobber "${patterns[@]}" || true
           fi
-          count=$(find dist -name 'remnant_mobs-*.jar' | wc -l)
-          echo "github_count=${count}" >> "$GITHUB_OUTPUT"
-          if [ "$count" -eq 0 ]; then
-            echo "No GitHub Release jars for v${VERSION}"
+          count=$(find dist -maxdepth 1 -name 'remnant_mobs-*.jar' | wc -l)
+          if [ "$count" -gt 0 ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Using $count jar(s) from GitHub Release v${VERSION}"
           else
-            ls -la dist/
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No GitHub Release jars for v${VERSION}; building from source"
           fi
 
+      # 21 stays JAVA_HOME (Gradle for 1.20.1/1.21.1); 17 is the 1.20.1 toolchain; the root build hands 26.x
+      # JAVA_HOME_25_X64.
       - uses: actions/setup-java@v4
-        if: steps.prebuilt.outputs.found != 'true'
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
         with:
           distribution: temurin
           java-version: |
             17
-            21
             25
+            21
 
       - uses: gradle/actions/setup-gradle@v4
-        if: steps.prebuilt.outputs.found != 'true'
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
 
-      - name: Build MultiLoader workspaces
-        if: steps.prebuilt.outputs.found != 'true'
+      - name: Build from source
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
         shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
-          if [ "$(find dist -name 'remnant_mobs-*.jar' | wc -l)" -gt 0 ]; then
-            echo "Skipping Gradle build; jars already in dist/"
-            exit 0
-          fi
-          MC_FILTER="${{ inputs.minecraft_version }}"
-          workspaces=()
-          if [ -n "$MC_FILTER" ]; then
-            workspaces=("$MC_FILTER")
-          else
-            workspaces=(1.20.1 1.21.1 26.1.2 26.2 26.3)
-          fi
-          built=0
-          for ws in "${workspaces[@]}"; do
-            if [ ! -f "$ws/gradlew" ] && [ ! -f "$ws/settings.gradle" ]; then
-              echo "Skipping missing workspace $ws"
-              continue
-            fi
-            echo "Building workspace $ws"
-            case "$ws" in
-              26.*) java_home="${JAVA_HOME_25_X64:-${JAVA_HOME_25_ARM64:-$JAVA_HOME}}" ;;
-              1.21.1) java_home="${JAVA_HOME_21_X64:-${JAVA_HOME_21_ARM64:-$JAVA_HOME}}" ;;
-              *) java_home="${JAVA_HOME_17_X64:-${JAVA_HOME_17_ARM64:-$JAVA_HOME}}" ;;
-            esac
-            (
-              export JAVA_HOME="$java_home"
-              export PATH="$JAVA_HOME/bin:$PATH"
-              cd "$ws"
-              chmod +x gradlew 2>/dev/null || true
-              ./gradlew build --no-daemon
-            )
-            built=1
-          done
-          if [ "$built" -eq 0 ]; then
-            echo "No Gradle workspace found to build" >&2
+          python3 scripts/check_targets.py workspaces
+          ws_version="$(python3 scripts/check_targets.py version)"
+          if [ "$ws_version" != "$VERSION" ]; then
+            echo "::error::The workspaces are at ${ws_version}, not ${VERSION}. Bump them first (./gradlew syncVersion -PmodVersion=${VERSION})."
             exit 1
           fi
+          chmod +x gradlew 1.20.1/gradlew 1.21.1/gradlew 26.2/gradlew 26.3/gradlew
+          ./gradlew buildAll --no-daemon
+          python3 scripts/check_targets.py jars --version "$VERSION" --dir releases --list-file built-jars.txt
+          mkdir -p dist
+          xargs -a built-jars.txt cp -f -t dist/
 
-      - name: Find release jars
+      - name: Verify release jars
         id: jars
         shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          MC_FILTER: ${{ inputs.minecraft_version }}
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
-          mapfile -t JARS < <(find dist -type f -name 'remnant_mobs-*.jar' \
-            ! -name '*-sources.jar' ! -name '*-javadoc.jar' \
-            ! -name '*-dev.jar' ! -name '*-common-*.jar' 2>/dev/null | sort)
-          if [ ${#JARS[@]} -eq 0 ]; then
-            mapfile -t JARS < <(find releases -maxdepth 1 -type f -name "remnant_mobs-*-${VERSION}.jar" \
-              ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
-              ! -name "*-common-*.jar" 2>/dev/null | sort)
-          fi
-          if [ ${#JARS[@]} -eq 0 ]; then
-            mapfile -t JARS < <(find . -type f -path "*/build/libs/remnant_mobs-*-${VERSION}.jar" \
-              ! -name "*-sources.jar" ! -name "*-javadoc.jar" \
-              ! -name "*-dev.jar" ! -name "*-dev-shadow.jar" \
-              ! -name "*-common-*.jar" | sort)
-          fi
-          if [ ${#JARS[@]} -eq 0 ]; then
-            echo "No remnant_mobs jars found for version ${VERSION}" >&2
-            exit 1
-          fi
-          MC_FILTER="${{ inputs.minecraft_version }}"
+          set -euo pipefail
+          # Exactly the 8 convention jars, one per loader + Minecraft pair, or the run stops here.
+          python3 scripts/check_targets.py jars --version "$VERSION" --dir dist --list-file jar-list.txt
+          mapfile -t JARS < jar-list.txt
           if [ -n "$MC_FILTER" ]; then
+            case "$MC_FILTER" in
+              1.20.1|1.21.1|26.2|26.3) ;;
+              *) echo "::error::minecraft_version must be 1.20.1, 1.21.1, 26.2 or 26.3, not ${MC_FILTER}"; exit 1 ;;
+            esac
             FILTERED=()
             for jar in "${JARS[@]}"; do
-              base=$(basename "$jar")
-              if echo "$base" | grep -qE "(^|-)${MC_FILTER}(-|$)"; then
+              if [[ "$(basename "$jar")" == remnant_mobs-*-"${MC_FILTER}"-"${VERSION}".jar ]]; then
                 FILTERED+=("$jar")
               fi
             done
-            if [ ${#FILTERED[@]} -eq 0 ]; then
-              echo "No jars matched minecraft_version filter ${MC_FILTER}" >&2
-              exit 1
-            fi
             JARS=("${FILTERED[@]}")
+            echo "Uploading only Minecraft ${MC_FILTER}:"
           fi
           printf '%s\n' "${JARS[@]}"
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "list<<$EOF" >> "$GITHUB_OUTPUT"
           printf '%s\n' "${JARS[@]}" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-release
+          path: dist/*.jar
 
       - name: Load release changelog
         id: notes
@@ -202,9 +229,17 @@ jobs:
           printf '%s\n' "$notes" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      - name: Same-day guard (again, right before upload)
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLISH_WORKFLOW: publish.yml
+          UPLOAD_STEP: Upload Modrinth + CurseForge
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/same_day_guard.mjs
 
       - name: Upload Modrinth + CurseForge
         if: ${{ inputs.dry_run != 'true' }}
@@ -245,6 +280,9 @@ jobs:
           for (const p of parsed) {
             if (!p.game) throw new Error('Cannot parse MC version from ' + p.name);
           }
+          // Fabric builds need Fabric API (Modrinth project P7dR8mSH, CurseForge slug fabric-api).
+          const modrinthDeps = (p) => (p.loader === 'fabric' ? [{ project_id: 'P7dR8mSH', dependency_type: 'required' }] : []);
+          const curseforgeRelations = (p) => (p.loader === 'fabric' ? { projects: [{ slug: 'fabric-api', type: 'requiredDependency' }] } : undefined);
 
           (async () => {
             if (!curseforgeOnly) {
@@ -253,7 +291,7 @@ jobs:
                   name: `Remnants: RPG Mobs ${version}`,
                   version_number: version,
                   changelog,
-                  dependencies: [],
+                  dependencies: modrinthDeps(p),
                   game_versions: [p.game],
                   version_type: 'release',
                   loaders: [p.loader],
@@ -346,6 +384,8 @@ jobs:
                 gameVersions: [clientId, serverId, loaderId, gameId],
                 releaseType: 'release',
               };
+              const relations = curseforgeRelations(p);
+              if (relations) meta.relations = relations;
               const cfForm = new FormData();
               cfForm.append('metadata', JSON.stringify(meta));
               cfForm.append('file', new Blob([fs.readFileSync(p.jar)]), p.name);

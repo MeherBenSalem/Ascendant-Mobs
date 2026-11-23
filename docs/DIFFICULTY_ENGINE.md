@@ -3,7 +3,9 @@
 Design for the 3.1 line: a world difficulty that rises with time, distance, depth and player power and drives the
 existing levels and ranks; event nights; player-side progression; and loot that scales with difficulty. Branch:
 `claude/difficulty-engine`. Status: **Phases 1–5 done: 1.20.1 (Fabric, Forge), 1.21.1 (Fabric, NeoForge), 26.1.2, 26.2 and 26.3 (Fabric,
-NeoForge, Forge)** (see [Status](#status) at the end).
+NeoForge, Forge)** (see [Status](#status) at the end). Since 23 Nov 2026 the repo follows the NightBeam convention:
+the 26.1.2 workspace and the Forge subprojects of 26.2 and 26.3 are removed, and the supported targets are 1.20.1
+(Fabric, Forge) and 1.21.1, 26.2, 26.3 (Fabric, NeoForge). The 26.1.2 and Forge 26.x notes below are history.
 
 The guiding rule: **extend what 3.0 already has instead of building a parallel system.** 3.0 already turns "how
 dangerous is this place" into a level (the *threat*), and level already drives rank odds. The difficulty engine

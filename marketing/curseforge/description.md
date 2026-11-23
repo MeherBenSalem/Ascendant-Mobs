@@ -190,7 +190,6 @@ Mob lists take entity ids (`minecraft:creeper`), tags (`#minecraft:skeletons`) o
 | --- | --- | --- | --- |
 | 1.20.1 | Fabric, Forge | 17+ | Fabric API (Fabric) |
 | 1.21.1 | Fabric, NeoForge | 21+ | Fabric API (Fabric) |
-| 26.1.2 | Fabric, NeoForge | 25+ | Fabric API (Fabric) |
 | 26.2 | Fabric, NeoForge | 25+ | Fabric API (Fabric) |
 | 26.3 | Fabric, NeoForge | 25+ | Fabric API (Fabric) |
 

@@ -1,7 +1,7 @@
 # Remnants: RPG Mobs: configuration reference
 
 Every option in every config file the mod writes, what it does in game, its default and the values it accepts.
-It applies to all five workspaces (1.20.1, 1.21.1, 26.1.2, 26.2, 26.3) and every loader (Fabric, Forge, NeoForge):
+It applies to all four workspaces (1.20.1, 1.21.1, 26.2, 26.3) and every loader (Fabric, Forge, NeoForge):
 the config code is the same in all of them (see [Version differences](#version-differences)).
 
 `ConfigDocsTest` in each workspace's `common` tests fails the build when a key in the code is missing here, when a key
@@ -638,16 +638,16 @@ What you see. Read only by your own game, so every player can set it their own w
 
 ## Version differences
 
-The ten files have the **same keys, defaults and ranges in every workspace** (1.20.1 Fabric/Forge, 1.21.1
-Fabric/NeoForge, 26.1.2, 26.2 and 26.3 Fabric/NeoForge/Forge): the config classes are the same code, and
+The ten files have the **same keys, defaults and ranges in every workspace** (1.20.1 Fabric/Forge, 1.21.1, 26.2
+and 26.3 Fabric/NeoForge): the config classes are the same code, and
 `ConfigDocsTest` checks this page against the files each workspace writes. What differs is how the game under them
 applies a few values:
 
-| | 1.20.1 | 1.21.1 | 26.1.2, 26.2, 26.3 |
+| | 1.20.1 | 1.21.1 | 26.2, 26.3 |
 | --- | --- | --- | --- |
 | In-game days (`days` factor, `time`, events, Hunter's Moon) | the Overworld's time of day | the same | the Overworld clock |
 | Attribute ids in `attributes[].attribute` | the game names them `generic.max_health`; both spellings work | `max_health`; both work | the same |
 | `infernal.fire_seconds` | rounded up to whole seconds | as written | as written |
 | `crushing.shield_seconds` | puts the shield on cooldown | the same | disables the shield (the game's own shield-disable, for that long) |
 | `frostbite.*` | Slowness and frost | the same | the same; from 26.4, the game's Freezing effect for `slowness_seconds` at `slowness_level` instead |
-| Difficulty meter (`meter.*`) | drawn with the HUD | the same | the same; on Forge 26.x as its own HUD layer |
+| Difficulty meter (`meter.*`) | drawn with the HUD | the same | the same |

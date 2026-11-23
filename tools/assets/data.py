@@ -33,7 +33,6 @@ _BG_OLD = f'{NS}:textures/gui/advancements/backgrounds/remnants.png'
 PROFILES = {
     '26.3': Profile('string', True, False, 'id', _BG_NEW, {'description': DESCRIPTION, 'min_format': 121, 'max_format': 121}),
     '26.2': Profile('string', True, False, 'id', _BG_NEW, {'pack_format': 34, 'description': DESCRIPTION}),
-    '26.1.2': Profile('string', True, False, 'id', _BG_NEW, {'pack_format': 34, 'description': DESCRIPTION}),
     '1.21.1': Profile('object', False, False, 'id', _BG_OLD, {'pack_format': 34, 'description': DESCRIPTION}),
     '1.20.1': Profile('object', False, True, 'item', _BG_OLD, {'pack_format': 15, 'description': DESCRIPTION}),
 }

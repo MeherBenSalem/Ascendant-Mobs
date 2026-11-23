@@ -61,7 +61,7 @@ if (-not $SkipBuild) {
         $null
     }
     if ($jdk25) {
-        foreach ($ws in @("26.1.2", "26.2", "26.3")) {
+        foreach ($ws in @("26.2", "26.3")) {
             Write-Host "Building $ws (NeoForge + Fabric)..." -ForegroundColor Cyan
             $env:JAVA_HOME = $jdk25
             $env:Path = "$jdk25\bin;" + $env:Path
