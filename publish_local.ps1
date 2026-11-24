@@ -1,5 +1,5 @@
 # Local build + GitHub release for Remnants: RPG Mobs (MultiLoader, repository Ascendant-Mobs).
-# Modrinth/CurseForge (upload-only, no CI build):
+# CurseForge (upload-only, no CI build):
 #   gh workflow run publish.yml --repo MeherBenSalem/Ascendant-Mobs -f version=X.Y.Z
 #
 # Usage:
@@ -118,5 +118,5 @@ Write-Host "Jars in dist/ ($($jars.Count)):" -ForegroundColor Cyan
 $jars | ForEach-Object { Write-Host "  $($_.Name)" }
 
 Write-Host ""
-Write-Host "Modrinth + CurseForge (local upload from dist/):" -ForegroundColor Yellow
+Write-Host "CurseForge (local upload from dist/):" -ForegroundColor Yellow
 Write-Host "  .\upload_local.ps1 -Version $Version"

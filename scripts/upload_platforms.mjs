@@ -1,10 +1,11 @@
 /**
- * Upload local dist/ jars to Modrinth + CurseForge (no GitHub Actions).
+ * Upload local dist/ jars to CurseForge (no GitHub Actions). NightBeam publishes to CurseForge only
+ * (since 24 Nov 2026); the existing Modrinth project stays up as it is but gets no new versions.
  * Tokens: env vars or NightBeam-Knowledge-Base/secrets/local.env
  *
  * Usage:
  *   node scripts/upload_platforms.mjs --version 3.0.0
- *   node scripts/upload_platforms.mjs --version 3.0.0 --curseforge-only
+ *   node scripts/upload_platforms.mjs --version 3.0.0 --dry-run
  */
 import fs from "fs";
 import path from "path";
@@ -14,7 +15,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
 
-const MODRINTH_ID = "4eSfhd3M";
 const CURSEFORGE_ID = "1088344";
 const MOD_TITLE = "Remnants: RPG Mobs";
 
@@ -42,12 +42,11 @@ async function loadEnv() {
 }
 
 function parseArgs(argv) {
-  const out = { curseforgeOnly: false, dryRun: false };
+  const out = { dryRun: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--version") out.version = argv[++i];
     else if (a === "--changelog-file") out.changelogFile = argv[++i];
-    else if (a === "--curseforge-only") out.curseforgeOnly = true;
     else if (a === "--dry-run") out.dryRun = true;
     else throw new Error(`Unknown arg ${a}`);
   }
@@ -87,46 +86,12 @@ async function main() {
     if (!p.game) throw new Error(`Cannot parse MC version from ${p.name}`);
   }
 
-  const { MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY } = process.env;
-  if (!MODRINTH_TOKEN || !CURSEFORGE_TOKEN || !CURSEFORGE_API_KEY) {
-    throw new Error("Set MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (or secrets/local.env)");
+  const { CURSEFORGE_TOKEN, CURSEFORGE_API_KEY } = process.env;
+  if (!CURSEFORGE_TOKEN || !CURSEFORGE_API_KEY) {
+    throw new Error("Set CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (or secrets/local.env)");
   }
 
-  console.log(`Uploading ${MOD_TITLE} ${version} (${jars.length} jars) → Modrinth ${MODRINTH_ID}, CF ${CURSEFORGE_ID}`);
-
-  if (!args.curseforgeOnly) {
-    for (const p of parsed) {
-      const body = {
-        name: `${MOD_TITLE} ${version}`,
-        version_number: version,
-        changelog,
-        dependencies: [],
-        game_versions: [p.game],
-        version_type: "release",
-        loaders: [p.loader],
-        featured: false,
-        status: "listed",
-        project_id: MODRINTH_ID,
-        file_parts: ["file_0"],
-        primary_file: "file_0",
-      };
-      if (args.dryRun) {
-        console.log("[dry-run] Modrinth", p.name, body);
-        continue;
-      }
-      const form = new FormData();
-      form.append("data", JSON.stringify(body));
-      form.append("file_0", new Blob([fs.readFileSync(p.jar)]), p.name);
-      const mrRes = await fetch("https://api.modrinth.com/v2/version", {
-        method: "POST",
-        headers: { Authorization: MODRINTH_TOKEN },
-        body: form,
-      });
-      const mrText = await mrRes.text();
-      if (!mrRes.ok) throw new Error(`Modrinth ${mrRes.status} ${p.name} ${mrText.slice(0, 500)}`);
-      console.log("Modrinth OK", p.name);
-    }
-  }
+  console.log(`Uploading ${MOD_TITLE} ${version} (${jars.length} jars) → CurseForge ${CURSEFORGE_ID}`);
 
   const LOADER_IDS = { fabric: 7499, forge: 7498, neoforge: 10150 };
   const legacyRes = await fetch("https://minecraft.curseforge.com/api/game/versions", {

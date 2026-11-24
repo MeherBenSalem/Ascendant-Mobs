@@ -1,14 +1,13 @@
-# Upload dist/ jars to Modrinth + CurseForge locally (no GitHub Actions).
+# Upload dist/ jars to CurseForge locally (no GitHub Actions). NightBeam publishes to CurseForge only.
 # Tokens from env or C:\Users\Meher\Desktop\local.env (also NightBeam-Knowledge-Base/secrets/local.env)
 #
 # Usage:
 #   .\upload_local.ps1
 #   .\upload_local.ps1 -Version 3.0.0
-#   .\upload_local.ps1 -Version 3.0.0 -CurseForgeOnly
+#   .\upload_local.ps1 -Version 3.0.0 -DryRun
 
 param(
     [string]$Version = "3.0.0",
-    [switch]$CurseForgeOnly,
     [switch]$DryRun
 )
 
@@ -25,7 +24,6 @@ if (-not (Test-Path $notes)) {
 }
 
 $nodeArgs = @("scripts/upload_platforms.mjs", "--version", $Version, "--changelog-file", $notes)
-if ($CurseForgeOnly) { $nodeArgs += "--curseforge-only" }
 if ($DryRun) { $nodeArgs += "--dry-run" }
 
 Write-Host "=== Local upload Remnants: RPG Mobs v$Version ===" -ForegroundColor Green
@@ -34,5 +32,4 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ""
 Write-Host "Done. Verify:" -ForegroundColor Cyan
-Write-Host "  https://modrinth.com/mod/rpg-mob-leveling-system/versions"
 Write-Host "  https://www.curseforge.com/minecraft/mc-mods/rpg-mob-leveling-system/files"

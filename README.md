@@ -54,7 +54,7 @@ the server does the leveling and the client draws the plates.
   the meter, an easier early game)
 - [docs/API.md](docs/API.md): `RemnantMobsApi`, entity tags and modifier ids for other mods and datapacks
 - [PATCH_NOTES.md](PATCH_NOTES.md) and [patchnotes/3.0.0.md](patchnotes/3.0.0.md): what changed
-- [marketing/](marketing/): CurseForge and Modrinth page, summary and images
+- [marketing/](marketing/): CurseForge page, summary and images
 
 ## Building
 
@@ -73,11 +73,11 @@ Jars land in `<workspace>/<loader>/build/libs/remnant_mobs-<loader>-<minecraft>-
 
 ## Releasing
 
-CI (`.github/workflows/ci.yml`) builds all 8 jars on every push to `main`. Publishing to Modrinth and CurseForge is
+CI (`.github/workflows/ci.yml`) builds all 8 jars on every push to `main`. Publishing to CurseForge is
 `.github/workflows/publish.yml`, run by hand (`version`, `dry_run`) or by a `v*.*.*` tag; it never runs on a plain
 push. It refuses a second release of the mod on the same day (Africa/Tunis), and fails unless exactly the 8 jars
-are found. It needs the secrets `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`, `CURSEFORGE_API_KEY` and the variables
-`MODRINTH_ID`, `CURSEFORGE_ID`.
+are found. It needs the secrets `CURSEFORGE_TOKEN` (upload token) and `CURSEFORGE_API_KEY` (Core API key) and the
+variable `CURSEFORGE_ID`. NightBeam publishes to CurseForge only; the Modrinth page stays up but gets no new versions.
 
 ## Tools
 

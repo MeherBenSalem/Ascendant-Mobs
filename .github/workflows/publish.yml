@@ -1,4 +1,4 @@
-# Publish Remnants: RPG Mobs to Modrinth + CurseForge (NightBeam convention).
+# Publish Remnants: RPG Mobs to CurseForge (NightBeam convention: CurseForge only since 24 Nov 2026).
 #
 # Runs only by hand (workflow_dispatch) or on a v*.*.* tag; a push to main never releases anything.
 # Uses exactly the 8 convention jars for the version, in this order of sources:
@@ -8,11 +8,12 @@
 # The run fails unless all 8 are found: 1.20.1 Fabric + Forge; 1.21.1, 26.2 and 26.3 Fabric + NeoForge.
 #
 # Same-day guard (NightBeam convention): scripts/same_day_guard.mjs stops the run if this mod already had a
-# release today (Africa/Tunis day), on Modrinth, CurseForge or an earlier Publish run. A dry run only reports it.
+# release today (Africa/Tunis day), on CurseForge or in an earlier Publish run. A dry run only reports it.
 # It runs before building and again right before the upload, whatever the inputs below say.
 #
-# Repo secrets: MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY
-# Repo variables: MODRINTH_ID, CURSEFORGE_ID
+# Repo secrets: CURSEFORGE_TOKEN (upload token), CURSEFORGE_API_KEY (Core API key, for the same-day guard)
+# Repo variable: CURSEFORGE_ID
+# The existing Modrinth project stays up as it is but gets no new versions.
 #
 # Prove it first:  gh workflow run publish.yml -f version=3.2.1 -f dry_run=true
 # Release:         gh workflow run publish.yml -f version=3.2.1   (or: git tag v3.2.1 && git push origin v3.2.1)
@@ -30,10 +31,6 @@ on:
         required: false
       dry_run:
         description: Skip uploads if true
-        required: false
-        default: "false"
-      curseforge_only:
-        description: Skip Modrinth (re-upload CurseForge only; the same-day guard still applies)
         required: false
         default: "false"
       minecraft_version:
@@ -78,12 +75,11 @@ jobs:
 
       - name: Same-day guard
         env:
-          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
           CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           PUBLISH_WORKFLOW: publish.yml
-          UPLOAD_STEP: Upload Modrinth + CurseForge
+          UPLOAD_STEP: Upload CurseForge|Upload Modrinth + CurseForge
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/same_day_guard.mjs
 
@@ -232,37 +228,32 @@ jobs:
       - name: Same-day guard (again, right before upload)
         if: ${{ inputs.dry_run != 'true' }}
         env:
-          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
           CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           PUBLISH_WORKFLOW: publish.yml
-          UPLOAD_STEP: Upload Modrinth + CurseForge
+          UPLOAD_STEP: Upload CurseForge|Upload Modrinth + CurseForge
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/same_day_guard.mjs
 
-      - name: Upload Modrinth + CurseForge
+      - name: Upload CurseForge
         if: ${{ inputs.dry_run != 'true' }}
         env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
           CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
           VERSION: ${{ steps.ver.outputs.version }}
           JAR_LIST: ${{ steps.jars.outputs.list }}
-          CURSEFORGE_ONLY: ${{ inputs.curseforge_only }}
           CHANGELOG: ${{ steps.notes.outputs.changelog }}
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${MODRINTH_ID:-}" && test -n "${CURSEFORGE_ID:-}"
+          test -n "${CURSEFORGE_ID:-}" || { echo "Set the repo variable CURSEFORGE_ID" >&2; exit 1; }
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
           const version = process.env.VERSION;
           const changelog = process.env.CHANGELOG || `## Remnants: RPG Mobs ${version}\n\nSee GitHub release notes.`;
-          const curseforgeOnly = process.env.CURSEFORGE_ONLY === 'true';
           const jars = process.env.JAR_LIST.split(/\n/).map(s => s.trim()).filter(Boolean);
 
           function parseJar(jar) {
@@ -280,43 +271,10 @@ jobs:
           for (const p of parsed) {
             if (!p.game) throw new Error('Cannot parse MC version from ' + p.name);
           }
-          // Fabric builds need Fabric API (Modrinth project P7dR8mSH, CurseForge slug fabric-api).
-          const modrinthDeps = (p) => (p.loader === 'fabric' ? [{ project_id: 'P7dR8mSH', dependency_type: 'required' }] : []);
+          // Fabric builds need Fabric API (CurseForge slug fabric-api).
           const curseforgeRelations = (p) => (p.loader === 'fabric' ? { projects: [{ slug: 'fabric-api', type: 'requiredDependency' }] } : undefined);
 
           (async () => {
-            if (!curseforgeOnly) {
-              for (const p of parsed) {
-                const body = {
-                  name: `Remnants: RPG Mobs ${version}`,
-                  version_number: version,
-                  changelog,
-                  dependencies: modrinthDeps(p),
-                  game_versions: [p.game],
-                  version_type: 'release',
-                  loaders: [p.loader],
-                  featured: false,
-                  status: 'listed',
-                  project_id: process.env.MODRINTH_ID,
-                  file_parts: ['file_0'],
-                  primary_file: 'file_0',
-                };
-                const form = new FormData();
-                form.append('data', JSON.stringify(body));
-                form.append('file_0', new Blob([fs.readFileSync(p.jar)]), p.name);
-                const mrRes = await fetch('https://api.modrinth.com/v2/version', {
-                  method: 'POST',
-                  headers: { Authorization: process.env.MODRINTH_TOKEN },
-                  body: form,
-                });
-                const mrText = await mrRes.text();
-                if (!mrRes.ok) throw new Error('Modrinth ' + mrRes.status + ' ' + p.name + ' ' + mrText.slice(0, 500));
-                console.log('Modrinth OK', p.name);
-              }
-            } else {
-              console.log('Skipping Modrinth (curseforge_only=true)');
-            }
-
             const LOADER_IDS = { fabric: 7499, forge: 7498, neoforge: 10150 };
             const legacyRes = await fetch('https://minecraft.curseforge.com/api/game/versions', {
               headers: { 'X-Api-Token': process.env.CURSEFORGE_TOKEN },
